@@ -1,7 +1,7 @@
 # Img_retrival
 
 ## Setup Env:
-* Create a virtual environment or activate an existing virtual environment on your machine.
+* Create a virtual environment or activate an existing virtual environment on your computer.
 * Then, execute the following 2 commands:
   ```
   !pip pip install ftfy regex tqdm
