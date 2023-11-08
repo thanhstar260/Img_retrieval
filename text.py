@@ -32,8 +32,11 @@ print(len(image_path))
 
 # LOAD MODEL
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print("Device:", device)
+
 model, preprocess = clip.load("ViT-B/32")
-model.cuda().eval()
+model.to(device).eval()
 
 
 text = "two polices stand near a car" 

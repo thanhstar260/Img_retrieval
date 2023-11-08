@@ -32,31 +32,29 @@ print(len(image_paths))
 
 # LOAD MODEL
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print("Device:", device)
+
 model, preprocess = clip.load("ViT-B/32")
-model.cuda().eval()
+model.to(device).eval()
 
 image_paths_query = r"C:\Users\admin\Projects\AIC\DATA\Keyframes\Keyframes_L01\L01_V002\0019.jpg"
 image_query = Image.open(image_paths_query)
 
-image_query = preprocess(image_query) # SHAPE(3,224,224)
+image_query = preprocess(image_query).to(device)
 print(image_query.shape)
 
-image_query = torch.unsqueeze(image_query, 0).cuda() # SHAPE(1,3,224,224)
-# print(image.shape)
-
-# image_input = torch.tensor(np.stack(image)).cuda()
+image_query = torch.unsqueeze(image_query, 0)
 print(image_query.shape)
+
 with torch.no_grad():
     image_features_query = model.encode_image(image_query).float()
 image_features_query /= image_features_query.norm(dim=-1, keepdim=True)
-# SHAPE(1,512)
 
-print("clip_feature: ",clip_feature.shape) # SHAPE(25032,512)
-print("image_feature: ",image_features_query.shape) 
+print("clip_feature: ", clip_feature.shape)
+print("image_feature: ", image_features_query.shape)
 
-
-# CALCULATE DISTANCE
-distance = np.linalg.norm(clip_feature - image_features_query.cpu().numpy(),axis = 1 )
+distance = np.linalg.norm(clip_feature - image_features_query.cpu().numpy(), axis=1)
 print(distance.shape)
 
 

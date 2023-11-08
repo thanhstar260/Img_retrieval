@@ -5,8 +5,6 @@ import clip
 import os
 import skimage
 import matplotlib.pyplot as plt
-import torch.nn.functional as F
-import matplotlib.pyplot as plt
 import json
 
 # LOAD CLIP_FEATURE
@@ -24,36 +22,67 @@ clip_feature = np.concatenate(array_list, axis=0)
 print(clip_feature.shape)
 
 # LOAD IMG_PATH
-image_path_dict = r"C:\Users\admin\Projects\AIC\feature.json"
+image_paths_dict = r"C:\Users\admin\Projects\AIC\feature.json"
 
 # Đọc nội dung từ tệp tin JSON và chuyển đổi thành từ điển
-with open(image_path_dict, "r") as json_file:
-    image_path = json.load(json_file)
-print(len(image_path))
+with open(image_paths_dict, "r") as json_file:
+    image_paths = json.load(json_file)
+print(len(image_paths))
 
 
 # LOAD MODEL
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print("Device:", device)
+
 model, preprocess = clip.load("ViT-B/32")
-model.cuda().eval()
+model.to(device).eval()
 
+image_paths_query = r"C:\Users\admin\Projects\AIC\DATA\Keyframes\Keyframes_L01\L01_V002\0019.jpg"
+image_query = Image.open(image_paths_query)
 
-text = "two polices stand near a car" 
-# Keyframe = "L01_V001/0147.jpg"
-text_tokens = clip.tokenize([text]).cuda() # (1,77)
+image_query = preprocess(image_query).to(device)
+print(image_query.shape)
+
+image_query = torch.unsqueeze(image_query, 0)
+print(image_query.shape)
 
 with torch.no_grad():
-    text_features = model.encode_text(text_tokens).float() #(1,512)
+    image_features_query = model.encode_image(image_query).float()
+image_features_query /= image_features_query.norm(dim=-1, keepdim=True)
+
+print("clip_feature: ", clip_feature.shape)
+print("image_feature: ", image_features_query.shape)
+
+distance = np.linalg.norm(clip_feature - image_features_query.cpu().numpy(), axis=1)
+print(distance.shape)
 
 
-text_features /= text_features.norm(dim=-1, keepdim=True)
-print("clip_feature: ",clip_feature.shape) # SHAPE(246,512)
-print("image_feature: ",text_features.shape) 
+# SHOW RESULT
+k = 50
+ids = np.argsort(distance)[:k]
 
 
-# CALCULATE DISTANCE
-images = model.encode_text(text)
 
-# Hiển thị ảnh
-for image in images[:40]:
-    print(image)
+result = [(image_paths[str(id)],distance[id]) for id in ids]
+
+axes = []
+grid_size = k//8
+fig = plt.figure(figsize=(10,5))
+
+for id in range(k):
+    draw_image = result[id]
+    axes.append(fig.add_subplot(grid_size + 1, 8, id+1))
+    
+    axes[-1].set_title(draw_image[0][-17:-4])
+    axes[-1].set_xticks([])
+    axes[-1].set_yticks([])
+    plt.imshow(Image.open(draw_image[0]))
+
+
+fig.tight_layout()
+plt.show()
+
+
+
+
