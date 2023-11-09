@@ -22,7 +22,7 @@ clip_feature = np.concatenate(array_list, axis=0)
 print(clip_feature.shape)
 
 # LOAD IMG_PATH
-image_paths_dict = r"C:\Users\admin\Projects\AIC\feature.json"
+image_paths_dict = r"C:\Users\admin\Projects\AIC\new_features.json"
 
 # Đọc nội dung từ tệp tin JSON và chuyển đổi thành từ điển
 with open(image_paths_dict, "r") as json_file:

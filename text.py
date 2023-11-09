@@ -22,7 +22,7 @@ clip_feature = np.concatenate(array_list, axis=0)
 print(clip_feature.shape)
 
 # LOAD IMG_PATH
-image_path_dict = r"C:\Users\admin\Projects\AIC\feature.json"
+image_path_dict = r"C:\Users\admin\Projects\AIC\new_features.json"
 
 # Đọc nội dung từ tệp tin JSON và chuyển đổi thành từ điển
 with open(image_path_dict, "r") as json_file:
@@ -38,10 +38,9 @@ print("Device:", device)
 model, preprocess = clip.load("ViT-B/32")
 model.to(device).eval()
 
-
-text = "two polices stand near a car" 
+text = "a dolphin and pink ball" 
 # Keyframe = "L01_V001/0147.jpg"
-text_tokens = clip.tokenize([text]).cuda() # (1,77)
+text_tokens = clip.tokenize([text]).to(device)# (1,77)
 
 with torch.no_grad():
     text_features = model.encode_text(text_tokens).float() #(1,512)
@@ -72,8 +71,9 @@ fig = plt.figure(figsize=(10,5))
 for id in range(k):
     draw_image = result[id]
     axes.append(fig.add_subplot(grid_size + 1, 8, id+1))
-    
     axes[-1].set_title(draw_image[0][-17:-4])
+    axes[-1].set_xticks([])
+    axes[-1].set_yticks([])
     plt.imshow(Image.open(draw_image[0]))
 
 
