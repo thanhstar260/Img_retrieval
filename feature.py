@@ -3,9 +3,6 @@ import torch
 from PIL import Image
 import clip
 import os
-import skimage
-import matplotlib.pyplot as plt
-import torch.nn.functional as F
 import matplotlib.pyplot as plt
 import json
 

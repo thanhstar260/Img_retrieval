@@ -3,7 +3,6 @@ import torch
 from PIL import Image
 import clip
 import os
-import skimage
 import matplotlib.pyplot as plt
 import json
 
@@ -22,7 +21,7 @@ clip_feature = np.concatenate(array_list, axis=0)
 print(clip_feature.shape)
 
 # LOAD IMG_PATH
-image_path_dict = r"C:\Users\admin\Projects\AIC\new_features.json"
+image_path_dict = r"C:\Users\admin\Projects\AIC\image_path.json"
 
 # Đọc nội dung từ tệp tin JSON và chuyển đổi thành từ điển
 with open(image_path_dict, "r") as json_file:
@@ -85,7 +84,7 @@ print("Device:", device)
 model, preprocess = clip.load("ViT-B/32")
 model.to(device).eval()
 
-text = "a dolphin and pink ball" 
+text = "a Chinese chess board"
 K = 40
 
 result = text2img(model, text, K, device)
