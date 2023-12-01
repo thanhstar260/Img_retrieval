@@ -1,6 +1,7 @@
 /DATA/
 /CLIP_prefix_caption/
 feature.json
+new_features.json
 /.vscode/
 /cuda_conda/
 /CLIP/

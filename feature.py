@@ -3,9 +3,6 @@ import torch
 from PIL import Image
 import clip
 import os
-import skimage
-import matplotlib.pyplot as plt
-import torch.nn.functional as F
 import matplotlib.pyplot as plt
 import json
 
@@ -15,6 +12,7 @@ folder_path = r'C:\Users\admin\Projects\AIC\DATA\Keyframes'
 image_dict = {}
 
 index = 0
+folder_path = r"./DATA/Keyframes"
 for folder_name in os.listdir(folder_path):
     folder_dir = os.path.join(folder_path, folder_name)
     for sub_folder_name in os.listdir(folder_dir):
@@ -27,7 +25,8 @@ for folder_name in os.listdir(folder_path):
 # for key, value in image_dict.items():
 #     print(key, ":", value)
 
-with open('feature.json', 'w') as file:
+
+with open('feature1.json', 'w') as file:
     json.dump(image_dict, file)
 
 print("success!")
