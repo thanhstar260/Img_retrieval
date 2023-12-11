@@ -5,12 +5,12 @@ import torch
 
 # DEFINE PARAMETER
 
-feature_folder_path = r'C:\Users\admin\Projects\AIC\DATA\clip-features-vit-b32'
-image_path_dict = r"C:\Users\admin\Projects\AIC\image_path.json"
+feature_folder_path = r'.\DATA\clip-features-vit-b32'
+image_path_dict = r".\image_path.json"
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 K = 40
 
-img_query_path = r"C:\Users\admin\Projects\AIC\DATA\Keyframes\Keyframes_L01\L01_V002\0019.jpg"
+img_query_path = r".\DATA\Keyframes\Keyframes_L01\L01_V002\0019.jpg"
 text_query = "a dolphin and a pink ball"
 
 # LOAD CLIP_FEATURE
