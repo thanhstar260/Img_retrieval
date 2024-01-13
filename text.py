@@ -97,4 +97,4 @@ if __name__ == "__main__":
 
     # TEST Query
     result = text2img(model, text_query, K, device,vector_db)
-    visualize(result, K)
+    visualize(result, K,image_path=image_path)
