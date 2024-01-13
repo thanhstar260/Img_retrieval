@@ -27,7 +27,7 @@
         <input type="text" id="text_query_asr" name="text_query_asr" value="{{ request.form.get('text_query_asr', '') }}" autocomplete="off">
     
         <label for="k_value">K Value</label>
-        <input type="text" id="k_value" name="k_value" class="k-value-input" value="{% if request.form.get('k_value') %}{{ request.form.get('k_value') }}{% else %}50{% endif %}" autocomplete="off">
+        <input type="text" id="k_value" name="k_value" class="k-value-input" value="{% if request.form.get('k_value') %}{{ request.form.get('k_value') }}{% else %}40{% endif %}" autocomplete="off">
         
         <button type="submit">Search</button>
     </form>
@@ -36,7 +36,7 @@
         <div class="image-container">
             {% for item in result %}
                 <div class="image-item">
-                    <img src="/static/images/{{ item[0] }}" alt="{{ item[0] }}">
+                    <img src="/static/images/{{ item }}" alt="{{ item }}">
                 </div>
                 {% if loop.index % 8 == 0 %}
                     </div><div class="image-container">

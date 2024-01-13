@@ -4,58 +4,42 @@ from PIL import Image
 import clip
 import os
 import matplotlib.pyplot as plt
+import faiss
 import json
 
-# LOAD CLIP_FEATURE
-feature_folder_path = r'C:\Users\NHAN\AIC\Img_retrival\DATA\clip-features-vit-b32'
-
-array_list = []
-
-for file_name in os.listdir(feature_folder_path):
-    if file_name.endswith(".npy"):
-        file_path = os.path.join(feature_folder_path, file_name)
-        array = np.load(file_path)
-        array_list.append(array)
-
-clip_feature = np.concatenate(array_list, axis=0)
-# print(clip_feature.shape)
-
-# LOAD IMG_PATH
-image_paths_dict = r"C:\Users\NHAN\UIT_HK5\Truy_van_ttdpt\final_project\Img_retrieval\image_path.json"
-
-# Đọc nội dung từ tệp tin JSON và chuyển đổi thành từ điển
-with open(image_paths_dict, "r") as json_file:
-    image_paths = json.load(json_file)
-# print(len(image_paths))
+def create_faiss_index(vectors_db):
+    # Khởi tạo index faiss.
+    index = faiss.IndexFlatL2(vectors_db.shape[1])
+    # Thêm các vector vào index.
+    index.add(vectors_db)  
+    return index
+ 
+def find_k_nearest_neighbors(input_vector, vectors_db, k):
+  # Tính khoảng cách giữa input_vector và các vector trong index.
+  distances, indices = vectors_db.search(input_vector.reshape(1, -1), k)
+  return indices[0]
 
 
+def img2img(preprocess,model,img_query_path,k,device,vector_db):
+    image_path_dict = r"C:\Users\NHAN\UIT_HK5\Truy_van_ttdpt\final_project\Img_retrieval\image_path.json"
+    image_paths = load_image_path(image_path_dict)
 
-# Define func
-
-def img2img(preprocess,model,img_query_path,k,device):
-    k=int(k)
     image_query = Image.open(img_query_path)
     image_query = preprocess(image_query).to(device)
-    # print(image_query.shape)
     image_query = torch.unsqueeze(image_query, 0)
-    # print(image_query.shape)
+
     with torch.no_grad():
         image_features_query = model.encode_image(image_query).float()
     image_features_query /= image_features_query.norm(dim=-1, keepdim=True)
 
-    # print("clip_feature: ", clip_feature.shape)
-    # print("image_feature: ", image_features_query.shape)
+    ids_result = find_k_nearest_neighbors(image_features_query.cpu().numpy(),vector_db,k)
 
-    distance = np.linalg.norm(clip_feature - image_features_query.cpu().numpy(), axis=1)
-    # print(distance.shape)
-    ids = np.argsort(distance)[:k]
+    results = [image_paths[str(id)][17:] for id in ids_result]
 
-    result = [(image_paths[str(id)][17:],distance[id]) for id in ids]
-
-    return result
+    return results
 
 
-def visualize(result,k):
+def visualize(result, k, image_path):
     axes = []
     grid_size = k//8
     fig = plt.figure(figsize=(10,5))
@@ -63,26 +47,59 @@ def visualize(result,k):
     for id in range(k):
         draw_image = result[id]
         axes.append(fig.add_subplot(grid_size + 1, 8, id+1))
-        axes[-1].set_title(draw_image[0][-17:-4])
+        axes[-1].set_title(image_path[str(draw_image)][-17:-4])
         axes[-1].set_xticks([])
         axes[-1].set_yticks([])
-        plt.imshow(Image.open(draw_image[0]))
+        plt.imshow(Image.open(image_path[str(draw_image)]))
 
     fig.tight_layout()
     plt.show()
 
+def load_clip_feature(feature_folder_path):
+    array_list = []
 
-img_query_path = r"C:\Users\NHAN\AIC\Img_retrival\DATA\Keyframes\Keyframes_L01\L01_V002\0019.jpg"
+    for file_name in os.listdir(feature_folder_path):
+        if file_name.endswith(".npy"):
+            file_path = os.path.join(feature_folder_path, file_name)
+            array = np.load(file_path)
+            array_list.append(array)
 
-# LOAD MODEL
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-# print("Device:", device)
+    clip_feature = np.concatenate(array_list, axis=0)
 
-model, preprocess = clip.load("ViT-B/32")
-model.to(device).eval()
-
-K = 50
+    return clip_feature
 
 
-# result = img2img(preprocess,model,img_query_path,K,device)
-# visualize(result, K)
+def load_image_path(image_path_dict):
+    with open(image_path_dict, "r") as json_file:
+        image_path = json.load(json_file)
+    return image_path
+
+def load_model(device):
+    model, preprocess = clip.load("ViT-B/32")
+    model.to(device).eval()
+    return model,preprocess
+
+if __name__ == "__main__":
+
+    # DEFINE PARAMETER
+    img_query_path = r"C:\Users\admin\Projects\AIC\DATA\Keyframes\Keyframes_L01\L01_V002\0019.jpg"
+    feature_folder_path = r'C:\Users\NHAN\AIC\Img_retrival\DATA\clip-features-vit-b32'
+    image_path_dict = r"C:\Users\NHAN\UIT_HK5\Truy_van_ttdpt\final_project\Img_retrieval\image_path.json"
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    K = 40
+    
+    # LOAD CLIP_FEATURE
+    clip_feature = load_clip_feature(feature_folder_path)
+
+    # LOAD IMG_PATH
+    image_path = load_image_path(image_path_dict)
+
+    # LOAD MODEL
+    model,preprocess = load_model(device)
+
+    # CREATE FAISS INDEX
+    vector_db = create_faiss_index(clip_feature)
+
+    # TEST Query
+    result = img2img(preprocess,model,img_query_path,K,device,vector_db)
+    visualize(result, K)
