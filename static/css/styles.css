@@ -1,0 +1,126 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin-left: 3rem;
+    padding: 0;
+}
+
+h1 {
+    font-size: 40px;
+    text-align: center;
+    color: #428bca;
+    margin-top: 3rem;
+    margin-bottom: 3rem;
+}
+
+form {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+label {
+    color: #428bca;
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+input {
+    padding: 8px;
+    margin-right: 18px;
+    width: 250px; /* Adjust the width as needed */
+    /* box-sizing: border-box; */
+    border-radius: 10px;
+    border-color: #eee;
+}
+
+button {
+    padding: 8px;
+    background-color: #428bca;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-left: 30px;
+}
+
+button:hover {
+    background-color: #3071a9;
+}
+
+.image-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content:left;
+}
+
+.image-item {
+    margin: 5px;
+    text-align: center;
+    cursor: pointer;
+}
+
+img {
+    width: 160px;
+    /* height: 140px; */
+    border: 2px solid #ddd;
+}
+
+.distance {
+    margin-top: 5px;
+    font-size: 14px;
+    color: #777;
+}
+
+/* Additional styles for K value input */
+.k-value-container {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.k-value-input {
+    padding: 8px;
+    width: 100px; /* Adjust the width as needed */
+    box-sizing: border-box;
+}
+
+/* Add these styles to your existing CSS or in a <style> tag */
+.popup-container {
+    display:none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    justify-content: center;
+    /* align-items: center; */
+    z-index: 2;
+}
+
+.popup-content {
+    margin-top: 3rem;
+    max-width: 60%;
+    max-height: 60%;
+}
+
+.popup-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.image-container {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.image-item img {
+    max-width: 100%;
+    height: auto;
+}
+
+.popup-image-name{
+    color: #fff;
+    text-align: center;
+}

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="{{ url_for('static', filename='script/script.js') }}"></script>
+    <title>Image Retrieval</title>
+</head>
+<body>
+    <h1>Image Retrieval System</h1>
+
+    <!-- <form action="/retrieve_image" method="post">
+        <label for="image_query">Image</label>
+        <input type="text" id="image_query" name="image_query" required>
+        <button type="submit">Search</button>
+    </form> -->
+
+    <form action="/retrieve_text" method="post">
+        <label for="text_query">CLIP</label>
+        <input type="text" id="text_query" name="text_query" value="{{ request.form.get('text_query', '') }}" autocomplete="off">
+    
+        <label for="text_query_ocr">OCR</label>
+        <input type="text" id="text_query_ocr" name="text_query_ocr" value="{{ request.form.get('text_query_ocr', '') }}" autocomplete="off">
+    
+        <label for="text_query_asr">Image</label>
+        <input type="text" id="text_query_asr" name="text_query_asr" value="{{ request.form.get('text_query_asr', '') }}" autocomplete="off">
+    
+        <label for="k_value">K Value</label>
+        <input type="text" id="k_value" name="k_value" class="k-value-input" value="{% if request.form.get('k_value') %}{{ request.form.get('k_value') }}{% else %}50{% endif %}" autocomplete="off">
+        
+        <button type="submit">Search</button>
+    </form>
+
+    {% if result %}
+        <div class="image-container">
+            {% for item in result %}
+                <div class="image-item">
+                    <img src="/static/images/{{ item[0] }}" alt="{{ item[0] }}">
+                </div>
+                {% if loop.index % 8 == 0 %}
+                    </div><div class="image-container">
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="popup-container"></div>
+
+</body>
+</html>
