@@ -21,8 +21,6 @@ def find_k_nearest_neighbors(input_vector, vectors_db, k):
 
 
 def img2img(preprocess,model,img_query_path,k,device,vector_db):
-    image_path_dict = r"C:\Users\NHAN\UIT_HK5\Truy_van_ttdpt\final_project\Img_retrieval\image_path.json"
-    image_paths = load_image_path(image_path_dict)
 
     image_query = Image.open(img_query_path)
     image_query = preprocess(image_query).to(device)
@@ -34,9 +32,7 @@ def img2img(preprocess,model,img_query_path,k,device,vector_db):
 
     ids_result = find_k_nearest_neighbors(image_features_query.cpu().numpy(),vector_db,k)
 
-    results = [image_paths[str(id)][17:] for id in ids_result]
-
-    return results
+    return ids_result
 
 
 def visualize(result, k, image_path):

@@ -11,10 +11,14 @@ import urllib.parse
 app = Flask(__name__, static_folder='static')
 
 feature_folder_path = r'C:\Users\NHAN\AIC\Img_retrival\DATA\clip-features-vit-b32'
+image_path_dict = r"C:\Users\NHAN\UIT_HK5\Truy_van_ttdpt\final_project\Img_retrieval\image_path.json"
+    
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # LOAD CLIP_FEATURE
 clip_feature = load_clip_feature(feature_folder_path)
+
+image_paths = load_image_path(image_path_dict)
 
 # LOAD MODEL
 model,preprocess = load_model(device)
@@ -40,7 +44,8 @@ def retrieve_image():
     k_value = request.form['k_value']
     K_value = int(k_value) if k_value and k_value.isdigit() else 40
     result = image_retrieval(preprocess, model, img_query_path, K_value, device, vector_db)
-    return render_template('index.html', result=result)
+    results = [image_paths[str(id)][17:] for id in result]
+    return render_template('index.html', result=results)
 
 # Route for text retrieval
 @app.route('/retrieve_text', methods=['POST'])
@@ -50,7 +55,8 @@ def retrieve_text():
     k_value = request.form['k_value']
     K_value = int(k_value) if k_value and k_value.isdigit() else 40
     result = text_retrieval(model, text_query, K_value, device, vector_db)
-    return render_template('index.html', result=result)
+    results = [image_paths[str(id)][17:] for id in result]
+    return render_template('index.html', result=results)
 
 if __name__ == '__main__':
     app.run(debug=True)

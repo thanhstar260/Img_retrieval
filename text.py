@@ -22,8 +22,6 @@ def find_k_nearest_neighbors(input_vector, vectors_db, k):
 
 
 def text2img(model,text_query,k,device,vector_db):
-    image_path_dict = r"C:\Users\NHAN\UIT_HK5\Truy_van_ttdpt\final_project\Img_retrieval\image_path.json"
-    image_paths = load_image_path(image_path_dict)
 
     text_tokens = clip.tokenize([text_query]).to(device)# (1,77)
 
@@ -32,9 +30,8 @@ def text2img(model,text_query,k,device,vector_db):
     text_features /= text_features.norm(dim=-1, keepdim=True)
 
     ids_result = find_k_nearest_neighbors(text_features.cpu().numpy(),vector_db,k)
-    results = [image_paths[str(id)][17:] for id in ids_result]
 
-    return results
+    return ids_result
 
 def visualize(result,k,image_path):
     axes = []
