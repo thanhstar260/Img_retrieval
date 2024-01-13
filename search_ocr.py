@@ -45,7 +45,7 @@ if __name__ == "__main__":
     image_path_dict = r"C:\Users\admin\Projects\AIC\image_path.json"
     text_query = "giao hàng thiết bị điện"
     K = 16
-    client = meilisearch.Client('https://edge.meilisearch.com', 'bc61b7bb01eb45353ed231d2f88750729ddbbac9')
+    client = meilisearch.Client('https://edge.meilisearch.com', 'masterKey')
     image_path = load_image_path(image_path_dict)
 
     result = result_id(client,text_query=text_query,k=K)

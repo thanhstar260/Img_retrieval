@@ -1,6 +1,6 @@
 import meilisearch
 import json
-client = meilisearch.Client('https://edge.meilisearch.com', 'bc61b7bb01eb45353ed231d2f88750729ddbbac9')
+client = meilisearch.Client('https://edge.meilisearch.com', 'masterKey')
 
 # An index is where the documents are stored.
 
