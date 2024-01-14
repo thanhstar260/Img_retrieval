@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
     const imageItems = document.querySelectorAll(".image-item");
     const popupContainer = document.querySelector(".popup-container");
+    const thumbnailList = document.querySelector(".thumbnail-list");
     let currentImageIndex;
 
     imageItems.forEach((item, index) => {
@@ -18,38 +19,73 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
+    thumbnailList.addEventListener("click", function (event) {
+        if (event.target.tagName === "IMG") {
+            // Extract the index from the thumbnail's alt attribute
+            const index = parseInt(event.target.alt, 10);
+            navigateToThumbnail(index);
+        }
+    });
+
     function showPopup(imageUrl, imageName) {
         const popupContent = document.createElement("div");
         popupContent.className = "popup-content";
-
+    
         const popupImageName = document.createElement("p");
         popupImageName.innerText = imageName;
         popupImageName.className = "popup-image-name";
-
+    
         const popupImage = document.createElement("img");
         popupImage.src = imageUrl;
-        popupImage.alt = imageName;  // Set alt attribute to the image name
+        popupImage.alt = imageName;
         popupImage.className = "popup-image";
-
+    
+        const thumbnailListContainer = document.createElement("div");
+        thumbnailListContainer.className = "thumbnail-list-container";
+    
         popupContent.appendChild(popupImageName);
         popupContent.appendChild(popupImage);
-        popupContainer.innerHTML = ""; // This line may not be necessary
+        popupContent.appendChild(thumbnailListContainer); // Append the thumbnail list container
+    
+        popupContainer.innerHTML = "";
         popupContainer.appendChild(popupContent);
-
+    
         popupContainer.style.display = "flex";
-
+    
+        // Append the thumbnail list to the container
+        thumbnailListContainer.appendChild(thumbnailList);
+    
+        updateThumbnailList();
         // Remove existing event listener before adding a new one
         document.removeEventListener("keydown", navigateOnKeyPress);
-
+    
         // Add event listener for arrow key navigation
         document.addEventListener("keydown", navigateOnKeyPress);
-    }
+    }    
+    
 
     function hidePopup() {
         popupContainer.style.display = "none";
 
         // Remove event listener for arrow key navigation
         document.removeEventListener("keydown", navigateOnKeyPress);
+    }
+
+    function updateThumbnailList() {
+        // Clear existing thumbnails
+        thumbnailList.innerHTML = "";
+
+        // Display thumbnails for a larger range around the current image
+        for (let i = currentImageIndex - 3; i <= currentImageIndex + 3; i++) {
+            const index = (i + imageItems.length) % imageItems.length; // Ensure circular indexing
+            const thumbnailItem = document.createElement("div");
+            thumbnailItem.className = "thumbnail-item";
+            const thumbnailImage = document.createElement("img");
+            thumbnailImage.src = imageItems[index].querySelector("img").src;
+            thumbnailImage.alt = index.toString();  // Set alt attribute to the index
+            thumbnailItem.appendChild(thumbnailImage);
+            thumbnailList.appendChild(thumbnailItem);
+        }
     }
 
     function navigateOnKeyPress(event) {
@@ -78,15 +114,30 @@ document.addEventListener("DOMContentLoaded", function () {
         var nextImageName = getNextImageName(directory, nextNumber);
 
         // Check if the next image exists
-        if (!imageExists(nextImagePath)) {
-            // If the next image doesn't exist, do nothing and return
-            console.warn("Next image does not exist. Keeping the current image.");
-            return;
+        if (imageExists(nextImagePath)) {
+            document.querySelector(".popup-image").src = nextImagePath;
+            document.querySelector(".popup-image-name").innerText = nextImageName;
+            currentImageIndex = (currentImageIndex + direction + imageItems.length) % imageItems.length; // Ensure circular indexing
+            updateThumbnailList();
         }
+    }
 
-        // Update the popup with the next image
-        document.querySelector(".popup-image").src = nextImagePath;
-        document.querySelector(".popup-image-name").innerText = nextImageName;
+    function navigateToThumbnail(index) {
+        // Navigate to the selected thumbnail image
+        const thumbnailImagePath = imageItems[index].querySelector("img").src;
+        const thumbnailImageName = imageItems[index].querySelector("img").alt;
+
+        document.querySelector(".popup-image").src = thumbnailImagePath;
+        document.querySelector(".popup-image-name").innerText = thumbnailImageName;
+        currentImageIndex = index;
+        updateThumbnailList();
+    }
+
+    function imageExists(imagePath) {
+        const http = new XMLHttpRequest();
+        http.open('HEAD', imagePath, false);
+        http.send();
+        return http.status !== 404;
     }
 
     function getNextImagePath(directory, nextNumber) {
@@ -102,13 +153,5 @@ document.addEventListener("DOMContentLoaded", function () {
     function getNextImageName(directory, nextNumber) {
         var name = getNextImagePath(directory, nextNumber);
         return name.slice(36)
-    }
-
-    // Function to check if an image exists
-    function imageExists(imagePath) {
-        var http = new XMLHttpRequest();
-        http.open('HEAD', imagePath, false);
-        http.send();
-        return http.status !== 404;
     }
 });

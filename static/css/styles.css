@@ -63,7 +63,7 @@ button:hover {
 img {
     width: 160px;
     /* height: 140px; */
-    border: 2px solid #ddd;
+    /* border: 2px solid #ddd; */
 }
 
 .distance {
@@ -123,4 +123,25 @@ img {
 .popup-image-name{
     color: #fff;
     text-align: center;
+}
+
+.thumbnail-list {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.thumbnail-item {
+    margin: 0 5px;
+    cursor: pointer;
+}
+
+.thumbnail-item img {
+    width: 150px; /* Adjust the width as needed */
+    height: auto;
+    /* border: 2px solid #ddd; */
+}
+
+.current-thumbnail {
+    border: 5px solid #4285f4; /* You can adjust the color as needed */
 }
