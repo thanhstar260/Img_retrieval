@@ -1,3 +1,4 @@
+# Test seach by text_ocr + meilisearch 
 import meilisearch
 import json
 from PIL import Image

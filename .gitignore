@@ -7,3 +7,4 @@ image_path.json
 /__pycache__/
 /cuda_conda/
 /CLIP/
+/static/
