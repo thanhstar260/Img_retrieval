@@ -2,19 +2,25 @@ from flask import Flask, render_template, request, send_from_directory
 from image import img2img as image_retrieval
 from text import load_clip_feature, load_image_path, load_model, create_faiss_index
 from text import text2img as text_retrieval
-from search_ocr import result_id
+from search_ocr import ocr_result
+from search_asr import asr_result
 import numpy as np
 import torch
 import clip
 import matplotlib.pyplot as plt
 import urllib.parse
 import meilisearch
+import json
 
 app = Flask(__name__, static_folder='static')
 
 feature_folder_path = r'C:\Users\NHAN\AIC\Img_retrival\DATA\clip-features-vit-b32'
 image_path_dict = r"C:\Users\NHAN\UIT_HK5\Truy_van_ttdpt\final_project\Img_retrieval\image_path.json"
+youtube_path_dict = r'C:\Users\NHAN\UIT_HK5\Truy_van_ttdpt\final_project\Img_retrieval\id2link.json'
 client = meilisearch.Client('https://edge.meilisearch.com', 'bc61b7bb01eb45353ed231d2f88750729ddbbac9')
+
+with open(youtube_path_dict, "r") as json_file:
+    youtube_path = json.load(json_file)
     
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -47,8 +53,9 @@ def retrieve_image():
     k_value = request.form['k_value']
     K_value = int(k_value) if k_value and k_value.isdigit() else 80
     result = image_retrieval(preprocess, model, img_query_path, K_value, device, vector_db)
-    results = [image_paths[str(id)] for id in result]
+    results = [(image_paths[str(id)], youtube_path[str(id)]) for id in result]
     return render_template('index.html', result=results)
+    
 
 # Route for text retrieval
 @app.route('/retrieve_text', methods=['POST'])
@@ -56,27 +63,34 @@ def retrieve_text():
     print(request.form)
     clip_query = request.form['text_query']
     ocr_query = request.form['text_query_ocr']
+    asr_query = request.form['text_query_asr']
     k_value = request.form['k_value']
     K_value = int(k_value) if k_value and k_value.isdigit() else 80
 
+    result_clip = []
+    result_ocr = []
+    result_asr = []
+
     if clip_query != '':
         result_clip = text_retrieval(model, clip_query, K_value, device, vector_db)
-        results_clip = [image_paths[str(id)] for id in result_clip]
-    else:
-        results_clip = []
 
     if ocr_query != '':
-        result_ocr = result_id(client,text_query=ocr_query,k=K_value)
-        results_ocr = [image_paths[str(id)] for id in result_ocr]
-    else:
-        results_ocr = []
+        result_ocr = ocr_result(client,text_query=ocr_query,k=K_value)
+        
 
-    if ((len(results_clip)!= 0) and (len(results_ocr)!= 0)):
-        results = results_ocr[:int(K_value/2)] + results_clip[:int(K_value/2)]
-    elif len(results_clip)!= 0:
-        results = results_clip
-    else:
-        results = results_ocr
+    if asr_query != '':
+        result_asr = asr_result(client,text_query=asr_query,k=K_value)
+
+    intersect_result = set(result_asr) & set(result_ocr) & set(result_clip)
+
+    if (len(intersect_result) < K_value):
+        intersect_result.update(result_asr[:int(K_value/3)])
+        intersect_result.update(result_ocr[:int(K_value/3)])
+        len_result = len(intersect_result)
+        intersect_result.update(result_clip[:K_value-len_result])
+
+    result = list(intersect_result)
+    results = [(image_paths[str(id)], youtube_path[str(id)]) for id in result]
 
     return render_template('index.html', result=results)
 

@@ -32,11 +32,12 @@
         <button type="submit">Search</button>
     </form>
 
+    <div class="container">
     {% if result %}
         <div class="image-container">
             {% for item in result %}
                 <div class="image-item">
-                    <img src="{{ item }}" alt="{{ item[15:] }}">
+                    <img src="{{ item[0] }}" alt="{{ item[0][15:] }}{{ item[1] }}">
                 </div>
                 {% if loop.index % 8 == 0 %}
                     </div><div class="image-container">
@@ -44,7 +45,7 @@
             {% endfor %}
         </div>
     {% endif %}
-
+    </div>
     <div class="popup-container"></div>
     <div class="thumbnail-list"></div>
 

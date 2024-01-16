@@ -1,3 +1,4 @@
+# Test seach by text_ocr + meilisearch 
 import meilisearch
 import json
 from PIL import Image
@@ -29,7 +30,7 @@ def load_image_path(image_path_dict):
         image_path = json.load(json_file)
     return image_path
 
-def result_id(client,text_query,k):
+def ocr_result(client,text_query,k):
 
     result = client.index("test").search(
         text_query,{"limit": k}
@@ -48,5 +49,5 @@ if __name__ == "__main__":
     client = meilisearch.Client('https://edge.meilisearch.com', 'bc61b7bb01eb45353ed231d2f88750729ddbbac9')
     image_path = load_image_path(image_path_dict)
 
-    result = result_id(client,text_query=text_query,k=K)
+    result = ocr_result(client,text_query=text_query,k=K)
     visualize(result, K,image_path=image_path)
