@@ -37,10 +37,11 @@ def asr_result(client,text_query,k):
     )["hits"]
     ids = []
     for result in results:
-        id = list(range(int(result["start"]),int(result["end"])))
+        id = list(range(int(result["start"]),int(result["end"])+1))
+        # print(id)
         ids.extend(id)
-    # print(ids)
-    return ids
+    print(len(ids))
+    return ids[:k]
 
 if __name__ == "__main__":
 
@@ -52,5 +53,5 @@ if __name__ == "__main__":
     client = meilisearch.Client('https://edge.meilisearch.com', 'bc61b7bb01eb45353ed231d2f88750729ddbbac9')
     image_path = load_image_path(image_path_dict)
 
-    result = result_id(client,text_query=text_query,k=K)
+    result = asr_result(client,text_query=text_query,k=K)
     visualize(result, K,image_path=image_path)

@@ -31,7 +31,7 @@ def text2img(model,text_query,k,device,vector_db):
 
     ids_result = find_k_nearest_neighbors(text_features.cpu().numpy(),vector_db,k)
 
-    return ids_result
+    return list(ids_result)
 
 def visualize(result,k,image_path):
     axes = []
@@ -77,10 +77,10 @@ def load_model(device):
 if __name__ == "__main__":
 
     # DEFINE PARAMETER
-    feature_folder_path = r'C:\Users\NHAN\AIC\Img_retrival\DATA\clip-features-vit-b32'
-    image_path_dict = r"C:\Users\NHAN\UIT_HK5\Truy_van_ttdpt\final_project\Img_retrieval\image_path.json"
+    feature_folder_path = r'.\DATA\clip-features-vit-b32'
+    image_path_dict = r".\image_path.json"
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    text_query = "a dog and a pink ball"
+    text_query = "a dolphin with a pink ball"
     K = 40
     
     # LOAD CLIP_FEATURE
@@ -97,5 +97,6 @@ if __name__ == "__main__":
 
     # TEST Query
     result = text2img(model, text_query, K, device,vector_db)
-    print(result)
+    # print(list(result)[:10])
+    # print(result)
     visualize(result, K, image_path)

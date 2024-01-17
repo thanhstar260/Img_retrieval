@@ -5,4 +5,5 @@ new_features.json
 /__pycache__/
 /cuda_conda/
 /CLIP/
+/Clip_caption_prefix/
 /static/
