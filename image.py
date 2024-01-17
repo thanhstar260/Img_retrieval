@@ -6,6 +6,9 @@ import os
 import matplotlib.pyplot as plt
 import faiss
 import json
+from PIL import Image
+import requests
+from io import BytesIO
 
 def create_faiss_index(vectors_db):
     # Khởi tạo index faiss.
@@ -20,9 +23,29 @@ def find_k_nearest_neighbors(input_vector, vectors_db, k):
   return indices[0]
 
 
-def img2img(preprocess,model,img_query_path,k,device,vector_db):
+# def img2img(preprocess,model,img_query_path,k,device,vector_db):
 
-    image_query = Image.open(img_query_path)
+#     image_query = Image.open(img_query_path)
+#     image_query = preprocess(image_query).to(device)
+#     image_query = torch.unsqueeze(image_query, 0)
+
+#     with torch.no_grad():
+#         image_features_query = model.encode_image(image_query).float()
+#     image_features_query /= image_features_query.norm(dim=-1, keepdim=True)
+
+#     ids_result = find_k_nearest_neighbors(image_features_query.cpu().numpy(),vector_db,k)
+
+#     return ids_result
+
+def img2img(preprocess, model, img_query_path, k, device, vector_db):
+    if img_query_path.startswith(('http://', 'https://')):
+        # Load image from URL
+        response = requests.get(img_query_path)
+        image_query = Image.open(BytesIO(response.content))
+    else:
+        # Load local image
+        image_query = Image.open(img_query_path)
+
     image_query = preprocess(image_query).to(device)
     image_query = torch.unsqueeze(image_query, 0)
 
@@ -30,7 +53,7 @@ def img2img(preprocess,model,img_query_path,k,device,vector_db):
         image_features_query = model.encode_image(image_query).float()
     image_features_query /= image_features_query.norm(dim=-1, keepdim=True)
 
-    ids_result = find_k_nearest_neighbors(image_features_query.cpu().numpy(),vector_db,k)
+    ids_result = find_k_nearest_neighbors(image_features_query.cpu().numpy(), vector_db, k)
 
     return ids_result
 
@@ -78,7 +101,7 @@ def load_model(device):
 if __name__ == "__main__":
 
     # DEFINE PARAMETER
-    img_query_path = r"C:\Users\admin\Projects\AIC\DATA\Keyframes\Keyframes_L01\L01_V002\0019.jpg"
+    img_query_path = r"C:\Users\NHAN\UIT_HK5\Truy_van_ttdpt\final_project\Img_retrieval\static\images\Keyframes_L02\L02_V001\0001.jpg"
     feature_folder_path = r'C:\Users\NHAN\AIC\Img_retrival\DATA\clip-features-vit-b32'
     image_path_dict = r"C:\Users\NHAN\UIT_HK5\Truy_van_ttdpt\final_project\Img_retrieval\image_path.json"
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

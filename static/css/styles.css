@@ -12,7 +12,7 @@ body {
 .container{
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
+    justify-content: center;
 }
 
 h1 {
@@ -38,7 +38,7 @@ label {
 input {
     padding: 10px;
     margin-right: 18px;
-    width: 280px; /* Adjust the width as needed */
+    width: 180px; /* Adjust the width as needed */
     /* box-sizing: border-box; */
     border-radius: 10px;
     border-color: #00509d;
@@ -63,10 +63,17 @@ button:hover {
     background-color: #3071a9;
 }
 
+.container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
 .image-container {
     display: flex;
     flex-wrap: wrap;
-    justify-content:left;
+    justify-items: left;
+    flex-direction: row;
 }
 
 .image-item {
@@ -125,10 +132,6 @@ img {
     object-fit: contain;
 }
 
-.image-container {
-    display: flex;
-    flex-wrap: wrap;
-}
 
 .image-item img {
     max-width: 100%;
@@ -171,7 +174,7 @@ img {
 }
 
 .youtube-icon{
-    width: 90px;
+    width: 80px;
     height: 45px;
     background-color: #fff;
     border-radius: 5px;
@@ -180,6 +183,12 @@ img {
 }
 
 .search-icon{
-    width: 45px;
+    width: 40px;
     cursor: pointer;
+}
+
+a:-webkit-any-link {
+    color: #00509d;
+    cursor: pointer;
+    text-decoration: none;
 }

@@ -8,13 +8,7 @@
     <title>Image Retrieval</title>
 </head>
 <body>
-    <h1>Image Retrieval System</h1>
-
-    <!-- <form action="/retrieve_image" method="post">
-        <label for="image_query">Image</label>
-        <input type="text" id="image_query" name="image_query" required>
-        <button type="submit">Search</button>
-    </form> -->
+    <h1><a href="/">Image Retrieval System</a></h1>
 
     <form action="/retrieve_text" method="post">
         <label for="text_query">CLIP</label>
@@ -25,6 +19,9 @@
     
         <label for="text_query_asr">ASR</label>
         <input type="text" id="text_query_asr" name="text_query_asr" value="{{ request.form.get('text_query_asr', '') }}" autocomplete="off">
+
+        <label for="image_query">Image</label>
+        <input type="text" id="image_query" name="image_query" value="{{ request.form.get('image_query', '') }}" autocomplete="off">
     
         <label for="k_value">K Value</label>
         <input type="text" id="k_value" name="k_value" class="k-value-input" value="{% if request.form.get('k_value') %}{{ request.form.get('k_value') }}{% else %}80{% endif %}" autocomplete="off">
@@ -46,6 +43,7 @@
         </div>
     {% endif %}
     </div>
+
     <div class="popup-container"></div>
     <div class="thumbnail-list"></div>
 

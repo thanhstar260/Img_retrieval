@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, send_from_directory
+from flask import Flask, render_template, request, send_from_directory, jsonify
 from image import img2img as image_retrieval
 from text import load_clip_feature, load_image_path, load_model, create_faiss_index
 from text import text2img as text_retrieval
@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import urllib.parse
 import meilisearch
 import json
+
 
 app = Flask(__name__, static_folder='static')
 
@@ -49,18 +50,34 @@ def index():
 # Route for image retrieval
 @app.route('/retrieve_image', methods=['POST'])
 def retrieve_image():
-    img_query_path = request.form['image_query']
-    k_value = request.form['k_value']
+    img_query_path = request.form.get('image_query')
+    k_value = request.form.get('k_value')
     K_value = int(k_value) if k_value and k_value.isdigit() else 80
-    result = image_retrieval(preprocess, model, img_query_path, K_value, device, vector_db)
-    results = [(image_paths[str(id)], youtube_path[str(id)]) for id in result]
-    return render_template('index.html', result=results)
+
+    try:
+        # Assuming image_retrieval function returns a list of image IDs
+        result = image_retrieval(preprocess, model, img_query_path, K_value, device, vector_db)
+        results = [(image_paths[str(id)], youtube_path[str(id)]) for id in result]
+
+        return jsonify({'result': results})
+    except Exception as e:
+        print(f"Error retrieving image: {e}")
+        return jsonify({'error': 'Internal Server Error'}), 500
     
 
 # Route for text retrieval
 @app.route('/retrieve_text', methods=['POST'])
 def retrieve_text():
     print(request.form)
+
+    img_query_path = request.form['image_query']
+    if img_query_path != '':
+        k_value = request.form['k_value']
+        K_value = int(k_value) if k_value and k_value.isdigit() else 80
+        result = image_retrieval(preprocess, model, img_query_path, K_value, device, vector_db)
+        results = [(image_paths[str(id)], youtube_path[str(id)]) for id in result]
+        return render_template('index.html', result=results)
+
     clip_query = request.form['text_query']
     ocr_query = request.form['text_query_ocr']
     asr_query = request.form['text_query_asr']
@@ -70,24 +87,53 @@ def retrieve_text():
     result_clip = []
     result_ocr = []
     result_asr = []
+    clip=False
+    ocr=False
+    asr=False
 
     if clip_query != '':
         result_clip = text_retrieval(model, clip_query, K_value, device, vector_db)
+        clip = True
 
     if ocr_query != '':
         result_ocr = ocr_result(client,text_query=ocr_query,k=K_value)
-        
+        ocr = True
 
     if asr_query != '':
         result_asr = asr_result(client,text_query=asr_query,k=K_value)
+        asr = True
 
     intersect_result = set(result_asr) & set(result_ocr) & set(result_clip)
 
     if (len(intersect_result) < K_value):
-        intersect_result.update(result_asr[:int(K_value/3)])
-        intersect_result.update(result_ocr[:int(K_value/3)])
-        len_result = len(intersect_result)
-        intersect_result.update(result_clip[:K_value-len_result])
+        if (clip and ocr and asr):
+            intersect_result.update(result_asr[:int(K_value/3)])
+            intersect_result.update(result_ocr[:int(K_value/3)])
+            len_result = len(intersect_result)
+            intersect_result.update(result_clip[:K_value-len_result])
+        elif (clip):
+            if (ocr):
+                intersect_result.update(result_ocr[:int(K_value/2)])
+                len_result = len(intersect_result)
+                intersect_result.update(result_clip[:K_value-len_result])
+            elif (asr):
+                intersect_result.update(result_asr[:int(K_value/2)])
+                len_result = len(intersect_result)
+                intersect_result.update(result_clip[:K_value-len_result])   
+            else:
+                len_result = len(intersect_result)
+                intersect_result.update(result_clip[:K_value-len_result])
+        elif (ocr):
+            if (asr):
+                intersect_result.update(result_asr[:int(K_value/2)])
+                len_result = len(intersect_result)
+                intersect_result.update(result_ocr[:K_value-len_result])   
+            else:
+                len_result = len(intersect_result)
+                intersect_result.update(result_ocr[:K_value-len_result])
+        else:
+            len_result = len(intersect_result)
+            intersect_result.update(result_asr[:K_value-len_result])
 
     result = list(intersect_result)
     results = [(image_paths[str(id)], youtube_path[str(id)]) for id in result]
