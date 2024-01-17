@@ -1,56 +1,30 @@
-# Test seach by text_ocr + meilisearch 
-import meilisearch
-import json
-from PIL import Image
-import os
-import matplotlib.pyplot as plt
+import pandas as pd
 import json
 
+# Định nghĩa biến path và đuôi file mới
+path_json = r"C:\Users\admin\Projects\AIC\image_path.json"
+path_csv = r"C:\Users\admin\Projects\AIC\data.csv"
 
-def visualize(result,k,image_path):
-    axes = []
-    grid_size = k//8
-    fig = plt.figure(figsize=(10,5))
+df = pd.read_csv(path_csv)
+values = df['new_idx'].tolist()
+with open(path_json) as json_file:
+    json_data = json.load(json_file)
+# keys = list(json_data.values())
+keys = df['link'].tolist()
+data = {}
 
-    for id in range(k):
-        draw_image = result[id]
-        axes.append(fig.add_subplot(grid_size + 1, 8, id+1))
-        axes[-1].set_title(image_path[str(draw_image)][-17:-4])
-        axes[-1].set_xticks([])
-        axes[-1].set_yticks([])
-        plt.imshow(Image.open(image_path[str(draw_image)]))
+print(len(keys))
+print(len(values))
 
+for i in range(len(keys)):
+    key = values[i]
+    value = keys[i]
+    data[key] = value
+    # data.append[result]
 
-    fig.tight_layout()
-    plt.show()
+print(len(data))
+with open("id2link.json", "w") as f:
+    json.dump(data, f)
 
-
-def load_image_path(image_path_dict):
-    with open(image_path_dict, "r") as json_file:
-        image_path = json.load(json_file)
-    return image_path
-
-def result_id(client,text_query,k):
-
-    results = client.index("asr").search(
-        text_query,{"limit": k}
-    )["hits"]
-    ids = []
-    for result in results:
-        id = list(range(int(result["start"]),int(result["end"])))
-        ids.extend(id)
-    print(ids)
-    return ids
-
-if __name__ == "__main__":
-
-    # DEFINE PARAMETER
-
-    image_path_dict = r"C:\Users\admin\Projects\AIC\image_path.json"
-    text_query = "chạm tay trong vòng cấm"
-    K = 40
-    client = meilisearch.Client('https://edge.meilisearch.com', 'bc61b7bb01eb45353ed231d2f88750729ddbbac9')
-    image_path = load_image_path(image_path_dict)
-
-    result = result_id(client,text_query=text_query,k=K)
-    visualize(result, K,image_path=image_path)
+# print(value[:10])
+# print(key[:10])
