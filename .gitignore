@@ -1,9 +1,8 @@
 /DATA/
-/CLIP_prefix_caption/
 feature.json
 new_features.json
 /.vscode/
 /__pycache__/
 /cuda_conda/
 /CLIP/
-/static/images/
+/static/

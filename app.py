@@ -14,9 +14,9 @@ import json
 
 app = Flask(__name__, static_folder='static')
 
-feature_folder_path = r'C:\Users\NHAN\AIC\Img_retrival\DATA\clip-features-vit-b32'
-image_path_dict = r"C:\Users\NHAN\UIT_HK5\Truy_van_ttdpt\final_project\Img_retrieval\image_path.json"
-youtube_path_dict = r'C:\Users\NHAN\UIT_HK5\Truy_van_ttdpt\final_project\Img_retrieval\id2link.json'
+feature_folder_path = r'.\DATA\clip-features-vit-b32'
+image_path_dict = r".\image_path.json"
+youtube_path_dict = r'.\id2link.json'
 client = meilisearch.Client('https://edge.meilisearch.com', 'bc61b7bb01eb45353ed231d2f88750729ddbbac9')
 
 with open(youtube_path_dict, "r") as json_file:
