@@ -31,7 +31,7 @@ def text2img(model,text_query,k,device,vector_db):
 
     ids_result = find_k_nearest_neighbors(text_features.cpu().numpy(),vector_db,k)
 
-    return ids_result
+    return list(ids_result)
 
 def visualize(result,k,image_path):
     axes = []
