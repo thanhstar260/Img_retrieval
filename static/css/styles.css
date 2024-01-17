@@ -1,0 +1,185 @@
+body {
+    font-family: Roboto, sans-serif;
+    background-color: #fff;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    justify-items: center;
+    align-items: center;
+}
+
+.container{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+h1 {
+    font-size: 40px;
+    text-align: center;
+    color: #00509d;
+    margin-top: 3rem;
+    margin-bottom: 2rem;
+}
+
+form {
+    margin-top: 20px;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+label {
+    color: #00509d;
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+input {
+    padding: 10px;
+    margin-right: 18px;
+    width: 280px; /* Adjust the width as needed */
+    /* box-sizing: border-box; */
+    border-radius: 10px;
+    border-color: #00509d;
+    box-shadow: none !important;
+}
+
+button {
+    padding: 12px;
+    padding-left: 20px;
+    padding-right: 20px;
+    background-color: #00509d;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-left: 30px;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+button:hover {
+    background-color: #3071a9;
+}
+
+.image-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content:left;
+}
+
+.image-item {
+    margin: 8px;
+    text-align: center;
+    cursor: pointer;
+}
+
+img {
+    width: 160px;
+    /* height: 140px; */
+    /* border: 2px solid #ddd; */
+}
+
+.distance {
+    margin-top: 5px;
+    font-size: 14px;
+    color: #777;
+}
+
+/* Additional styles for K value input */
+.k-value-container {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.k-value-input {
+    padding: 10px;
+    width: 70px; /* Adjust the width as needed */
+    box-sizing: border-box;
+}
+
+/* Add these styles to your existing CSS or in a <style> tag */
+.popup-container {
+    display:none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    justify-content: center;
+    /* align-items: center; */
+    z-index: 2;
+}
+
+.popup-content {
+    margin-top: 2rem;
+    max-width: 60%;
+    max-height: 60%;
+}
+
+.popup-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.image-container {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.image-item img {
+    max-width: 100%;
+    height: auto;
+}
+
+.popup-image-name{
+    color: #fff;
+    text-align: center;
+}
+
+.thumbnail-list {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.thumbnail-item {
+    margin: 0 5px;
+    cursor: pointer;
+}
+
+.thumbnail-item img {
+    width: 150px; /* Adjust the width as needed */
+    height: auto;
+    /* border: 2px solid #ddd; */
+}
+
+.current-thumbnail {
+    border: 5px solid #4285f4; /* You can adjust the color as needed */
+}
+
+.buttons{
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    justify-content: center;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.youtube-icon{
+    width: 90px;
+    height: 45px;
+    background-color: #fff;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 20px;
+}
+
+.search-icon{
+    width: 45px;
+    cursor: pointer;
+}

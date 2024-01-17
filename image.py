@@ -48,7 +48,6 @@ def visualize(result, k, image_path):
         axes[-1].set_yticks([])
         plt.imshow(Image.open(image_path[str(draw_image)]))
 
-
     fig.tight_layout()
     plt.show()
 
@@ -80,8 +79,8 @@ if __name__ == "__main__":
 
     # DEFINE PARAMETER
     img_query_path = r"C:\Users\admin\Projects\AIC\DATA\Keyframes\Keyframes_L01\L01_V002\0019.jpg"
-    feature_folder_path = r'C:\Users\admin\Projects\AIC\DATA\clip-features-vit-b32'
-    image_path_dict = r"C:\Users\admin\Projects\AIC\image_path.json"
+    feature_folder_path = r'C:\Users\NHAN\AIC\Img_retrival\DATA\clip-features-vit-b32'
+    image_path_dict = r"C:\Users\NHAN\UIT_HK5\Truy_van_ttdpt\final_project\Img_retrieval\image_path.json"
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     K = 40
     

@@ -77,8 +77,8 @@ def load_model(device):
 if __name__ == "__main__":
 
     # DEFINE PARAMETER
-    feature_folder_path = r'C:\Users\admin\Projects\AIC\DATA\clip-features-vit-b32'
-    image_path_dict = r"C:\Users\admin\Projects\AIC\image_path.json"
+    feature_folder_path = r'C:\Users\NHAN\AIC\Img_retrival\DATA\clip-features-vit-b32'
+    image_path_dict = r"C:\Users\NHAN\UIT_HK5\Truy_van_ttdpt\final_project\Img_retrieval\image_path.json"
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     text_query = "a dog and a pink ball"
     K = 40
@@ -97,4 +97,5 @@ if __name__ == "__main__":
 
     # TEST Query
     result = text2img(model, text_query, K, device,vector_db)
-    visualize(result, K,image_path=image_path)
+    print(result)
+    visualize(result, K, image_path)
