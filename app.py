@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, send_from_directory, jsonify
 from image import img2img as image_retrieval
 from text import load_clip_feature, load_image_path, load_model, create_faiss_index
 from text import text2img as text_retrieval
+from combine_results import combine_2results, combine_3results
 from search_ocr import ocr_result
 from search_asr import asr_result
 import numpy as np
@@ -103,39 +104,59 @@ def retrieve_text():
         result_asr = asr_result(client,text_query=asr_query,k=K_value)
         asr = True
 
-    intersect_result = set(result_asr) & set(result_ocr) & set(result_clip)
-
-    if (len(intersect_result) < K_value):
-        if (clip and ocr and asr):
-            intersect_result.update(result_asr[:int(K_value/3)])
-            intersect_result.update(result_ocr[:int(K_value/3)])
-            len_result = len(intersect_result)
-            intersect_result.update(result_clip[:K_value-len_result])
-        elif (clip):
-            if (ocr):
-                intersect_result.update(result_ocr[:int(K_value/2)])
-                len_result = len(intersect_result)
-                intersect_result.update(result_clip[:K_value-len_result])
-            elif (asr):
-                intersect_result.update(result_asr[:int(K_value/2)])
-                len_result = len(intersect_result)
-                intersect_result.update(result_clip[:K_value-len_result])   
-            else:
-                len_result = len(intersect_result)
-                intersect_result.update(result_clip[:K_value-len_result])
-        elif (ocr):
-            if (asr):
-                intersect_result.update(result_asr[:int(K_value/2)])
-                len_result = len(intersect_result)
-                intersect_result.update(result_ocr[:K_value-len_result])   
-            else:
-                len_result = len(intersect_result)
-                intersect_result.update(result_ocr[:K_value-len_result])
+    if (clip and ocr and asr):
+        result = combine_3results(result_clip, result_asr, result_ocr,  K_value)
+    elif (clip):
+        if (ocr):
+            result = combine_2results(result_clip, result_ocr, K_value)
+        elif (asr):
+            result = combine_2results(result_clip, result_asr, K_value)
         else:
-            len_result = len(intersect_result)
-            intersect_result.update(result_asr[:K_value-len_result])
+            result = result_clip
+    elif (ocr):
+        if (asr):
+            result = combine_2results(result_asr, result_ocr, K_value)
+        else:
+            result = result_ocr
+    else:
+        result = result_asr
+    print(result_clip)
+    print(result_ocr)
+    print(result_asr)
+    print(result)
 
-    result = list(intersect_result)
+    # intersect_result = [value for value in result_asr if value in result_ocr and value in result_clip]
+
+    # if (len(intersect_result) < K_value):
+    #     if (clip and ocr and asr):
+    #         intersect_result.extend(result_asr[:int(K_value/3)])
+    #         intersect_result.extend(result_ocr[:int(K_value/3)])
+    #         len_result = len(intersect_result)
+    #         intersect_result.extend(result_clip[:K_value-len_result])
+    #     elif (clip):
+    #         if (ocr):
+    #             intersect_result.extend(result_ocr[:int(K_value/2)])
+    #             len_result = len(intersect_result)
+    #             intersect_result.extend(result_clip[:K_value-len_result])
+    #         elif (asr):
+    #             intersect_result.extend(result_asr[:int(K_value/2)])
+    #             len_result = len(intersect_result)
+    #             intersect_result.extend(result_clip[:K_value-len_result])   
+    #         else:
+    #             len_result = len(intersect_result)
+    #             intersect_result.extend(result_clip[:K_value-len_result])
+    #     elif (ocr):
+    #         if (asr):
+    #             intersect_result.extend(result_asr[:int(K_value/2)])
+    #             len_result = len(intersect_result)
+    #             intersect_result.extend(result_ocr[:K_value-len_result])   
+    #         else:
+    #             len_result = len(intersect_result)
+    #             intersect_result.extend(result_ocr[:K_value-len_result])
+    #     else:
+    #         len_result = len(intersect_result)
+    #         intersect_result.extend(result_asr[:K_value-len_result])
+
     results = [(image_paths[str(id)], youtube_path[str(id)]) for id in result]
 
     return render_template('index.html', result=results)

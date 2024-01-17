@@ -39,8 +39,10 @@ def asr_result(client,text_query,k):
     for result in results:
         id = list(range(int(result["start"]),int(result["end"])+1))
         # print(id)
-        ids.extend(id)
-    print(len(ids))
+        # ids.extend(id)
+        # if len(ids) > k:
+        #     break
+    # print(len(ids))
     return ids[:k]
 
 if __name__ == "__main__":

@@ -51,14 +51,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const popupImage = document.createElement("img");
         popupImage.src = imageUrl;
-        popupImage.alt = imageName;
+        popupImage.alt = imageName + globalYoutubeLink;
         popupImage.className = "popup-image";
 
         popupContent.appendChild(popupImageName);
         popupContent.appendChild(popupImage);
 
         const buttonsContainer = document.createElement("div");
-        buttonsContainer.className = "buttons";
+        buttonsContainer.className = "buttons"; 
 
         // Add search button
         const searchIcon = document.createElement("img");
@@ -135,17 +135,41 @@ document.addEventListener("DOMContentLoaded", function () {
         var pathArray = currentPath.split('/');
         var filename = pathArray[pathArray.length - 1];
         var directory = pathArray.slice(0, -1).join('/');
-
+    
         var number = parseInt(filename, 10);
         var nextNumber = number + direction;
         var nextImagePath = getNextImagePath(directory, nextNumber);
         var nextImageName = getNextImageName(directory, nextNumber);
-
+    
         if (imageExists(nextImagePath)) {
-            document.querySelector(".popup-image").src = nextImagePath;
-            document.querySelector(".popup-image-name").innerText = nextImageName;
             currentImageIndex = (currentImageIndex + direction + imageItems.length) % imageItems.length;
+    
+            // Update global variables
+            currentImageUrl = nextImagePath;
+            const altText = imageItems[currentImageIndex].querySelector("img").alt;
+            globalYoutubeLink = parseAltText(altText);
+    
+            // Update the popup content
+            const popupImage = document.querySelector(".popup-image");
+            popupImage.src = currentImageUrl;
+            popupImage.alt = nextImageName + globalYoutubeLink; // Update alt attribute
+            document.querySelector(".popup-image-name").innerText = nextImageName;
+    
+            // Update YouTube link in the buttonsContainer
+            const buttonsContainer = document.querySelector(".buttons");
+            const youtubeIcon = buttonsContainer.querySelector(".youtube-icon");
+            youtubeIcon.removeEventListener("click", handleYoutubeIconClick); // Remove previous event listener
+            youtubeIcon.addEventListener("click", handleYoutubeIconClick); // Add new event listener
+    
             updateThumbnailList();
+        }
+    }    
+
+    function handleYoutubeIconClick() {
+        if (globalYoutubeLink) {
+            window.open(globalYoutubeLink, '_blank');
+        } else {
+            alert("No YouTube link available for this image.");
         }
     }
 
@@ -184,7 +208,7 @@ document.addEventListener("DOMContentLoaded", function () {
     function retrieveImage(query) {
         let route;
         route = '/retrieve_image';
-    
+
         fetch(route, {
             method: 'POST',
             headers: {
@@ -202,10 +226,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 // Create a new container to hold the updated results
                 const newResultsContainer = document.createElement('div');
                 newResultsContainer.className = 'container';
-    
+
                 const imageContainer = document.createElement('div');
                 imageContainer.className = 'image-container';
-    
+
                 data.result.forEach(item => {
                     const imageItem = document.createElement('div');
                     imageItem.className = 'image-item';
@@ -215,7 +239,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     imageItem.appendChild(image);
                     imageContainer.appendChild(imageItem);
                 });
-    
+
                 newResultsContainer.appendChild(imageContainer);
 
                 // Replace the existing container with the new one
@@ -224,10 +248,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 const Container = document.querySelector('.container');
                 Container.style.marginLeft = '2rem';
-    
+
                 // Reattach the event listeners to the new images
                 attachEventListeners();
-    
+
                 // Close the popup
                 hidePopup();
             }
@@ -236,10 +260,10 @@ document.addEventListener("DOMContentLoaded", function () {
             console.error('Error during AJAX request:', error);
         });
     }
-    
+
     function attachEventListeners() {
         const imageItems = document.querySelectorAll(".image-item");
-        
+
         imageItems.forEach((item, index) => {
             item.addEventListener("click", function () {
                 currentImageIndex = index;
@@ -252,5 +276,5 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         });
     }
-    
+
 });
