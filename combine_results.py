@@ -45,9 +45,9 @@ if __name__ == "__main__":
     w_B = 2
     w_C = 2
 
-    results3 = combine_3results(A, B, C, w_A=w_A, w_B=w_B, w_C=w_C,K = K)
+    # results3 = combine_3results(A, B, C, w_A=w_A, w_B=w_B, w_C=w_C,K = K)
     results2 = combine_2results(A, B, w_A=w_A, w_B=w_B,K = K)
 
-    print(results3)
+    # print(results3)
     print(results2)
 
