@@ -1,8 +1,7 @@
-# Test seach by text_ocr + meilisearch 
+# Test seach by text_asr + meilisearch 
 import meilisearch
 import json
 from PIL import Image
-import os
 import matplotlib.pyplot as plt
 import json
 
@@ -38,11 +37,7 @@ def asr_result(client,text_query,k):
     ids = []
     for result in results:
         id = list(range(int(result["start"]),int(result["end"])+1))
-        # print(id)
-        # ids.extend(id)
-        # if len(ids) > k:
-        #     break
-    # print(len(ids))
+        ids.extend(id)
     return ids[:k]
 
 if __name__ == "__main__":
