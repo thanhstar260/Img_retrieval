@@ -26,10 +26,8 @@ def combine_2results(A: list, B: list, K, w_A=1, w_B=2):
 
     length = len(A)
     for i in range(length):
-        if A[i] in results:  # Check if the key exists in the dictionary
-            results[A[i]] += (length - i) * w_A
-        if B[i] in results:  # Check if the key exists in the dictionary
-            results[B[i]] += (length - i) * w_B
+        results[A[i]] += (length - i) * w_A
+        results[B[i]] += (length - i) * w_B
 
     sorted_keys = sorted(results.keys(), key=lambda x: results[x], reverse=True)[:K]
     return sorted_keys 
@@ -39,7 +37,7 @@ def combine_2results(A: list, B: list, K, w_A=1, w_B=2):
 if __name__ == "__main__":
     A = [56322, 43428, 70170, 47095, 47153, 18796, 17983,  9812, 18247, 33156]
     B = [8417, 25886, 28266, 35556, 54410, 7841, 53380, 54821, 39382, 47879]
-    C = [3264, 61, 903, 1200, 175]
+    C = [8417, 25886, 28266, 35556, 54410, 7841, 53380, 54821, 39382, 47879]
     K = 5
     w_A = 1
     w_B = 2
