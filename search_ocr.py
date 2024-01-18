@@ -32,7 +32,7 @@ def load_image_path(image_path_dict):
 
 def ocr_result(client,text_query,k):
 
-    result = client.index("test").search(
+    result = client.index("ocr").search(
         text_query,{"limit": k}
     )["hits"]
 
