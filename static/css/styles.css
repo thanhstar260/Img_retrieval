@@ -147,6 +147,7 @@ img {
     display: flex;
     justify-content: center;
     margin-top: 20px;
+    align-items: center;
 }
 
 .thumbnail-item {
