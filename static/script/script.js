@@ -4,16 +4,16 @@ document.addEventListener("DOMContentLoaded", function () {
     const thumbnailList = document.querySelector(".thumbnail-list");
     let currentImageIndex;
     let currentImageUrl;
-    let globalYoutubeLink; // Declare the global variable
+    let globalYoutubeLink;
 
     imageItems.forEach((item, index) => {
         item.addEventListener("click", function () {
             currentImageIndex = index;
             const imageUrl = this.querySelector("img").src;
-            currentImageUrl = this.querySelector("img").src;
+            currentImageUrl = imageUrl; // Update currentImageUrl when an image is clicked
             const altText = this.querySelector("img").alt;
-            globalYoutubeLink = parseAltText(altText); // Set the global variable
-            const imageName = altText.replace(globalYoutubeLink, "").trim(); // Extract the image name
+            globalYoutubeLink = parseAltText(altText);
+            const imageName = altText.replace(globalYoutubeLink, "").trim();
             showPopup(imageUrl, imageName);
         });
     });
@@ -32,16 +32,13 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     function parseAltText(altText) {
-        // Use a regular expression to match the YouTube link
         const match = altText.match(/https:\/\/youtu\.be\/[\w-]+(\?.+)?/);
-
-        // Extract the YouTube link
         const youtubeLink = match ? match[0].trim() : null;
-
         return youtubeLink;
     }
 
     function showPopup(imageUrl, imageName) {
+        currentImageUrl = imageUrl; // Update currentImageUrl when showing the popup
         const popupContent = document.createElement("div");
         popupContent.className = "popup-content";
 
@@ -51,28 +48,26 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const popupImage = document.createElement("img");
         popupImage.src = imageUrl;
-        popupImage.alt = imageName + globalYoutubeLink;
+        popupImage.alt = imageName;
         popupImage.className = "popup-image";
 
         popupContent.appendChild(popupImageName);
         popupContent.appendChild(popupImage);
 
         const buttonsContainer = document.createElement("div");
-        buttonsContainer.className = "buttons"; 
+        buttonsContainer.className = "buttons";
 
-        // Add search button
         const searchIcon = document.createElement("img");
         searchIcon.src = "/static/icons/search_icon.svg"
         searchIcon.alt = "Search";
         searchIcon.className = "search-icon";
         searchIcon.addEventListener("click", function () {
-            // Add your search functionality here
-            retrieveImage(currentImageUrl)
+            retrieveImage(currentImageUrl); // Use currentImageUrl for search
         });
         buttonsContainer.appendChild(searchIcon);
 
         const youtubeIcon = document.createElement("img");
-        youtubeIcon.src = "/static/icons/youtube_icon.svg"; // Replace with the actual path to your YouTube icon
+        youtubeIcon.src = "/static/icons/youtube_icon.svg";
         youtubeIcon.alt = "YouTube Icon";
         youtubeIcon.className = "youtube-icon";
         youtubeIcon.addEventListener("click", function () {
@@ -108,15 +103,30 @@ document.addEventListener("DOMContentLoaded", function () {
     function updateThumbnailList() {
         thumbnailList.innerHTML = "";
 
-        for (let i = currentImageIndex - 3; i <= currentImageIndex + 3; i++) {
-            const index = (i + imageItems.length) % imageItems.length;
-            const thumbnailItem = document.createElement("div");
-            thumbnailItem.className = "thumbnail-item";
-            const thumbnailImage = document.createElement("img");
-            thumbnailImage.src = imageItems[index].querySelector("img").src;
-            thumbnailImage.alt = index.toString();
-            thumbnailItem.appendChild(thumbnailImage);
-            thumbnailList.appendChild(thumbnailItem);
+        const currentNumber = parseInt(currentImageUrl.split('/').pop().split('.')[0], 10);
+        const directory = currentImageUrl.substring(0, currentImageUrl.lastIndexOf("/"));
+
+        const maxIndex = currentNumber + 3;
+        const minIndex = Math.max(1, currentNumber - 3);
+
+        for (let i = minIndex; i <= maxIndex; i++) {
+            const paddedNumber = String(i).padStart(4, '0');
+            const imagePath = `${directory}/${paddedNumber}.jpg`;
+            if (imageExists(imagePath)) {
+                const thumbnailItem = document.createElement("div");
+                thumbnailItem.className = "thumbnail-item";
+                if (i === currentNumber) {
+                    thumbnailItem.classList.add("current-thumbnail"); // Add class to highlight current image
+                }
+                const thumbnailImage = document.createElement("img");
+                thumbnailImage.src = imagePath;
+                thumbnailImage.alt = getImageName(directory, paddedNumber); // Set alt to the correct format
+                thumbnailImage.addEventListener("click", function(event) {
+                    showPopup(event.target.src, event.target.alt); // Show the clicked image in the popup
+                });
+                thumbnailItem.appendChild(thumbnailImage);
+                thumbnailList.appendChild(thumbnailItem);
+            }
         }
     }
 
@@ -135,35 +145,32 @@ document.addEventListener("DOMContentLoaded", function () {
         var pathArray = currentPath.split('/');
         var filename = pathArray[pathArray.length - 1];
         var directory = pathArray.slice(0, -1).join('/');
-    
+
         var number = parseInt(filename, 10);
         var nextNumber = number + direction;
         var nextImagePath = getNextImagePath(directory, nextNumber);
         var nextImageName = getNextImageName(directory, nextNumber);
-    
+
         if (imageExists(nextImagePath)) {
             currentImageIndex = (currentImageIndex + direction + imageItems.length) % imageItems.length;
-    
-            // Update global variables
-            currentImageUrl = nextImagePath;
+
+            currentImageUrl = nextImagePath; // Update currentImageUrl when navigating
             const altText = imageItems[currentImageIndex].querySelector("img").alt;
             globalYoutubeLink = parseAltText(altText);
-    
-            // Update the popup content
+
             const popupImage = document.querySelector(".popup-image");
             popupImage.src = currentImageUrl;
-            popupImage.alt = nextImageName + globalYoutubeLink; // Update alt attribute
+            popupImage.alt = nextImageName + globalYoutubeLink;
             document.querySelector(".popup-image-name").innerText = nextImageName;
-    
-            // Update YouTube link in the buttonsContainer
+
             const buttonsContainer = document.querySelector(".buttons");
             const youtubeIcon = buttonsContainer.querySelector(".youtube-icon");
-            youtubeIcon.removeEventListener("click", handleYoutubeIconClick); // Remove previous event listener
-            youtubeIcon.addEventListener("click", handleYoutubeIconClick); // Add new event listener
-    
+            youtubeIcon.removeEventListener("click", handleYoutubeIconClick);
+            youtubeIcon.addEventListener("click", handleYoutubeIconClick);
+
             updateThumbnailList();
         }
-    }    
+    }
 
     function handleYoutubeIconClick() {
         if (globalYoutubeLink) {
@@ -177,6 +184,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const thumbnailImagePath = imageItems[index].querySelector("img").src;
         const thumbnailImageName = imageItems[index].querySelector("img").alt;
 
+        currentImageUrl = thumbnailImagePath; // Update currentImageUrl when navigating to a thumbnail
         document.querySelector(".popup-image").src = thumbnailImagePath;
         document.querySelector(".popup-image-name").innerText = thumbnailImageName;
         currentImageIndex = index;
@@ -205,6 +213,13 @@ document.addEventListener("DOMContentLoaded", function () {
         return name.slice(36);
     } 
 
+    function getImageName(directory, paddedNumber) {
+        const parts = directory.split('/');
+        const sequenceName = parts[parts.length - 2];
+        const versionNumber = parts[parts.length - 1];
+        return `${sequenceName}/${versionNumber}/${paddedNumber}.jpg`;
+    }   
+
     function retrieveImage(query) {
         let route;
         route = '/retrieve_image';
@@ -223,7 +238,6 @@ document.addEventListener("DOMContentLoaded", function () {
         .then(data => {
             console.log('Server response:', data);
             if (data.result) {
-                // Create a new container to hold the updated results
                 const newResultsContainer = document.createElement('div');
                 newResultsContainer.className = 'container';
 
@@ -241,18 +255,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
 
                 newResultsContainer.appendChild(imageContainer);
-
-                // Replace the existing container with the new one
                 const existingResultsContainer = document.querySelector('.container');
                 existingResultsContainer.replaceWith(newResultsContainer);
-
                 const Container = document.querySelector('.container');
                 Container.style.marginLeft = '2rem';
-
-                // Reattach the event listeners to the new images
                 attachEventListeners();
-
-                // Close the popup
                 hidePopup();
             }
         })
@@ -268,13 +275,12 @@ document.addEventListener("DOMContentLoaded", function () {
             item.addEventListener("click", function () {
                 currentImageIndex = index;
                 const imageUrl = this.querySelector("img").src;
-                currentImageUrl = this.querySelector("img").src;
+                currentImageUrl = imageUrl; // Update currentImageUrl when an image is clicked
                 const altText = this.querySelector("img").alt;
-                globalYoutubeLink = parseAltText(altText); // Set the global variable
-                const imageName = altText.replace(globalYoutubeLink, "").trim(); // Extract the image name
+                globalYoutubeLink = parseAltText(altText);
+                const imageName = altText.replace(globalYoutubeLink, "").trim();
                 showPopup(imageUrl, imageName);
             });
         });
     }
-
 });

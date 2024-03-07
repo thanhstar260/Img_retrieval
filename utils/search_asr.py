@@ -48,7 +48,10 @@ if __name__ == "__main__":
     text_query = "chạm tay trong vòng cấm"
     K = 40
     client = meilisearch.Client('https://ms-cd3d65ab69ae-7424.sgp.meilisearch.io', 'e17ddafe4eea648822355f14d326b3a478bd7141')
+<<<<<<< HEAD
 
+=======
+>>>>>>> 087f2ac992c246623901b2b39c659261c9298e4c
     image_path = load_image_path(image_path_dict)
 
     result = asr_result(client,text_query=text_query,k=K)

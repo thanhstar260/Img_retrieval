@@ -17,7 +17,6 @@ image_path_dict = r".\utils\image_path.json"
 youtube_path_dict = r'.\utils\id2link.json'
 client = meilisearch.Client('https://ms-cd3d65ab69ae-7424.sgp.meilisearch.io', 'e17ddafe4eea648822355f14d326b3a478bd7141')
 
-
 with open(youtube_path_dict, "r") as json_file:
     youtube_path = json.load(json_file)
     
