@@ -77,7 +77,7 @@ def load_model(device):
 if __name__ == "__main__":
 
     # DEFINE PARAMETER
-    feature_folder_path = r'.\DATA\clip-features-vit-b32'
+    feature_folder_path = r'..\DATA\clip-features-vit-b32'
     image_path_dict = r".\image_path.json"
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     text_query = "a dolphin with a pink ball"

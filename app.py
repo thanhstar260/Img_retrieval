@@ -1,15 +1,11 @@
 from flask import Flask, render_template, request, send_from_directory, jsonify
-from image import img2img as image_retrieval
-from text import load_clip_feature, load_image_path, load_model, create_faiss_index
-from text import text2img as text_retrieval
-from combine_results import combine_2results, combine_3results
-from search_ocr import ocr_result
-from search_asr import asr_result
-import numpy as np
+from utils.image import img2img as image_retrieval
+from utils.text import load_clip_feature, load_image_path, load_model, create_faiss_index
+from utils.text import text2img as text_retrieval
+from utils.combine_results import combine_2results, combine_3results
+from utils.search_ocr import ocr_result
+from utils.search_asr import asr_result 
 import torch
-import clip
-import matplotlib.pyplot as plt
-import urllib.parse
 import meilisearch
 import json
 
@@ -17,9 +13,10 @@ import json
 app = Flask(__name__, static_folder='static')
 
 feature_folder_path = r'.\DATA\clip-features-vit-b32'
-image_path_dict = r".\image_path.json"
-youtube_path_dict = r'.\id2link.json'
-client = meilisearch.Client('https://edge.meilisearch.com', 'bc61b7bb01eb45353ed231d2f88750729ddbbac9')
+image_path_dict = r".\utils\image_path.json"
+youtube_path_dict = r'.\utils\id2link.json'
+client = meilisearch.Client('https://ms-cd3d65ab69ae-7424.sgp.meilisearch.io', 'e17ddafe4eea648822355f14d326b3a478bd7141')
+
 
 with open(youtube_path_dict, "r") as json_file:
     youtube_path = json.load(json_file)

@@ -101,9 +101,9 @@ def load_model(device):
 if __name__ == "__main__":
 
     # DEFINE PARAMETER
-    img_query_path = r"C:\Users\NHAN\UIT_HK5\Truy_van_ttdpt\final_project\Img_retrieval\static\images\Keyframes_L02\L02_V001\0001.jpg"
-    feature_folder_path = r'C:\Users\NHAN\AIC\Img_retrival\DATA\clip-features-vit-b32'
-    image_path_dict = r"C:\Users\NHAN\UIT_HK5\Truy_van_ttdpt\final_project\Img_retrieval\image_path.json"
+    img_query_path = r"..\static\images\Keyframes_L02\L02_V001\0001.jpg"
+    feature_folder_path = r'..\DATA\clip-features-vit-b32'
+    image_path_dict = r".\image_path.json"
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     K = 40
     

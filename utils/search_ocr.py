@@ -43,10 +43,11 @@ if __name__ == "__main__":
 
     # DEFINE PARAMETER
 
-    image_path_dict = r"C:\Users\NHAN\UIT_HK5\Truy_van_ttdpt\final_project\Img_retrieval\image_path.json"
+    image_path_dict = r".\image_path.json"
     text_query = "giao hàng thiết bị điện"
     K = 16
-    client = meilisearch.Client('https://edge.meilisearch.com', 'bc61b7bb01eb45353ed231d2f88750729ddbbac9')
+    client = meilisearch.Client('https://ms-cd3d65ab69ae-7424.sgp.meilisearch.io', 'e17ddafe4eea648822355f14d326b3a478bd7141')
+
     image_path = load_image_path(image_path_dict)
 
     result = ocr_result(client,text_query=text_query,k=K)
