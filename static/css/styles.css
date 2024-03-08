@@ -156,13 +156,14 @@ img {
 }
 
 .thumbnail-item img {
-    width: 150px; /* Adjust the width as needed */
+    width: 150px; 
     height: auto;
     /* border: 2px solid #ddd; */
 }
 
 .current-thumbnail {
-    border: 5px solid #4285f4; /* You can adjust the color as needed */
+    border: 5px solid #4285f4;
+    height: 84px;
 }
 
 .buttons{

@@ -4,16 +4,14 @@ document.addEventListener("DOMContentLoaded", function () {
     const thumbnailList = document.querySelector(".thumbnail-list");
     let currentImageIndex;
     let currentImageUrl;
-    let globalYoutubeLink;
+    let youtubeLinks;
 
     imageItems.forEach((item, index) => {
         item.addEventListener("click", function () {
             currentImageIndex = index;
             const imageUrl = this.querySelector("img").src;
             currentImageUrl = imageUrl; // Update currentImageUrl when an image is clicked
-            const altText = this.querySelector("img").alt;
-            globalYoutubeLink = parseAltText(altText);
-            const imageName = altText.replace(globalYoutubeLink, "").trim();
+            const imageName = this.querySelector("img").alt;;
             showPopup(imageUrl, imageName);
         });
     });
@@ -31,11 +29,16 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    function parseAltText(altText) {
-        const match = altText.match(/https:\/\/youtu\.be\/[\w-]+(\?.+)?/);
-        const youtubeLink = match ? match[0].trim() : null;
-        return youtubeLink;
-    }
+    fetch('./static/path2link.json')
+    .then(response => response.json())
+    .then(data => {
+        console.log(data)
+        console.log(Object.keys(data).length);
+        youtubeLinks = data;
+    })
+    .catch(error => {
+        console.error('Error loading the JSON file:', error);
+    });
 
     function showPopup(imageUrl, imageName) {
         currentImageUrl = imageUrl; // Update currentImageUrl when showing the popup
@@ -71,11 +74,7 @@ document.addEventListener("DOMContentLoaded", function () {
         youtubeIcon.alt = "YouTube Icon";
         youtubeIcon.className = "youtube-icon";
         youtubeIcon.addEventListener("click", function () {
-            if (globalYoutubeLink) {
-                window.open(globalYoutubeLink, '_blank');
-            } else {
-                alert("No YouTube link available for this image.");
-            }
+            handleYoutubeIconClick()
         });
         buttonsContainer.appendChild(youtubeIcon);
 
@@ -145,40 +144,30 @@ document.addEventListener("DOMContentLoaded", function () {
         var pathArray = currentPath.split('/');
         var filename = pathArray[pathArray.length - 1];
         var directory = pathArray.slice(0, -1).join('/');
-
+    
         var number = parseInt(filename, 10);
         var nextNumber = number + direction;
         var nextImagePath = getNextImagePath(directory, nextNumber);
-        var nextImageName = getNextImageName(directory, nextNumber);
-
+        var nextImageName = getImageName(directory, nextNumber);
+    
         if (imageExists(nextImagePath)) {
             currentImageIndex = (currentImageIndex + direction + imageItems.length) % imageItems.length;
-
+    
             currentImageUrl = nextImagePath; // Update currentImageUrl when navigating
-            const altText = imageItems[currentImageIndex].querySelector("img").alt;
-            globalYoutubeLink = parseAltText(altText);
-
+    
             const popupImage = document.querySelector(".popup-image");
             popupImage.src = currentImageUrl;
-            popupImage.alt = nextImageName + globalYoutubeLink;
+            popupImage.alt = nextImageName;
             document.querySelector(".popup-image-name").innerText = nextImageName;
-
+    
             const buttonsContainer = document.querySelector(".buttons");
             const youtubeIcon = buttonsContainer.querySelector(".youtube-icon");
             youtubeIcon.removeEventListener("click", handleYoutubeIconClick);
             youtubeIcon.addEventListener("click", handleYoutubeIconClick);
-
-            updateThumbnailList();
+    
+            updateThumbnailList(); // Update thumbnail list after navigating
         }
-    }
-
-    function handleYoutubeIconClick() {
-        if (globalYoutubeLink) {
-            window.open(globalYoutubeLink, '_blank');
-        } else {
-            alert("No YouTube link available for this image.");
-        }
-    }
+    }          
 
     function navigateToThumbnail(index) {
         const thumbnailImagePath = imageItems[index].querySelector("img").src;
@@ -189,6 +178,22 @@ document.addEventListener("DOMContentLoaded", function () {
         document.querySelector(".popup-image-name").innerText = thumbnailImageName;
         currentImageIndex = index;
         updateThumbnailList();
+    }
+
+    function handleYoutubeIconClick() {
+        const currentImageName = document.querySelector(".popup-image").alt;
+        console.log(currentImageName)
+        // Check if youtubeLinks is loaded
+        if (youtubeLinks) {
+            const youtubeLink = youtubeLinks[currentImageName];
+            if (youtubeLink) {
+                window.open(youtubeLink, '_blank');
+            } else {
+                console.error("YouTube link not found for the current image.");
+            }
+        } else {
+            console.error("YouTube links not loaded yet.");
+        }
     }
 
     function imageExists(imagePath) {
@@ -206,18 +211,15 @@ document.addEventListener("DOMContentLoaded", function () {
         } else {
             return directory + '/0' + nextNumber + '.jpg';
         }
-    }
-
-    function getNextImageName(directory, nextNumber) {
-        var name = getNextImagePath(directory, nextNumber);
-        return name.slice(36);
     } 
 
     function getImageName(directory, paddedNumber) {
         const parts = directory.split('/');
+        // console.log(parts)
         const sequenceName = parts[parts.length - 2];
         const versionNumber = parts[parts.length - 1];
-        return `${sequenceName}/${versionNumber}/${paddedNumber}.jpg`;
+        const number = String(paddedNumber).padStart(4, '0');
+        return `${sequenceName}/${versionNumber}/${number}.jpg`;
     }   
 
     function retrieveImage(query) {
@@ -248,8 +250,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     const imageItem = document.createElement('div');
                     imageItem.className = 'image-item';
                     const image = document.createElement('img');
-                    image.src = item[0];
-                    image.alt = item[0].slice(15) + item[1];
+                    image.src = item;
+                    image.alt = item.slice(16);
                     imageItem.appendChild(image);
                     imageContainer.appendChild(imageItem);
                 });
@@ -275,10 +277,9 @@ document.addEventListener("DOMContentLoaded", function () {
             item.addEventListener("click", function () {
                 currentImageIndex = index;
                 const imageUrl = this.querySelector("img").src;
-                currentImageUrl = imageUrl; // Update currentImageUrl when an image is clicked
-                const altText = this.querySelector("img").alt;
-                globalYoutubeLink = parseAltText(altText);
-                const imageName = altText.replace(globalYoutubeLink, "").trim();
+                currentImageUrl = imageUrl; // Update currentImageUrl when an image is clicked 
+                const imageName = this.querySelector("img").alt;
+                console.log(imageName)
                 showPopup(imageUrl, imageName);
             });
         });

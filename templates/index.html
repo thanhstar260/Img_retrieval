@@ -34,7 +34,7 @@
         <div class="image-container">
             {% for item in result %}
                 <div class="image-item">
-                    <img src="{{ item[0] }}" alt="{{ item[0][15:] }}{{ item[1] }}">
+                    <img src="{{ item }}" alt="{{ item[16:] }}">
                 </div>
                 {% if loop.index % 8 == 0 %}
                     </div><div class="image-container">
