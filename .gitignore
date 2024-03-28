@@ -1,10 +1,9 @@
 /DATA/
-feature.json
-new_features.json
 /.vscode/
-/__pycache__/
+__pycache__/
 /cuda_conda/
 /CLIP/
 /Clip_caption_prefix/
 /static/images/
-/ZSE-SBIR/
+ZSE-SBIR/
+/.gitignore/
