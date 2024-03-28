@@ -7,4 +7,5 @@ new_features.json
 /CLIP/
 /Clip_caption_prefix/
 /static/images/
-/utils/__pycache__/
+/./utils/__pycache__/
+/ZSE-SBIR/

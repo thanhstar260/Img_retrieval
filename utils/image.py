@@ -83,7 +83,7 @@ def load_clip_feature(feature_folder_path):
             array = np.load(file_path)
             array_list.append(array)
 
-    clip_feature = np.concatenate(array_list, axis=0)
+    clip_feature = np.concatenate(array_list, axis=0) #(87306, 512)
 
     return clip_feature
 
@@ -121,4 +121,4 @@ if __name__ == "__main__":
 
     # TEST Query
     result = img2img(preprocess,model,img_query_path,K,device,vector_db)
-    visualize(result, K)
+    visualize(result, K,image_path)
