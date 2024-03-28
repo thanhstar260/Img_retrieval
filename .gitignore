@@ -6,4 +6,4 @@ __pycache__/
 /Clip_caption_prefix/
 /static/images/
 ZSE-SBIR/
-/.gitignore/
+./utils/__pycache__/
