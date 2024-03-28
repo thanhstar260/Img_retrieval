@@ -5,10 +5,5 @@ __pycache__/
 /CLIP/
 /Clip_caption_prefix/
 /static/images/
-<<<<<<< HEAD
-/./utils/__pycache__/
-/ZSE-SBIR/
-=======
 ZSE-SBIR/
 ./utils/__pycache__/
->>>>>>> main
