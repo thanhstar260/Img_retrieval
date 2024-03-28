@@ -1,11 +1,14 @@
 /DATA/
-feature.json
-new_features.json
 /.vscode/
-/__pycache__/
+__pycache__/
 /cuda_conda/
 /CLIP/
 /Clip_caption_prefix/
 /static/images/
+<<<<<<< HEAD
 /./utils/__pycache__/
 /ZSE-SBIR/
+=======
+ZSE-SBIR/
+./utils/__pycache__/
+>>>>>>> main

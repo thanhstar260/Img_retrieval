@@ -14,11 +14,11 @@ app = Flask(__name__, static_folder='static')
 
 feature_folder_path = r'.\DATA\clip-features-vit-b32'
 image_path_dict = r".\utils\image_path.json"
-youtube_path_dict = r'.\utils\id2link.json'
+# youtube_path_dict = r'.\utils\id2link.json'
 client = meilisearch.Client('https://ms-cd3d65ab69ae-7424.sgp.meilisearch.io', 'e17ddafe4eea648822355f14d326b3a478bd7141')
 
-with open(youtube_path_dict, "r") as json_file:
-    youtube_path = json.load(json_file)
+# with open(youtube_path_dict, "r") as json_file:
+#     youtube_path = json.load(json_file)
     
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -54,7 +54,7 @@ def retrieve_image():
     try:
         # Assuming image_retrieval function returns a list of image IDs
         result = image_retrieval(preprocess, model, img_query_path, K_value, device, vector_db)
-        results = [(image_paths[str(id)], youtube_path[str(id)]) for id in result]
+        results = [image_paths[str(id)] for id in result]
 
         return jsonify({'result': results})
     except Exception as e:
@@ -72,7 +72,7 @@ def retrieve_text():
         k_value = request.form['k_value']
         K_value = int(k_value) if k_value and k_value.isdigit() else 80
         result = image_retrieval(preprocess, model, img_query_path, K_value, device, vector_db)
-        results = [(image_paths[str(id)], youtube_path[str(id)]) for id in result]
+        results = [image_paths[str(id)] for id in result]
         return render_template('index.html', result=results)
 
     clip_query = request.form['text_query']
@@ -116,44 +116,12 @@ def retrieve_text():
             result = result_ocr
     else:
         result = result_asr
-    print(result_clip)
-    print(result_ocr)
-    print(result_asr)
-    print(result)
+    # print(result_clip)
+    # print(result_ocr)
+    # print(result_asr)
+    # print(result)
 
-    # intersect_result = [value for value in result_asr if value in result_ocr and value in result_clip]
-
-    # if (len(intersect_result) < K_value):
-    #     if (clip and ocr and asr):
-    #         intersect_result.extend(result_asr[:int(K_value/3)])
-    #         intersect_result.extend(result_ocr[:int(K_value/3)])
-    #         len_result = len(intersect_result)
-    #         intersect_result.extend(result_clip[:K_value-len_result])
-    #     elif (clip):
-    #         if (ocr):
-    #             intersect_result.extend(result_ocr[:int(K_value/2)])
-    #             len_result = len(intersect_result)
-    #             intersect_result.extend(result_clip[:K_value-len_result])
-    #         elif (asr):
-    #             intersect_result.extend(result_asr[:int(K_value/2)])
-    #             len_result = len(intersect_result)
-    #             intersect_result.extend(result_clip[:K_value-len_result])   
-    #         else:
-    #             len_result = len(intersect_result)
-    #             intersect_result.extend(result_clip[:K_value-len_result])
-    #     elif (ocr):
-    #         if (asr):
-    #             intersect_result.extend(result_asr[:int(K_value/2)])
-    #             len_result = len(intersect_result)
-    #             intersect_result.extend(result_ocr[:K_value-len_result])   
-    #         else:
-    #             len_result = len(intersect_result)
-    #             intersect_result.extend(result_ocr[:K_value-len_result])
-    #     else:
-    #         len_result = len(intersect_result)
-    #         intersect_result.extend(result_asr[:K_value-len_result])
-
-    results = [(image_paths[str(id)], youtube_path[str(id)]) for id in result]
+    results = [image_paths[str(id)] for id in result]
 
     return render_template('index.html', result=results)
 
