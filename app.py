@@ -15,8 +15,7 @@ app = Flask(__name__, static_folder='static')
 feature_folder_path = r'.\DATA\clip-features-vit-b32'
 image_path_dict = r".\utils\image_path.json"
 # youtube_path_dict = r'.\utils\id2link.json'
-client = meilisearch.Client('https://ms-cd3d65ab69ae-7424.sgp.meilisearch.io', 'e17ddafe4eea648822355f14d326b3a478bd7141')
-
+client = client = meilisearch.Client('https://ms-771a4545fc1a-8932.sgp.meilisearch.io', 'a7aa95f4dd64d9a82a0c56e60955f01db6145cfc')
 # with open(youtube_path_dict, "r") as json_file:
 #     youtube_path = json.load(json_file)
     
