@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles1.css') }}">
+    <script src="{{ url_for('static', filename='script/script.js') }}"></script>
+    <title>Image Retrieval</title>
+    <script src="https://cdn.tailwindcss.com/"></script>
+</head>
+<body>
+    <div class="main-container">
+        <div class="sidebar">
+            <div class="sidebar-container">
+                <div class="flex justify-between mb-4 w-[300px]">
+                    <button type="button" onclick="setType('clip')" data-type="clip" class="bg-transparent font-semibold text-[#00509d] cursor-pointer">CLIP</button>
+                    <button type="button" onclick="setType('ocr')" data-type="ocr" class="bg-transparent font-semibold text-[#00509d] cursor-pointer">OCR</button>
+                    <button type="button" onclick="setType('asr')" data-type="asr" class="bg-transparent font-semibold text-[#00509d] cursor-pointer">ASR</button>
+                    <button type="button" onclick="setType('image')" data-type="image" class="bg-transparent font-semibold text-[#00509d] cursor-pointer">Image</button>
+                    <button type="button" onclick="setType('sketch')" data-type="sketch" class="bg-transparent font-semibold text-[#00509d] cursor-pointer">Sketch</button>
+                </div>
+                <form id="form" action="/retrieve_text" method="post">
+                    <label for="clip_query" class="mr-6 text-[#00509d] font-semibold hidden" id="clip_query_label">CLIP:</label>
+                    <div class="relative">
+                        <textarea id="clip_query" name="clip_query" placeholder="Enter your query..." autocomplete="off" class="focus:outline-1 focus:outline-blue-500 border-[0.1px] resize-none h-[120px] border-[#9EA5B1] rounded w-[20vw] p-2 hidden" onkeydown="if (event.key === 'Enter') { event.preventDefault(); document.getElementById('form').submit(); }" oninput="checkInput(this)">{{ clip_query }}</textarea>
+                        <button type="button" id="cancel_clip" onclick="cancelInput('clip_query')" class="absolute top-0 right-0 mr-2 mt-2 text-gray-500 hidden">&times;</button>
+                    </div>
+
+                    <label for="ocr_query" class="mr-6 text-[#00509d] font-semibold hidden" id="ocr_query_label">OCR:</label>
+                    <div class="relative">
+                        <textarea id="ocr_query" name="ocr_query" placeholder="Enter your query..." autocomplete="off" class="focus:outline-1 focus:outline-blue-500 border-[0.1px] resize-none h-[120px] border-[#9EA5B1] rounded w-[20vw] p-2 hidden" onkeydown="if (event.key === 'Enter') { event.preventDefault(); document.getElementById('form').submit(); }" oninput="checkInput(this)">{{ ocr_query }}</textarea>
+                        <button type="button" id="cancel_ocr" onclick="cancelInput('ocr_query')" class="absolute top-0 right-0 mr-2 mt-2 text-gray-500 hidden">&times;</button>
+                    </div>
+
+                    <label for="asr_query" class="mr-6 text-[#00509d] font-semibold hidden" id="asr_query_label">ASR:</label>
+                    <div class="relative">
+                        <textarea id="asr_query" name="asr_query" placeholder="Enter your query..." autocomplete="off" class="focus:outline-1 focus:outline-blue-500 border-[0.1px] resize-none h-[120px] border-[#9EA5B1] rounded w-[20vw] p-2 hidden" onkeydown="if (event.key === 'Enter') { event.preventDefault(); document.getElementById('form').submit(); }" oninput="checkInput(this)">{{ asr_query }}</textarea>
+                        <button type="button" id="cancel_asr" onclick="cancelInput('asr_query')" class="absolute top-0 right-0 mr-2 mt-2 text-gray-500 hidden">&times;</button>
+                    </div>
+
+                    <label for="image_query" class="mr-6 text-[#00509d] font-semibold hidden" id="image_query_label">Image:</label>
+                    <div class="relative">
+                        <input type="text" id="image_query" name="image_query" placeholder="Enter your image link..." autocomplete="off" class="focus:outline-1 focus:outline-blue-500 border-[0.1px] resize-none h-[50px] border-[#9EA5B1] rounded w-[20vw] p-2 hidden" oninput="displayImage(this.value)" value="{{ image_query }}">
+                        <button type="button" id="cancel_image" onclick="cancelInput('image_query')" class="absolute top-0 right-0 mr-2 mt-2 text-gray-500 hidden">&times;</button>
+                        <img id="display_image" class="hidden mt-4 w-[20vw]" />
+                    </div>
+
+                    <label for="sketch_query" class="mr-6 text-[#00509d] font-semibold hidden" id="sketch_query_label">Sketch:</label>
+                    <div class="relative">
+                        <canvas id="sketch_query" width="295" height="200" class="hidden"></canvas>
+                        <button type="button" id="cancel_sketch" onclick="cancelInput('sketch_query')" class="absolute top-0 right-0 mr-2 mt-2 text-gray-500 hidden">&times;</button>
+                        <button type="button" id="clear_sketch" onclick="clearCanvas()" class="mt-2 hidden">Clear</button>
+                        <input type="file" id="sketch_upload" accept="image/*" onchange="handleFileUpload(event)" style="display: none;">
+                        <input type="hidden" id="sketch_query_input" name="sketch_query" value="{{ sketch_query }}">
+                        <button type="button" id="upload_sketch" class="hidden" onclick="document.getElementById('sketch_upload').click()">Upload sketch</button>
+                    </div>
+                    
+                    <div class="flex justify-between mt-4 items-center">
+                        <label for="k_value" class="mr-6 text-[#00509d] font-semibold">K Value</label>
+                        <input type="text" id="k_value" name="k_value" class="p-2 focus:outline-1 focus:outline-blue-500 border-[0.1px] resize-none h-[40px] border-[#9EA5B1] rounded-md w-[14vw] text-left align-top" value="{% if request.form.get('k_value') %}{{ request.form.get('k_value') }}{% else %}80{% endif %}" autocomplete="off">
+                    </div>
+
+                    <div class="flex mt-4 justify-end">
+                        <input type="submit" value="Search" class="text-sm font-semibold bg-[#00509d] text-white py-2 px-4 rounded cursor-pointer" id="searchButton">
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    
+        <div class="result">
+            <div class="tit">
+                <h1 class="text-3xl font-bold"><a href="/">Image Retrieval System</a></h1>
+            </div>
+            <div class="container">
+                {% if result %}
+                    <div class="image-container">
+                        {% for item in result %}
+                            <div class="image-item">
+                                <img src="{{ item }}" alt="{{ item[16:] }}">
+                            </div>
+                            {% if loop.index % 6 == 0 %}
+                                </div><div class="image-container">
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        
+            <div class="popup-container"></div>
+            <div class="thumbnail-list"></div>
+        </div>
+    </div>
+
+    <script>
+        function setType(type) {
+            // Toggle the active state of the clicked button
+            const activeButton = document.querySelector(`button[data-type="${type}"]`);
+            activeButton.classList.toggle('active');
+    
+            // Toggle the visibility of the input field corresponding to the clicked button
+            const inputField = document.getElementById(`${type}_query`);
+            inputField.classList.toggle('hidden');
+    
+            // Toggle the visibility of the label for the input field
+            const label = document.getElementById(`${type}_query_label`);
+            label.classList.toggle('hidden');
+    
+            // Toggle the visibility of the cancel button for the input field
+            const cancelButton = document.getElementById(`cancel_${type}`);
+            if (!inputField.classList.contains('hidden')) {
+                cancelButton.classList.remove('hidden'); // Show the cancel button when input is visible
+            } else {
+                cancelButton.classList.add('hidden'); // Otherwise, hide it
+            }
+    
+            // Toggle the visibility of the clear button for the sketch pad
+            if (type === 'sketch') {
+                const clearButton = document.getElementById(`clear_${type}`);
+                const uploadButton = document.getElementById(`upload_${type}`);
+                if (!inputField.classList.contains('hidden')) {
+                    clearButton.classList.remove('hidden'); // Show the clear button when input is visible
+                    uploadButton.classList.remove('hidden'); // Show the upload button when input is visible
+                } else {
+                    clearButton.classList.add('hidden'); // Otherwise, hide it
+                    uploadButton.classList.add('hidden'); // Otherwise, hide it
+                }
+            }
+    
+            // Store the active button types in local storage
+            const activeTypes = [];
+            const buttons = document.querySelectorAll('.sidebar button.active');
+            buttons.forEach(button => activeTypes.push(button.getAttribute('data-type')));
+            localStorage.setItem('activeTypes', JSON.stringify(activeTypes));
+        }
+    
+        function cancelInput(type) {
+            const inputField = document.getElementById(`${type}`);
+            if (!inputField) return; // Early exit if inputField doesn't exist
+
+            inputField.value = ''; // Clear the input value
+            inputField.classList.add('hidden'); // Hide the input field
+
+            const label = document.getElementById(`${type}_label`);
+            if (label) label.classList.add('hidden'); // Hide the label if it exists
+
+            // Hide the clear button for the sketch canvas
+            if (type === 'sketch_query') {
+                const clearButton = document.getElementById(`clear_sketch`);
+                const uploadButton = document.getElementById(`upload_sketch`);
+                clearButton.classList.add('hidden'); // Hide the clear sketch button
+                uploadButton.classList.add('hidden'); // Hide the upload sketch button
+                clearCanvas(); // Clear the sketch canvas
+            }
+
+            // Hide the cancel button for the current input type
+            const cancelButton = inputField.nextElementSibling;
+            if (cancelButton) cancelButton.classList.add('hidden');
+
+            // Remove 'active' class from the button
+            const button = document.querySelector(`button[data-type="${type.replace('_query', '')}"]`);
+            if (button) button.classList.remove('active');
+
+            // Update the active types in local storage
+            const activeTypes = [];
+            const buttons = document.querySelectorAll('.sidebar button.active');
+            buttons.forEach(button => activeTypes.push(button.getAttribute('data-type')));
+            localStorage.setItem('activeTypes', JSON.stringify(activeTypes));
+        }
+
+        var canvas = document.getElementById('sketch_query');
+        var ctx = canvas.getContext('2d');
+        var drawing = false;
+
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mouseout', stopDrawing);
+
+        // function startDrawing(e) {
+        //     drawing = true;
+        //     ctx.fillStyle = 'white';
+        //     ctx.fillRect(0, 0, canvas.width, canvas.height);
+        //     draw(e); // to ensure drawing starts immediately
+        // }
+
+        function startDrawing(e) {
+            drawing = true;
+            // Draw the existing content of the canvas before filling it with white color
+            ctx.drawImage(canvas, 0, 0);
+            // Fill the canvas with white color to create a white background
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            draw(e); // to ensure drawing starts immediately
+        }
+
+        function draw(e) {
+            if (!drawing) return;
+            var rect = canvas.getBoundingClientRect();
+            var x = e.clientX - rect.left;
+            var y = e.clientY - rect.top;
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+
+            // Save the sketch data to local storage
+            localStorage.setItem('sketch_query', canvas.toDataURL('image/png'));
+        }
+
+        function stopDrawing() {
+            drawing = false;
+            ctx.beginPath(); // begin a new path to stop drawing from the last point
+        }
+
+        function clearCanvas() {
+            const canvas = document.getElementById('sketch_query');
+            const context = canvas.getContext('2d');
+
+            // Set white background
+            context.fillStyle = 'white';
+            context.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Clear any existing drawings
+            context.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        document.getElementById('searchButton').addEventListener('click', submitForm);
+
+        function submitForm() {
+            // Store the active button types in local storage
+            const activeTypes = [];
+            const buttons = document.querySelectorAll('.sidebar button.active');
+            buttons.forEach(button => activeTypes.push(button.getAttribute('data-type')));
+            localStorage.setItem('activeTypes', JSON.stringify(activeTypes));
+
+            // Update the value of the hidden sketch query input
+            const canvas = document.getElementById('sketch_query');
+            const context = canvas.getContext('2d');
+            const sketchDataUrl = canvas.toDataURL('image/png');
+            document.getElementById('sketch_query_input').value = sketchDataUrl;
+
+            // Submit the form
+            const form = document.getElementById('form');
+            form.submit();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Restore the visibility of input areas based on local storage
+            const activeTypes = JSON.parse(localStorage.getItem('activeTypes')) || [];
+            activeTypes.forEach(type => {
+                const button = document.querySelector(`button[data-type="${type}"]`);
+                const inputField = document.getElementById(`${type}_query`);
+                const label = document.getElementById(`${type}_query_label`);
+                const cancelButton = document.getElementById(`cancel_${type}`);
+                
+                button.classList.add('active');
+                inputField.classList.remove('hidden');
+                label.classList.remove('hidden');
+                cancelButton.classList.remove('hidden');
+
+                // If sketch type is active, show the clear and upload buttons
+                if (type === 'sketch') {
+                    const clearButton = document.getElementById(`clear_${type}`);
+                    const uploadButton = document.getElementById(`upload_${type}`);
+                    clearButton.classList.remove('hidden');
+                    uploadButton.classList.remove('hidden');
+                }
+            });
+        });
+
+        function displayImageOnLoad() {
+            const imageUrl = localStorage.getItem('image_query');
+            // Check if image query are empty, if so, hide them
+            const imageQuery = document.getElementById('image_query').value.trim();
+            if (!imageQuery) {
+                return;
+            }
+            else if (imageUrl) {
+                const img = document.getElementById('display_image');
+                img.src = imageUrl;
+                img.classList.remove('hidden');
+            }
+        }
+
+        // Call the displayImageOnLoad function when the DOM content is loaded
+        document.addEventListener('DOMContentLoaded', displayImageOnLoad);
+        
+        // Function to handle displaying image and saving to local storage
+        function displayImage(link) {
+            var img = document.getElementById('display_image');
+            img.src = link;
+            img.classList.remove('hidden');
+            // Save the image URL to local storage
+            localStorage.setItem('image_query', link);
+        }
+
+        // Function to clear the image from local storage
+        function clearImage() {
+            // Remove the image URL from local storage
+            localStorage.removeItem('image_query');
+            // Hide the image element
+            var img = document.getElementById('display_image');
+            img.classList.add('hidden');
+            // Clear the input value
+            var input = document.getElementById('image_query');
+            input.value = '';
+        }
+
+        // Call the clearImage function when the cancel button is clicked
+        document.getElementById('cancel_image').addEventListener('click', clearImage);
+
+        // Function to display the sketch when the page loads
+        function displaySketchOnLoad() {
+            const sketchDataUrl = localStorage.getItem('sketch_query');
+            // Check if sketch query are empty, if so, hide them
+            const sketchQuery = document.getElementById('sketch_query_input').value.trim();
+            if (!sketchQuery) {
+                return;
+            }
+            else if (sketchDataUrl) {
+                const canvas = document.getElementById('sketch_query');
+                const context = canvas.getContext('2d');
+                const img = new Image();
+                img.onload = function() {
+                    context.clearRect(0, 0, canvas.width, canvas.height);
+                    context.drawImage(img, 0, 0, canvas.width, canvas.height);
+                };
+                img.src = sketchDataUrl;
+            }
+        }
+
+        // Call the displaySketchOnLoad function when the DOM content is loaded
+        document.addEventListener('DOMContentLoaded', displaySketchOnLoad);
+        
+        // Function to handle uploading sketch and saving to local storage
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return; // Early exit if no file is selected
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const canvas = document.getElementById('sketch_query');
+                const context = canvas.getContext('2d');
+                const img = new Image();
+                img.onload = function() {
+                    context.clearRect(0, 0, canvas.width, canvas.height);
+                    context.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    // Save the sketch data to local storage
+                    localStorage.setItem('sketch_query', canvas.toDataURL('image/png'));
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Function to clear the sketch from local storage
+        function clearSketch() {
+            // Remove the sketch data from local storage
+            localStorage.removeItem('sketch_query');
+            // Clear the canvas
+            const canvas = document.getElementById('sketch_query');
+            const context = canvas.getContext('2d');
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            // Clear the file input
+            const fileInput = document.getElementById('sketch_upload');
+            fileInput.value = '';
+        }
+
+        // Call the clearSketch function when the clear button is clicked
+        document.getElementById('clear_sketch').addEventListener('click', clearSketch);
+
+        // Call the handleFileUpload function when a file is selected for upload
+        document.getElementById('sketch_upload').addEventListener('change', handleFileUpload);
+    </script>
+
+</body>
+</html>

@@ -121,4 +121,4 @@ if __name__ == "__main__":
 
     # TEST Query
     result = img2img(preprocess,model,img_query_path,K,device,vector_db)
-    visualize(result, K,image_path)
+    visualize(result, K, image_path)
