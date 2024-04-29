@@ -47,7 +47,7 @@ if __name__ == "__main__":
     image_path_dict = r"C:\Users\admin\Projects\AIC\image_path.json"
     text_query = "chạm tay trong vòng cấm"
     K = 40
-    client = meilisearch.Client('https://ms-cd3d65ab69ae-7424.sgp.meilisearch.io', 'e17ddafe4eea648822355f14d326b3a478bd7141')
+    client = meilisearch.Client('https://ms-771a4545fc1a-8932.sgp.meilisearch.io', 'a7aa95f4dd64d9a82a0c56e60955f01db6145cfc')
     image_path = load_image_path(image_path_dict)
 
     result = asr_result(client,text_query=text_query,k=K)

@@ -2,82 +2,100 @@ from flask import Flask, render_template, request, send_from_directory, jsonify
 from utils.image import img2img as image_retrieval
 from utils.text import load_clip_feature, load_image_path, load_model, create_faiss_index
 from utils.text import text2img as text_retrieval
+from ZSE_SBIR.result import sketch2img
 from utils.combine_results import combine_2results, combine_3results
 from utils.search_ocr import ocr_result
 from utils.search_asr import asr_result 
+from ZSE_SBIR.options import Option
+from ZSE_SBIR.model.model import Model
+from ZSE_SBIR.utils.util import setup_seed, load_checkpoint
+from torchvision import transforms
 import torch
 import meilisearch
 import json
-
+import os
+from PIL import Image
+import base64
+from dotenv import load_dotenv, find_dotenv
+_ = load_dotenv(find_dotenv()) # read local .env file
+HTTP = os.getenv("HTTP")
+MASTER_KEY = os.getenv("MASTER_KEY")
+client = meilisearch.Client(HTTP, MASTER_KEY)
 
 app = Flask(__name__, static_folder='static')
 
 feature_folder_path = r'.\DATA\clip-features-vit-b32'
 image_path_dict = r".\utils\image_path.json"
-# youtube_path_dict = r'.\utils\id2link.json'
-client = meilisearch.Client('https://ms-cd3d65ab69ae-7424.sgp.meilisearch.io', 'e17ddafe4eea648822355f14d326b3a478bd7141')
-
-# with open(youtube_path_dict, "r") as json_file:
-#     youtube_path = json.load(json_file)
+image_paths = load_image_path(image_path_dict)
     
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-# LOAD CLIP_FEATURE
 clip_feature = load_clip_feature(feature_folder_path)
-
-image_paths = load_image_path(image_path_dict)
-
-# LOAD MODEL
 model,preprocess = load_model(device)
-
-# CREATE FAISS INDEX
 vector_db = create_faiss_index(clip_feature)
 
-# Your existing routes for serving images
+#sketch
+args = Option().parse()
+os.environ["CUDA_VISIBLE_DEVICES"] = args.choose_cuda
+setup_seed(args.seed)
+checkpoint = load_checkpoint(args.load)
+sket_feature_path = r'C:\Users\NHAN\UIT_HK5\Truy_van_ttdpt\final_project\Img_retrieval\ZSE_SBIR\features'
+
+
 @app.route('/images/<filename>')
 def get_image(filename):
     return send_from_directory('static/images', filename)
 
-
-# Route for the main page
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index1.html', clip_query='', ocr_query='', asr_query='', image_query='', sketch_query='', k_value='80')
 
-# Route for image retrieval
 @app.route('/retrieve_image', methods=['POST'])
 def retrieve_image():
-    img_query_path = request.form.get('image_query')
-    k_value = request.form.get('k_value')
+    print(request.form)
+    img_query_path = request.form['image_query']
+    k_value = request.form['k_value']
     K_value = int(k_value) if k_value and k_value.isdigit() else 80
-
     try:
-        # Assuming image_retrieval function returns a list of image IDs
         result = image_retrieval(preprocess, model, img_query_path, K_value, device, vector_db)
         results = [image_paths[str(id)] for id in result]
-
         return jsonify({'result': results})
     except Exception as e:
         print(f"Error retrieving image: {e}")
         return jsonify({'error': 'Internal Server Error'}), 500
-    
 
-# Route for text retrieval
 @app.route('/retrieve_text', methods=['POST'])
 def retrieve_text():
     print(request.form)
-
     img_query_path = request.form['image_query']
+    sketch_query = request.form['sketch_query']
     if img_query_path != '':
         k_value = request.form['k_value']
         K_value = int(k_value) if k_value and k_value.isdigit() else 80
         result = image_retrieval(preprocess, model, img_query_path, K_value, device, vector_db)
         results = [image_paths[str(id)] for id in result]
-        return render_template('index.html', result=results)
+        return render_template('index1.html', result=results,image_query=img_query_path, sketch_query=sketch_query, k_value=k_value)
+    
+    if sketch_query != '':
+        # Extract base64 image data from data URL
+        _, encoded_data = sketch_query.split(',', 1)
+        
+        # Decode base64 image data
+        decoded_data = base64.b64decode(encoded_data)
+        
+        # Save decoded data to a file
+        save_path = r'C:\Users\NHAN\UIT_HK5\Truy_van_ttdpt\final_project\Img_retrieval\static\images\sketch.jpg'
+        with open(save_path, 'wb') as f:
+            f.write(decoded_data)
 
-    clip_query = request.form['text_query']
-    ocr_query = request.form['text_query_ocr']
-    asr_query = request.form['text_query_asr']
+        k_value = request.form['k_value']
+        K_value = int(k_value) if k_value and k_value.isdigit() else 80
+        result = sketch2img(save_path, sket_feature_path, checkpoint, K_value, args)
+        results = [image_paths[str(id)] for id in result]
+        return render_template('index1.html', result=results,image_query=img_query_path, sketch_query=sketch_query, k_value=k_value)
+
+    clip_query = request.form['clip_query']
+    ocr_query = request.form['ocr_query']
+    asr_query = request.form['asr_query']
     k_value = request.form['k_value']
     K_value = int(k_value) if k_value and k_value.isdigit() else 80
 
@@ -116,14 +134,11 @@ def retrieve_text():
             result = result_ocr
     else:
         result = result_asr
-    # print(result_clip)
-    # print(result_ocr)
-    # print(result_asr)
-    # print(result)
 
     results = [image_paths[str(id)] for id in result]
 
-    return render_template('index.html', result=results)
+    return render_template('index1.html', result=results, clip_query=clip_query, ocr_query=ocr_query, asr_query=asr_query,
+                           image_query=img_query_path, sketch_query=sketch_query, k_value=k_value)
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -46,7 +46,7 @@ if __name__ == "__main__":
     image_path_dict = r"C:\Users\NHAN\UIT_HK5\Truy_van_ttdpt\final_project\Img_retrieval\image_path.json"
     text_query = "giao hàng thiết bị điện"
     K = 16
-    client = meilisearch.Client('https://ms-cd3d65ab69ae-7424.sgp.meilisearch.io', 'e17ddafe4eea648822355f14d326b3a478bd7141')
+    client = meilisearch.Client('https://ms-771a4545fc1a-8932.sgp.meilisearch.io', 'a7aa95f4dd64d9a82a0c56e60955f01db6145cfc')
     image_path = load_image_path(image_path_dict)
 
     result = ocr_result(client,text_query=text_query,k=K)

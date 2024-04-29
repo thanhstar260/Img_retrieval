@@ -7,3 +7,6 @@ new_features.json
 /CLIP/
 /Clip_caption_prefix/
 /static/images/
+.env
+/ZSE_SBIR/
+/checkpoints/
