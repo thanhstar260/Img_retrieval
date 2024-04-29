@@ -8,6 +8,10 @@ from utils.search_asr import asr_result
 import torch
 import meilisearch
 import json
+import os
+import sys
+# sys.path.append('..')
+from dotenv import load_dotenv, find_dotenv
 
 
 app = Flask(__name__, static_folder='static')
@@ -15,7 +19,11 @@ app = Flask(__name__, static_folder='static')
 feature_folder_path = r'.\DATA\clip-features-vit-b32'
 image_path_dict = r".\utils\image_path.json"
 # youtube_path_dict = r'.\utils\id2link.json'
-client = client = meilisearch.Client('https://ms-771a4545fc1a-8932.sgp.meilisearch.io', 'a7aa95f4dd64d9a82a0c56e60955f01db6145cfc')
+
+_ = load_dotenv(find_dotenv()) # read local .env file
+HTTP = os.getenv("HTTP")
+MASTER_KEY = os.getenv("MASTER_KEY")
+client = meilisearch.Client(HTTP, MASTER_KEY)
 # with open(youtube_path_dict, "r") as json_file:
 #     youtube_path = json.load(json_file)
     
