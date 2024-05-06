@@ -2,9 +2,15 @@
 import meilisearch
 import json
 import os
+import sys
+sys.path.append('..')
 
+from dotenv import load_dotenv, find_dotenv
+_ = load_dotenv(find_dotenv()) # read local .env file
+HTTP = os.getenv("HTTP")
+MASTER_KEY = os.getenv("MASTER_KEY")
 
-client = meilisearch.Client('https://ms-771a4545fc1a-8932.sgp.meilisearch.io', 'a7aa95f4dd64d9a82a0c56e60955f01db6145cfc')
+client = meilisearch.Client(HTTP, MASTER_KEY)
 # An index is where the documents are stored.
 # index = client.index('ocr')
 save_path_ocr = r"C:\Users\admin\Projects\AIC\DATA\ocr\final_ocr.json"

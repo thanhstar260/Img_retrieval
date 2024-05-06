@@ -10,3 +10,6 @@ utils/__pycache__/
 .env
 /ZSE_SBIR/
 /checkpoints/
+/human_pose/
+/test/
+test.py

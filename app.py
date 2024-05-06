@@ -2,49 +2,35 @@ from flask import Flask, render_template, request, send_from_directory, jsonify
 from utils.image import img2img as image_retrieval
 from utils.text import load_clip_feature, load_image_path, load_model, create_faiss_index
 from utils.text import text2img as text_retrieval
-from ZSE_SBIR.result import sketch2img
 from utils.combine_results import combine_2results, combine_3results
 from utils.search_ocr import ocr_result
 from utils.search_asr import asr_result 
-from ZSE_SBIR.options import Option
-from ZSE_SBIR.model.model import Model
-from ZSE_SBIR.utils.util import setup_seed, load_checkpoint
+import os
 from torchvision import transforms
 import torch
 import meilisearch
 import json
-import os
-<<<<<<< HEAD
-import sys
-# sys.path.append('..')
-from dotenv import load_dotenv, find_dotenv
-
-=======
 from PIL import Image
 import base64
 from dotenv import load_dotenv, find_dotenv
 _ = load_dotenv(find_dotenv()) # read local .env file
+
+import sys
+sys.path.append('ZSE_SBIR')
+from options import Option
+from result import sketch2img
+from model.model import Model
+from utils.util import setup_seed, load_checkpoint
+
 HTTP = os.getenv("HTTP")
 MASTER_KEY = os.getenv("MASTER_KEY")
 client = meilisearch.Client(HTTP, MASTER_KEY)
->>>>>>> a4ea827666e8e3c00222cca7a142610278c054d7
 
 app = Flask(__name__, static_folder='static')
 
 feature_folder_path = r'.\DATA\clip-features-vit-b32'
 image_path_dict = r".\utils\image_path.json"
-<<<<<<< HEAD
-# youtube_path_dict = r'.\utils\id2link.json'
-
-_ = load_dotenv(find_dotenv()) # read local .env file
-HTTP = os.getenv("HTTP")
-MASTER_KEY = os.getenv("MASTER_KEY")
-client = meilisearch.Client(HTTP, MASTER_KEY)
-# with open(youtube_path_dict, "r") as json_file:
-#     youtube_path = json.load(json_file)
-=======
 image_paths = load_image_path(image_path_dict)
->>>>>>> a4ea827666e8e3c00222cca7a142610278c054d7
     
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 clip_feature = load_clip_feature(feature_folder_path)
@@ -55,9 +41,23 @@ vector_db = create_faiss_index(clip_feature)
 args = Option().parse()
 os.environ["CUDA_VISIBLE_DEVICES"] = args.choose_cuda
 setup_seed(args.seed)
-checkpoint = load_checkpoint(args.load)
-sket_feature_path = r'C:\Users\NHAN\UIT_HK5\Truy_van_ttdpt\final_project\Img_retrieval\ZSE_SBIR\features'
+args.load = r".\ZSE_SBIR\checkpoints\sketchy_ext\best_checkpoint.pth"
 
+checkpoint = load_checkpoint(args.load)
+sket_feature_path = r'.\ZSE_SBIR\features'
+# Khởi tạo model
+sketch_model = Model(args).float()  # Chuyển model sang half precision
+if args.load is not None:
+    cur = sketch_model.state_dict()
+    new = {k: v for k, v in checkpoint['model'].items() if k in cur.keys()}
+    cur.update(new)
+    sketch_model.load_state_dict(cur)
+sketch_model.cpu()  # Chuyển model lên CPU
+
+if len(args.choose_cuda) > 1:
+    sketch_model = torch.nn.parallel.DataParallel(model)
+
+sketch_model.eval()
 
 @app.route('/images/<filename>')
 def get_image(filename):
@@ -101,13 +101,15 @@ def retrieve_text():
         decoded_data = base64.b64decode(encoded_data)
         
         # Save decoded data to a file
-        save_path = r'C:\Users\NHAN\UIT_HK5\Truy_van_ttdpt\final_project\Img_retrieval\static\images\sketch.jpg'
+        save_path = r'.\static\sketch_query\sketch.jpg'
+        
+        # print(os.path.exists(save_path))
         with open(save_path, 'wb') as f:
             f.write(decoded_data)
 
         k_value = request.form['k_value']
         K_value = int(k_value) if k_value and k_value.isdigit() else 80
-        result = sketch2img(save_path, sket_feature_path, checkpoint, K_value, args)
+        result = sketch2img(save_path, sket_feature_path, sketch_model, K_value)
         results = [image_paths[str(id)] for id in result]
         return render_template('index1.html', result=results,image_query=img_query_path, sketch_query=sketch_query, k_value=k_value)
 
