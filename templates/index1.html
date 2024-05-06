@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles1.css') }}">
     <script src="{{ url_for('static', filename='script/script.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/4.3.1/fabric.min.js"></script>
+    <!-- <script src="{{ url_for('static', filename='script/script2.js') }}"></script> -->
     <title>Image Retrieval</title>
     <script src="https://cdn.tailwindcss.com/"></script>
 </head>
@@ -12,48 +14,67 @@
     <div class="main-container">
         <div class="sidebar">
             <div class="sidebar-container">
-                <div class="flex justify-between mb-4 w-[300px]">
-                    <button type="button" onclick="setType('clip')" data-type="clip" class="bg-transparent font-semibold text-[#00509d] cursor-pointer">CLIP</button>
-                    <button type="button" onclick="setType('ocr')" data-type="ocr" class="bg-transparent font-semibold text-[#00509d] cursor-pointer">OCR</button>
-                    <button type="button" onclick="setType('asr')" data-type="asr" class="bg-transparent font-semibold text-[#00509d] cursor-pointer">ASR</button>
-                    <button type="button" onclick="setType('image')" data-type="image" class="bg-transparent font-semibold text-[#00509d] cursor-pointer">Image</button>
-                    <button type="button" onclick="setType('sketch')" data-type="sketch" class="bg-transparent font-semibold text-[#00509d] cursor-pointer">Sketch</button>
+                <div class="flex justify-between mb-4 w-[300px] flex-wrap">
+                    <button type="button" onclick="setType('clip')" data-type="clip" class="bg-transparent font-semibold text-[#00509d] cursor-pointer mb-3">CLIP</button>
+                    <button type="button" onclick="setType('ocr')" data-type="ocr" class="bg-transparent font-semibold text-[#00509d] cursor-pointer mb-3">OCR</button>
+                    <button type="button" onclick="setType('asr')" data-type="asr" class="bg-transparent font-semibold text-[#00509d] cursor-pointer mb-3">ASR</button>
+                    <button type="button" onclick="setType('image')" data-type="image" class="bg-transparent font-semibold text-[#00509d] cursor-pointer mb-3">Image</button>
+                    <button type="button" onclick="setType('sketch')" data-type="sketch" class="bg-transparent font-semibold text-[#00509d] cursor-pointer mb-3">Sketch</button>
+                    <!-- <button type="button" onclick="showPoseElements()" data-type="pose" class="bg-transparent font-semibold text-[#00509d] cursor-pointer mb-3">Pose</button> -->
                 </div>
                 <form id="form" action="/retrieve_text" method="post">
                     <label for="clip_query" class="mr-6 text-[#00509d] font-semibold hidden" id="clip_query_label">CLIP:</label>
                     <div class="relative">
                         <textarea id="clip_query" name="clip_query" placeholder="Enter your query..." autocomplete="off" class="focus:outline-1 focus:outline-blue-500 border-[0.1px] resize-none h-[120px] border-[#9EA5B1] rounded w-[20vw] p-2 hidden" onkeydown="if (event.key === 'Enter') { event.preventDefault(); document.getElementById('form').submit(); }" oninput="checkInput(this)">{{ clip_query }}</textarea>
-                        <button type="button" id="cancel_clip" onclick="cancelInput('clip_query')" class="absolute top-0 right-0 mr-2 mt-2 text-gray-500 hidden">&times;</button>
+                        <button type="button" id="cancel_clip" onclick="cancelInput('clip_query')" class="absolute top-0 right-0 mr-2 mt-2 text-gray-500 hidden bg-[#fff]">&times;</button>
+                        <textarea id="language" name="language" style="display: None"></textarea> <!-- Hidden input to store the selected language -->
+                        <button type="button" id="eng_buttons" onclick="setLanguage('english')" data-language="english" class="bg-transparent font-semibold text-[#00509d] cursor-pointer mb-3 hidden">English</button>
+                        <button type="button" id="viet_buttons" onclick="setLanguage('vietnamese')" data-language="vietnamese" class="bg-transparent font-semibold text-[#00509d] cursor-pointer mb-3">Vietnamese</button>
                     </div>
 
                     <label for="ocr_query" class="mr-6 text-[#00509d] font-semibold hidden" id="ocr_query_label">OCR:</label>
                     <div class="relative">
                         <textarea id="ocr_query" name="ocr_query" placeholder="Enter your query..." autocomplete="off" class="focus:outline-1 focus:outline-blue-500 border-[0.1px] resize-none h-[120px] border-[#9EA5B1] rounded w-[20vw] p-2 hidden" onkeydown="if (event.key === 'Enter') { event.preventDefault(); document.getElementById('form').submit(); }" oninput="checkInput(this)">{{ ocr_query }}</textarea>
-                        <button type="button" id="cancel_ocr" onclick="cancelInput('ocr_query')" class="absolute top-0 right-0 mr-2 mt-2 text-gray-500 hidden">&times;</button>
+                        <button type="button" id="cancel_ocr" onclick="cancelInput('ocr_query')" class="absolute top-0 right-0 mr-2 mt-2 text-gray-500 hidden bg-[#fff]">&times;</button>
                     </div>
 
                     <label for="asr_query" class="mr-6 text-[#00509d] font-semibold hidden" id="asr_query_label">ASR:</label>
                     <div class="relative">
                         <textarea id="asr_query" name="asr_query" placeholder="Enter your query..." autocomplete="off" class="focus:outline-1 focus:outline-blue-500 border-[0.1px] resize-none h-[120px] border-[#9EA5B1] rounded w-[20vw] p-2 hidden" onkeydown="if (event.key === 'Enter') { event.preventDefault(); document.getElementById('form').submit(); }" oninput="checkInput(this)">{{ asr_query }}</textarea>
-                        <button type="button" id="cancel_asr" onclick="cancelInput('asr_query')" class="absolute top-0 right-0 mr-2 mt-2 text-gray-500 hidden">&times;</button>
+                        <button type="button" id="cancel_asr" onclick="cancelInput('asr_query')" class="absolute top-0 right-0 mr-2 mt-2 text-gray-500 hidden bg-[#fff]">&times;</button>
                     </div>
 
                     <label for="image_query" class="mr-6 text-[#00509d] font-semibold hidden" id="image_query_label">Image:</label>
                     <div class="relative">
                         <input type="text" id="image_query" name="image_query" placeholder="Enter your image link..." autocomplete="off" class="focus:outline-1 focus:outline-blue-500 border-[0.1px] resize-none h-[50px] border-[#9EA5B1] rounded w-[20vw] p-2 hidden" oninput="displayImage(this.value)" value="{{ image_query }}">
-                        <button type="button" id="cancel_image" onclick="cancelInput('image_query')" class="absolute top-0 right-0 mr-2 mt-2 text-gray-500 hidden">&times;</button>
+                        <button type="button" id="cancel_image" onclick="cancelInput('image_query')" class="absolute top-0 right-0 mr-2 mt-2 text-gray-500 hidden bg-[#fff]">&times;</button>
                         <img id="display_image" class="hidden mt-4 w-[20vw]" />
                     </div>
 
                     <label for="sketch_query" class="mr-6 text-[#00509d] font-semibold hidden" id="sketch_query_label">Sketch:</label>
                     <div class="relative">
                         <canvas id="sketch_query" width="295" height="200" class="hidden"></canvas>
-                        <button type="button" id="cancel_sketch" onclick="cancelInput('sketch_query')" class="absolute top-0 right-0 mr-2 mt-2 text-gray-500 hidden">&times;</button>
+                        <button type="button" id="cancel_sketch" onclick="cancelInput('sketch_query')" class="absolute top-0 right-0 mr-2 mt-2 text-gray-500 hidden bg-[#fff]">&times;</button>
                         <button type="button" id="clear_sketch" onclick="clearCanvas()" class="mt-2 hidden">Clear</button>
                         <input type="file" id="sketch_upload" accept="image/*" onchange="handleFileUpload(event)" style="display: none;">
                         <input type="hidden" id="sketch_query_input" name="sketch_query" value="{{ sketch_query }}">
                         <button type="button" id="upload_sketch" class="hidden" onclick="document.getElementById('sketch_upload').click()">Upload sketch</button>
                     </div>
+
+                    <!-- <label for="pose_query" class="mr-6 text-[#00509d] font-semibold hidden" id="pose_query_label">Pose:</label>
+                    <div class="relative">
+                        <svg id="pose-svg" width="295" height="350" style="background: white;" class="mb-5"></svg>
+                        <button type="button" id="cancel_pose" onclick="cancelPoseInput()" class="absolute top-0 right-0 mr-2 mt-2 text-gray-500">&times;</button>
+                        <label for="keypoints" id="label_kpt">Keypoints:</label>
+                        <textarea id="keypoints" name="keypoints" rows="5" cols="38" readonly class="mt-3"></textarea>
+                        <label for="inp_keypoints" style="display: None">Input:</label>
+                        <textarea id="inp_keypoints" name="inp_keypoints" rows="5" cols="38" readonly style="display: None"></textarea>
+                        <button id="btn-default" type="button" style="display: None">Default</button> 
+                        <button id="btn-hands-folded" type="button" style="display: None">Hands Folded</button>
+                        <button id="btn-upside-down" type="button" style="display: None">Upside Down</button>
+                        <button id="btn-touch-head" type="button" style="display: None">Touch Head</button>
+                        
+                    </div> -->
                     
                     <div class="flex justify-between mt-4 items-center">
                         <label for="k_value" class="mr-6 text-[#00509d] font-semibold">K Value</label>
@@ -113,6 +134,18 @@
             } else {
                 cancelButton.classList.add('hidden'); // Otherwise, hide it
             }
+
+            if (type === 'clip') {
+                const engButton = document.getElementById(`eng_buttons`);
+                const vietButton = document.getElementById(`viet_buttons`);
+                if (!inputField.classList.contains('hidden')) {
+                    engButton.classList.remove('hidden'); // Show the clear button when input is visible
+                    vietButton.classList.remove('hidden'); // Show the upload button when input is visible
+                } else {
+                    engButton.classList.add('hidden'); // Otherwise, hide it
+                    vietButton.classList.add('hidden'); // Otherwise, hide it
+                }
+            }
     
             // Toggle the visibility of the clear button for the sketch pad
             if (type === 'sketch') {
@@ -144,6 +177,11 @@
             const label = document.getElementById(`${type}_label`);
             if (label) label.classList.add('hidden'); // Hide the label if it exists
 
+            if (type === 'clip_query') {
+                document.getElementById('eng_buttons').classList.add('hidden');
+                document.getElementById('viet_buttons').classList.add('hidden');
+            }
+
             // Hide the clear button for the sketch canvas
             if (type === 'sketch_query') {
                 const clearButton = document.getElementById(`clear_sketch`);
@@ -168,29 +206,106 @@
             localStorage.setItem('activeTypes', JSON.stringify(activeTypes));
         }
 
+
+        // function cancelPoseInput() {
+        //     // Hide the pose query label
+        //     document.getElementById('pose_query_label').style.display = 'none';
+
+        //     // Hide all the elements after the cancel button
+        //     var elementsToHide = ['pose-svg', 'keypoints', 'inp_keypoints', 'btn-default', 'btn-hands-folded', 'btn-upside-down', 'btn-touch-head', 'cancel_pose', "label_kpt"];
+        //     for (var i = 0; i < elementsToHide.length; i++) {
+        //         document.getElementById(elementsToHide[i]).style.display = 'none';
+        //     }
+        //     document.getElementById('inp_keypoints').value = '';
+
+        //     // Remove 'active' class from the button
+        //     const poseButton = document.querySelector(`button[data-type="pose"]`);
+        //     poseButton.classList.toggle('active');
+
+        //     // Update the active types in local storage
+        //     const activeTypes = [];
+        //     const buttons = document.querySelectorAll('.sidebar button.active');
+        //     buttons.forEach(button => activeTypes.push(button.getAttribute('data-type')));
+        //     localStorage.setItem('activeTypes', JSON.stringify(activeTypes));
+        // }
+
+        // function showPoseElements() {
+        //     const activeButton = document.querySelector(`button[data-type="pose"]`);
+        //     activeButton.classList.toggle('active');
+        //     // Show the pose query label
+        //     document.getElementById('pose_query_label').style.display = '';
+
+        //     // Show all the elements after the cancel button
+        //     var elementsToShow = ['pose-svg', 'keypoints'];
+        //     for (var i = 0; i < elementsToShow.length; i++) {
+        //         document.getElementById(elementsToShow[i]).style.display = '';
+        //     }
+        // }
+
+        function setLanguage(language) {
+            // Clear the input field
+            const inputField = document.getElementById('clip_query');
+            inputField.value = '';
+
+            // Update the value of the hidden language input
+            const languageInput = document.getElementById('language');
+            languageInput.value = language;
+
+            // Toggle the active state of language buttons
+            const engButton = document.getElementById('eng_buttons');
+            const vietButton = document.getElementById('viet_buttons');
+            if (language === 'english' || language === '') {
+                engButton.classList.add('active');
+                vietButton.classList.remove('active');
+                localStorage.setItem('selectedLanguage', 'english');
+            } else {
+                vietButton.classList.add('active');
+                engButton.classList.remove('active');
+                localStorage.setItem('selectedLanguage', 'vietnamese');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // if clip button is active
+            const activeTypes = JSON.parse(localStorage.getItem('activeTypes')) || [];
+            if (activeTypes.includes('clip')) {
+                const engButton = document.getElementById('eng_buttons');
+                const vietButton = document.getElementById('viet_buttons');
+                const storedLanguage = localStorage.getItem('selectedLanguage');
+            
+                if (storedLanguage === 'vietnamese') {
+                    vietButton.classList.add('active');
+                    engButton.classList.remove('active');
+                } else {
+                    engButton.classList.add('active');
+                    vietButton.classList.remove('active');
+                }
+                engButton.classList.remove('hidden');
+                vietButton.classList.remove('hidden');
+            } else {
+                const engButton = document.getElementById('eng_buttons');
+                const vietButton = document.getElementById('viet_buttons');
+                engButton.classList.add('hidden');
+                vietButton.classList.add('hidden');
+            }
+        });
+
+
         var canvas = document.getElementById('sketch_query');
         var ctx = canvas.getContext('2d');
         var drawing = false;
+
+        // Fill the canvas with white background initially
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         canvas.addEventListener('mousedown', startDrawing);
         canvas.addEventListener('mousemove', draw);
         canvas.addEventListener('mouseup', stopDrawing);
         canvas.addEventListener('mouseout', stopDrawing);
 
-        // function startDrawing(e) {
-        //     drawing = true;
-        //     ctx.fillStyle = 'white';
-        //     ctx.fillRect(0, 0, canvas.width, canvas.height);
-        //     draw(e); // to ensure drawing starts immediately
-        // }
-
         function startDrawing(e) {
             drawing = true;
-            // Draw the existing content of the canvas before filling it with white color
-            ctx.drawImage(canvas, 0, 0);
-            // Fill the canvas with white color to create a white background
-            ctx.fillStyle = 'white';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
             draw(e); // to ensure drawing starts immediately
         }
 
@@ -219,12 +334,15 @@
             const canvas = document.getElementById('sketch_query');
             const context = canvas.getContext('2d');
 
-            // Set white background
+            // Clear the canvas by resetting its content
+            // context.clearRect(0, 0, canvas.width, canvas.height);
+
             context.fillStyle = 'white';
             context.fillRect(0, 0, canvas.width, canvas.height);
-
-            // Clear any existing drawings
-            context.clearRect(0, 0, canvas.width, canvas.height);
+            
+            localStorage.removeItem('sketch_query');
+            document.getElementById('sketch_query_input').value = '';
+            
         }
 
         document.getElementById('searchButton').addEventListener('click', submitForm);
@@ -236,12 +354,14 @@
             buttons.forEach(button => activeTypes.push(button.getAttribute('data-type')));
             localStorage.setItem('activeTypes', JSON.stringify(activeTypes));
 
-            // Update the value of the hidden sketch query input
-            const canvas = document.getElementById('sketch_query');
-            const context = canvas.getContext('2d');
-            const sketchDataUrl = canvas.toDataURL('image/png');
-            document.getElementById('sketch_query_input').value = sketchDataUrl;
-
+            if (activeTypes.includes('sketch')) {
+                // Update the value of the hidden sketch query input
+                const canvas = document.getElementById('sketch_query');
+                const context = canvas.getContext('2d');
+                const sketchDataUrl = canvas.toDataURL('image/png');
+                document.getElementById('sketch_query_input').value = sketchDataUrl;
+            }
+            
             // Submit the form
             const form = document.getElementById('form');
             form.submit();
@@ -267,6 +387,14 @@
                     const uploadButton = document.getElementById(`upload_${type}`);
                     clearButton.classList.remove('hidden');
                     uploadButton.classList.remove('hidden');
+                }
+
+                // If clip type is active, show the language buttons
+                if (type === 'clip') {
+                    const engButton = document.getElementById(`eng_buttons`);
+                    const vietButton = document.getElementById(`viet_buttons`);
+                    engButton.classList.remove('hidden');
+                    vietButton.classList.remove('hidden');
                 }
             });
         });
@@ -355,21 +483,8 @@
             reader.readAsDataURL(file);
         }
 
-        // Function to clear the sketch from local storage
-        function clearSketch() {
-            // Remove the sketch data from local storage
-            localStorage.removeItem('sketch_query');
-            // Clear the canvas
-            const canvas = document.getElementById('sketch_query');
-            const context = canvas.getContext('2d');
-            context.clearRect(0, 0, canvas.width, canvas.height);
-            // Clear the file input
-            const fileInput = document.getElementById('sketch_upload');
-            fileInput.value = '';
-        }
-
-        // Call the clearSketch function when the clear button is clicked
-        document.getElementById('clear_sketch').addEventListener('click', clearSketch);
+        // Call the clearCanvas function when the clear button is clicked
+        document.getElementById('clear_sketch').addEventListener('click', clearCanvas);
 
         // Call the handleFileUpload function when a file is selected for upload
         document.getElementById('sketch_upload').addEventListener('change', handleFileUpload);

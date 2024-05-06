@@ -22,21 +22,6 @@ def find_k_nearest_neighbors(input_vector, vectors_db, k):
   distances, indices = vectors_db.search(input_vector.reshape(1, -1), k)
   return indices[0]
 
-
-# def img2img(preprocess,model,img_query_path,k,device,vector_db):
-
-#     image_query = Image.open(img_query_path)
-#     image_query = preprocess(image_query).to(device)
-#     image_query = torch.unsqueeze(image_query, 0)
-
-#     with torch.no_grad():
-#         image_features_query = model.encode_image(image_query).float()
-#     image_features_query /= image_features_query.norm(dim=-1, keepdim=True)
-
-#     ids_result = find_k_nearest_neighbors(image_features_query.cpu().numpy(),vector_db,k)
-
-#     return ids_result
-
 def img2img(preprocess, model, img_query_path, k, device, vector_db):
     if img_query_path.startswith(('http://', 'https://')):
         # Load image from URL
@@ -101,9 +86,15 @@ def load_model(device):
 if __name__ == "__main__":
 
     # DEFINE PARAMETER
+<<<<<<< HEAD
     img_query_path = r"..\static\images\Keyframes_L02\L02_V001\0001.jpg"
     feature_folder_path = r'..\DATA\clip-features-vit-b32'
     image_path_dict = r".\image_path.json"
+=======
+    img_query_path = r"C:\Users\NHAN\Downloads\anh.png"
+    feature_folder_path = r'C:\Users\NHAN\UIT_HK5\Truy_van_ttdpt\final_project\Img_retrieval\DATA\clip-features-vit-b32'
+    image_path_dict = r"C:\Users\NHAN\UIT_HK5\Truy_van_ttdpt\final_project\Img_retrieval\utils\image_path.json"
+>>>>>>> a57d6cac9e17f42a745a5728eb971db9cad615cf
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     K = 40
     
