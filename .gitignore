@@ -8,3 +8,4 @@ __pycache__/
 .env
 /ZSE_SBIR/
 /checkpoints/
+/human_pose/

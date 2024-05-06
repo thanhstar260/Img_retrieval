@@ -202,7 +202,7 @@ a:-webkit-any-link {
 canvas { 
     border: 1px solid #9EA5B1; 
     border-radius: 5px;
-    background-color: #fff;
+    /* background-color: #fff; */
 }
 
 #cancel_clip:hover, #cancel_ocr:hover, #cancel_asr:hover, #cancel_image{

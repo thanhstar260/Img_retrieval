@@ -22,21 +22,6 @@ def find_k_nearest_neighbors(input_vector, vectors_db, k):
   distances, indices = vectors_db.search(input_vector.reshape(1, -1), k)
   return indices[0]
 
-
-# def img2img(preprocess,model,img_query_path,k,device,vector_db):
-
-#     image_query = Image.open(img_query_path)
-#     image_query = preprocess(image_query).to(device)
-#     image_query = torch.unsqueeze(image_query, 0)
-
-#     with torch.no_grad():
-#         image_features_query = model.encode_image(image_query).float()
-#     image_features_query /= image_features_query.norm(dim=-1, keepdim=True)
-
-#     ids_result = find_k_nearest_neighbors(image_features_query.cpu().numpy(),vector_db,k)
-
-#     return ids_result
-
 def img2img(preprocess, model, img_query_path, k, device, vector_db):
     if img_query_path.startswith(('http://', 'https://')):
         # Load image from URL
