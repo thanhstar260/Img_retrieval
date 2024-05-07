@@ -65,11 +65,11 @@ sketch_model.cpu()
 sketch_model.eval()
 
 # pose
-image_path_dict_pose = r".\human_pose\yolov9_pose\data\data.json"
-feature_pose_folder_path = r'.\human_pose\poem\output32'
-image_paths_pose = load_image_path(image_path_dict_pose)
-pose_embed = load_pose_embed(feature_pose_folder_path)
-vector_pose_db = create_faiss_index(pose_embed)
+# image_path_dict_pose = r".\human_pose\yolov9_pose\data\data.json"
+# feature_pose_folder_path = r'.\human_pose\poem\output32'
+# image_paths_pose = load_image_path(image_path_dict_pose)
+# pose_embed = load_pose_embed(feature_pose_folder_path)
+# vector_pose_db = create_faiss_index(pose_embed)
 
 
 @app.route('/images/<filename>')

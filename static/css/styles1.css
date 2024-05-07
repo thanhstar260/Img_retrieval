@@ -202,13 +202,16 @@ a:-webkit-any-link {
 canvas { 
     border: 1px solid #9EA5B1; 
     border-radius: 5px;
-    /* background-color: #fff; */
 }
 
-#cancel_clip:hover, #cancel_ocr:hover, #cancel_asr:hover, #cancel_image{
+#cancel_clip, #cancel_ocr, #cancel_asr, #cancel_image{
     background-color: #fff;
+    width: 20px;
+    height: 20px;
 }
 
 #cancel_clip:hover, #cancel_ocr:hover, #cancel_asr:hover, #cancel_image:hover {
     background-color: #00509d;
+    border: none;
 }
+
