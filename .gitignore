@@ -13,3 +13,4 @@ utils/__pycache__/
 /human_pose/
 /test/
 test.py
+/static/sketch_query/sketch.jpg

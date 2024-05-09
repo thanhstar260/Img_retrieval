@@ -5,11 +5,8 @@ from utils.text import text2img as text_retrieval
 from utils.combine_results import combine_2results, combine_3results
 from utils.search_ocr import ocr_result
 from utils.search_asr import asr_result 
-<<<<<<< HEAD
-=======
-from human_pose.test_result import load_pose_embed, load_image_path, retrieval_pose
+# from human_pose.test_result import load_pose_embed, load_image_path, retrieval_pose
 from utils.translate import translate
->>>>>>> a57d6cac9e17f42a745a5728eb971db9cad615cf
 import os
 from torchvision import transforms
 import torch
@@ -67,12 +64,12 @@ sketch_model.cpu()
 
 sketch_model.eval()
 
-# pose
-image_path_dict_pose = r".\human_pose\yolov9_pose\data\data.json"
-feature_pose_folder_path = r'.\human_pose\poem\output32'
-image_paths_pose = load_image_path(image_path_dict_pose)
-pose_embed = load_pose_embed(feature_pose_folder_path)
-vector_pose_db = create_faiss_index(pose_embed)
+# # pose
+# image_path_dict_pose = r".\human_pose\yolov9_pose\data\data.json"
+# feature_pose_folder_path = r'.\human_pose\poem\output32'
+# image_paths_pose = load_image_path(image_path_dict_pose)
+# pose_embed = load_pose_embed(feature_pose_folder_path)
+# vector_pose_db = create_faiss_index(pose_embed)
 
 
 @app.route('/images/<filename>')
