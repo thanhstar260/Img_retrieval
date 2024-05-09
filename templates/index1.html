@@ -15,46 +15,46 @@
         <div class="sidebar">
             <div class="sidebar-container">
                 <div class="flex justify-between mb-4 w-[300px] flex-wrap">
-                    <button type="button" onclick="setType('clip')" data-type="clip" class="bg-transparent font-semibold text-[#00509d] cursor-pointer mb-3">CLIP</button>
-                    <button type="button" onclick="setType('ocr')" data-type="ocr" class="bg-transparent font-semibold text-[#00509d] cursor-pointer mb-3">OCR</button>
-                    <button type="button" onclick="setType('asr')" data-type="asr" class="bg-transparent font-semibold text-[#00509d] cursor-pointer mb-3">ASR</button>
+                    <button type="button" onclick="setType('clip')" data-type="clip" class="bg-transparent font-semibold text-[#00509d] cursor-pointer mb-3">Scene Description</button>
+                    <button type="button" onclick="setType('ocr')" data-type="ocr" class="bg-transparent font-semibold text-[#00509d] cursor-pointer mb-3">Text on screen</button>
+                    <button type="button" onclick="setType('asr')" data-type="asr" class="bg-transparent font-semibold text-[#00509d] cursor-pointer mb-3">Speech</button>
                     <button type="button" onclick="setType('image')" data-type="image" class="bg-transparent font-semibold text-[#00509d] cursor-pointer mb-3">Image</button>
                     <button type="button" onclick="setType('sketch')" data-type="sketch" class="bg-transparent font-semibold text-[#00509d] cursor-pointer mb-3">Sketch</button>
                     <!-- <button type="button" onclick="showPoseElements()" data-type="pose" class="bg-transparent font-semibold text-[#00509d] cursor-pointer mb-3">Pose</button> -->
                 </div>
                 <form id="form" action="/retrieve_text" method="post">
-                    <label for="clip_query" class="mr-6 text-[#00509d] font-semibold hidden" id="clip_query_label">CLIP:</label>
+                    <label for="clip_query" class="mr-6 text-[#00509d] font-semibold hidden" id="clip_query_label">Scene Description:</label>
                     <div class="relative">
                         <textarea id="clip_query" name="clip_query" placeholder="Enter your query..." autocomplete="off" class="focus:outline-1 focus:outline-blue-500 border-[0.1px] resize-none h-[120px] border-[#9EA5B1] rounded w-[20vw] p-2 hidden" onkeydown="if (event.key === 'Enter') { event.preventDefault(); document.getElementById('form').submit(); }" oninput="checkInput(this)">{{ clip_query }}</textarea>
-                        <button type="button" id="cancel_clip" onclick="cancelInput('clip_query')" class="absolute top-0 right-0 mr-2 mt-2 text-gray-500 hidden bg-[#fff]">&times;</button>
+                        <button type="button" id="cancel_clip" onclick="cancelInput('clip_query')" class="absolute top-0 right-0 mr-1 mt-1 text-gray-500 hidden bg-[#fff]"><span style="position: relative; top: -6px; left: -3px">&times;</span></button>
                         <textarea id="language" name="language" style="display: None"></textarea> <!-- Hidden input to store the selected language -->
-                        <button type="button" id="eng_buttons" onclick="setLanguage('english')" data-language="english" class="bg-transparent font-semibold text-[#00509d] cursor-pointer mb-3 hidden">English</button>
-                        <button type="button" id="viet_buttons" onclick="setLanguage('vietnamese')" data-language="vietnamese" class="bg-transparent font-semibold text-[#00509d] cursor-pointer mb-3">Vietnamese</button>
+                        <button type="button" id="eng_buttons" onclick="setLanguage('english')" data-language="english" class="bg-transparent cursor-pointer mb-3 hidden">English</button>
+                        <button type="button" id="viet_buttons" onclick="setLanguage('vietnamese')" data-language="vietnamese" class="bg-transparent cursor-pointer mb-3">Vietnamese</button>
                     </div>
 
-                    <label for="ocr_query" class="mr-6 text-[#00509d] font-semibold hidden" id="ocr_query_label">OCR:</label>
+                    <label for="ocr_query" class="mr-6 text-[#00509d] font-semibold hidden" id="ocr_query_label">Text on screen:</label>
                     <div class="relative">
                         <textarea id="ocr_query" name="ocr_query" placeholder="Enter your query..." autocomplete="off" class="focus:outline-1 focus:outline-blue-500 border-[0.1px] resize-none h-[120px] border-[#9EA5B1] rounded w-[20vw] p-2 hidden" onkeydown="if (event.key === 'Enter') { event.preventDefault(); document.getElementById('form').submit(); }" oninput="checkInput(this)">{{ ocr_query }}</textarea>
-                        <button type="button" id="cancel_ocr" onclick="cancelInput('ocr_query')" class="absolute top-0 right-0 mr-2 mt-2 text-gray-500 hidden bg-[#fff]">&times;</button>
+                        <button type="button" id="cancel_ocr" onclick="cancelInput('ocr_query')" class="absolute top-0 right-0 mr-1 mt-1 text-gray-500 hidden bg-[#fff]"><span style="position: relative; top: -6px; left: -3px">&times;</span></button>
                     </div>
 
-                    <label for="asr_query" class="mr-6 text-[#00509d] font-semibold hidden" id="asr_query_label">ASR:</label>
+                    <label for="asr_query" class="mr-6 text-[#00509d] font-semibold hidden" id="asr_query_label">Speech:</label>
                     <div class="relative">
                         <textarea id="asr_query" name="asr_query" placeholder="Enter your query..." autocomplete="off" class="focus:outline-1 focus:outline-blue-500 border-[0.1px] resize-none h-[120px] border-[#9EA5B1] rounded w-[20vw] p-2 hidden" onkeydown="if (event.key === 'Enter') { event.preventDefault(); document.getElementById('form').submit(); }" oninput="checkInput(this)">{{ asr_query }}</textarea>
-                        <button type="button" id="cancel_asr" onclick="cancelInput('asr_query')" class="absolute top-0 right-0 mr-2 mt-2 text-gray-500 hidden bg-[#fff]">&times;</button>
+                        <button type="button" id="cancel_asr" onclick="cancelInput('asr_query')" class="absolute top-0 right-0 mr-1 mt-1 text-gray-500 hidden bg-[#fff]"><span style="position: relative; top: -6px; left: -3px">&times;</span></button>
                     </div>
 
                     <label for="image_query" class="mr-6 text-[#00509d] font-semibold hidden" id="image_query_label">Image:</label>
                     <div class="relative">
                         <input type="text" id="image_query" name="image_query" placeholder="Enter your image link..." autocomplete="off" class="focus:outline-1 focus:outline-blue-500 border-[0.1px] resize-none h-[50px] border-[#9EA5B1] rounded w-[20vw] p-2 hidden" oninput="displayImage(this.value)" value="{{ image_query }}">
-                        <button type="button" id="cancel_image" onclick="cancelInput('image_query')" class="absolute top-0 right-0 mr-2 mt-2 text-gray-500 hidden bg-[#fff]">&times;</button>
+                        <button type="button" id="cancel_image" onclick="cancelInput('image_query')" class="absolute top-0 right-0 mr-1 mt-1 text-gray-500 hidden bg-[#fff]"><span style="position: relative; top: -6px; left: -3px">&times;</span></button>
                         <img id="display_image" class="hidden mt-4 w-[20vw]" />
                     </div>
 
                     <label for="sketch_query" class="mr-6 text-[#00509d] font-semibold hidden" id="sketch_query_label">Sketch:</label>
                     <div class="relative">
                         <canvas id="sketch_query" width="295" height="200" class="hidden"></canvas>
-                        <button type="button" id="cancel_sketch" onclick="cancelInput('sketch_query')" class="absolute top-0 right-0 mr-2 mt-2 text-gray-500 hidden bg-[#fff]">&times;</button>
+                        <button type="button" id="cancel_sketch" onclick="cancelInput('sketch_query')" class="absolute top-0 right-0 mr-1 mt-1 text-gray-500 hidden bg-[#fff]"><span style="position: relative; top: -6px; left: -3px">&times;</span></button>
                         <button type="button" id="clear_sketch" onclick="clearCanvas()" class="mt-2 hidden">Clear</button>
                         <input type="file" id="sketch_upload" accept="image/*" onchange="handleFileUpload(event)" style="display: none;">
                         <input type="hidden" id="sketch_query_input" name="sketch_query" value="{{ sketch_query }}">
@@ -243,13 +243,12 @@
         // }
 
         function setLanguage(language) {
-            // Clear the input field
-            const inputField = document.getElementById('clip_query');
-            inputField.value = '';
+            // // Clear the input field
+            // const inputField = document.getElementById('clip_query');
+            // inputField.value = '';
 
             // Update the value of the hidden language input
-            const languageInput = document.getElementById('language');
-            languageInput.value = language;
+            document.getElementById('language').value = language;
 
             // Toggle the active state of language buttons
             const engButton = document.getElementById('eng_buttons');
@@ -266,12 +265,13 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
+            const storedLanguage = localStorage.getItem('selectedLanguage');
+            setLanguage(storedLanguage)
             // if clip button is active
             const activeTypes = JSON.parse(localStorage.getItem('activeTypes')) || [];
             if (activeTypes.includes('clip')) {
                 const engButton = document.getElementById('eng_buttons');
                 const vietButton = document.getElementById('viet_buttons');
-                const storedLanguage = localStorage.getItem('selectedLanguage');
             
                 if (storedLanguage === 'vietnamese') {
                     vietButton.classList.add('active');

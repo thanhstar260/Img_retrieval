@@ -23,7 +23,7 @@ def translate(text_query):
         stop_sequences=[],
         return_likelihoods='NONE')
     result = response.generations[0].text
-    print('Prediction: {}'.format(result))
+    # print('Prediction: {}'.format(result))
     return result
 
 # viet_query = "thanh is stupid"
