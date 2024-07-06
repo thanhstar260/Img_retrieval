@@ -13,7 +13,7 @@ MASTER_KEY = os.getenv("MASTER_KEY")
 client = meilisearch.Client(HTTP, MASTER_KEY)
 # An index is where the documents are stored.
 # index = client.index('ocr')
-save_path_ocr = r"C:\Users\admin\Projects\AIC\DATA\ocr\final_ocr.json"
+save_path_ocr = r"C:\Users\admin\Projects\AIC\DATA\ocr\final_ocr_clean.json"
 save_path_asr = r"C:\Users\admin\Projects\AIC\DATA\asr\final_asr.json"
 
 print(client.is_healthy())

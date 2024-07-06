@@ -14,3 +14,6 @@ utils/__pycache__/
 /test/
 test.py
 /static/sketch_query/sketch.jpg
+/elasticsearch/
+/unilm/
+/models/

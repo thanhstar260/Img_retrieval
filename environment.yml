@@ -1,4 +1,4 @@
-name: img_retrieval
+name: AIC
 channels:
   - pytorch
   - nvidia
