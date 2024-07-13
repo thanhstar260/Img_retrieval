@@ -54,7 +54,7 @@ const inputTypes = [
 // }
 
 
-const Stage = ({name}) => {
+const Stage = ({id, canClose}) => {
     const [selected, setSelected] = useState("scene");
     const [lang, setLang] = useState("vie");
     const [data, setData] = useState({
@@ -86,7 +86,7 @@ const Stage = ({name}) => {
         {
             switch(selected) {
                 case "scene":
-                    return <TextSearchControl id={name} label={"Enter the scene description"}/>
+                    return <TextSearchControl id={id} label={"Enter the scene description"}/>
                 case "image":
                     return;
                 case "text":
@@ -103,7 +103,7 @@ const Stage = ({name}) => {
 
   return (
     <div className='px-4 py-4 bg-slate-50 rounded-lg'>
-        <p className='text-teal-500 mb-2'>Stage</p>
+        <p className='text-teal-500 mb-2'>Stage <span className='stage-name'></span></p>
         <div
          className='flex flex-row gap-x-2 mb-4'>
             {inputTypes.map(type => <IconButton 
@@ -119,7 +119,7 @@ const Stage = ({name}) => {
                 getSearchControl(selected)
         }
         <div className='flex items-center text-teal-500 mt-4'>
-            <IoLanguageSharp className='text-lg mr-2'/>
+            <IoLanguageSharp className='text-lg mr-2' name={id}/>
             <span className='mr-4'>Language: </span>
             <LangRadioGroup value={lang} onChange={selectLangHandler}/>
         </div>
