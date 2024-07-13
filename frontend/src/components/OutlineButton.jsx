@@ -6,11 +6,11 @@ const OutlineButton = ({className, onClick, isSelected = false, children, ...pro
   return (
     <button 
     className={twMerge(
-        'px-3 py-2 rounded-md border border-teal-500',
-        `${isSelected ? 'bg-teal-500 text-white' : 'bg-transparent text-teal-500'}`,
+        'px-3 py-2 rounded-md border-2 border-teal-500 flex justify-center items-center gap-2 hover:bg-teal-500 hover:text-white text-teal-500 transition-all',
         className
     )}
     onClick={onClick}
+    {...props}
     >
         {children}
     </button>

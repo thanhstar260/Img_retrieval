@@ -14,7 +14,7 @@ const IconButton = ({className, onClick, isSelected = false, label, children, ..
     }
     {...props} >
             {children}
-            {label ? <div className='text-center hidden group-hover:block rounded-md p-1 absolute top-[120%] z-10 text-xs bg-slate-800 -translate-x-1/2 left-1/2'>{label}</div> : undefined}
+            {label ? <div className='text-center hidden group-hover:block rounded-md p-1 absolute top-[120%] z-10 text-xs bg-slate-800 -translate-x-1/2 left-1/2 shrink-0 min-w-16'>{label}</div> : undefined}
     </div>
   )
 }

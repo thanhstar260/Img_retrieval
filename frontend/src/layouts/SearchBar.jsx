@@ -3,6 +3,9 @@ import IconButton from '../components/IconButton';
 import Stage from '../components/Stage';
 import { v4 as uuidv4 } from 'uuid';
 import { IoIosAdd } from "react-icons/io";
+import OutlineButton from '../components/OutlineButton';
+import { PiRankingLight } from "react-icons/pi";
+import { IoIosSearch } from "react-icons/io";
 
 const SearchBar = () => {
     const [canClose, setCanClose] = useState(false);
@@ -51,6 +54,15 @@ const SearchBar = () => {
         >
              <IoIosAdd className='text-2xl'/>
         </IconButton>
+
+        <div className='flex justify-around mt-8'>
+            <OutlineButton>
+                <PiRankingLight className='inline-block text-xl'/> Rerank
+            </OutlineButton>
+            <OutlineButton>
+                <IoIosSearch className='inline-block text-xl'/> Search
+            </OutlineButton>
+        </div>
     </div>
   )
 }
