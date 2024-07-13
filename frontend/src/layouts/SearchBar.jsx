@@ -5,12 +5,18 @@ import { v4 as uuidv4 } from 'uuid';
 import { IoIosAdd } from "react-icons/io";
 
 const SearchBar = () => {
+    const [canClose, setCanClose] = useState(false);
     const [stages, setStages] = useState([{
         key: uuidv4(),
-        stage: <Stage id={uuidv4()}></Stage>
     }]);
 
     useEffect(() => {
+        if(stages.length > 1) {
+            setCanClose(true);
+        } else {
+            setCanClose(false);
+        }
+
         document
             .querySelectorAll(".stage-name")
             .forEach((value, key) => {
@@ -21,18 +27,21 @@ const SearchBar = () => {
     const addNewStageHandler = () => {
         setStages([
             ...stages,
-            {
-                key: uuidv4(),
-                stage: <Stage id={uuidv4()}/>
-            }
+            uuidv4(),
         ])
+    }
+
+    const closeStageHandler = (key) => {
+        setStages(
+            stages.filter((ele => ele !== key))
+        )
     }
 
   return (
     <div className='w-80 bg-slate-100 h-screen px-6 py-8 overflow-scroll'>
         <div className='flex flex-col gap-4'>
         {
-            stages.map(elm => elm.stage)
+            stages.map(elm => <Stage key={elm} canClose={canClose} id={elm} onClose={() => closeStageHandler(elm)}></Stage>)
         }
         </div>
         <IconButton 

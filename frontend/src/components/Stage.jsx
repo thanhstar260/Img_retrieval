@@ -9,6 +9,7 @@ import IconButton from './IconButton';
 import TextSearchControl from './TextSearchControl';
 import { IoLanguageSharp } from "react-icons/io5";
 import LangRadioGroup from './LangRadioGroup';
+import { IoIosClose } from "react-icons/io";
 
 const inputTypes = [
     {
@@ -54,7 +55,7 @@ const inputTypes = [
 // }
 
 
-const Stage = ({id, canClose}) => {
+const Stage = ({id, canClose, onClose}) => {
     const [selected, setSelected] = useState("scene");
     const [lang, setLang] = useState("vie");
     const [data, setData] = useState({
@@ -82,6 +83,7 @@ const Stage = ({id, canClose}) => {
         })
     }
 
+
     const getSearchControl = useCallback(() => {
         {
             switch(selected) {
@@ -102,8 +104,12 @@ const Stage = ({id, canClose}) => {
     }, [selected])
 
   return (
-    <div className='px-4 py-4 bg-slate-50 rounded-lg'>
-        <p className='text-teal-500 mb-2'>Stage <span className='stage-name'></span></p>
+    <div className='relative px-4 py-4 bg-slate-50 rounded-lg'>
+        {canClose && 
+            <IconButton onClick={onClose} label="Close" className='absolute top-3 right-4 text-gray-600 hover:text-red-500'>
+            <IoIosClose />
+        </IconButton>}
+        <p className='text-teal-500 mb-4'>Stage <span className='stage-name'></span></p>
         <div
          className='flex flex-row gap-x-2 mb-4'>
             {inputTypes.map(type => <IconButton 
