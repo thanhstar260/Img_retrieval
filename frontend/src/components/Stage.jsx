@@ -11,6 +11,7 @@ import { IoLanguageSharp } from "react-icons/io5";
 import LangRadioGroup from './LangRadioGroup';
 import { IoIosClose } from "react-icons/io";
 import ImageSearchControl from './ImageSearchControl';
+import ObjectSearchControl from './ObjectSearchControl';
 
 const inputTypes = [
     {
@@ -95,9 +96,9 @@ const Stage = ({id, canClose, onClose, onChange}) => {
                 case "image":
                     return <ImageSearchControl id={id} />;
                 case "text":
-                    return <TextSearchControl />;
+                    return <TextSearchControl id={id} label={"Enter your text"}/>;
                 case "object":
-                    return;
+                    return <ObjectSearchControl />;
                 case "speech":
                     return;
                 case "sketch":
