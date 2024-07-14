@@ -11,6 +11,7 @@ const SearchBar = () => {
     const [canClose, setCanClose] = useState(false);
     const [stages, setStages] = useState([{
         key: uuidv4(),
+        value: undefined,
     }]);
 
     useEffect(() => {
@@ -30,7 +31,10 @@ const SearchBar = () => {
     const addNewStageHandler = () => {
         setStages([
             ...stages,
-            uuidv4(),
+            {
+                key: uuidv4(),
+                value: undefined
+            }
         ])
     }
 
@@ -40,11 +44,27 @@ const SearchBar = () => {
         )
     }
 
+    const changeValueHandler = (key) => {
+        return (data) => {
+            const newStages = stages.map(elm => {
+                if(elm.key === key) {
+                    elm = {
+                        ...elm,
+                        value: data,
+                    }
+                }
+                return elm;
+            })
+
+            setStages(newStages);
+        }
+    }
+
   return (
-    <div className='w-80 bg-slate-100 h-screen px-6 py-8 overflow-scroll'>
+    <div className='w-[22rem] bg-slate-100 h-screen px-6 py-8 overflow-scroll'>
         <div className='flex flex-col gap-4'>
         {
-            stages.map(elm => <Stage key={elm} canClose={canClose} id={elm} onClose={() => closeStageHandler(elm)}></Stage>)
+            stages.map(elm => <Stage key={elm.key} canClose={canClose} id={elm.key} onClose={() => closeStageHandler(elm)} onChange={changeValueHandler(elm.key)}></Stage>)
         }
         </div>
         <IconButton 

@@ -10,6 +10,7 @@ import TextSearchControl from './TextSearchControl';
 import { IoLanguageSharp } from "react-icons/io5";
 import LangRadioGroup from './LangRadioGroup';
 import { IoIosClose } from "react-icons/io";
+import ImageSearchControl from './ImageSearchControl';
 
 const inputTypes = [
     {
@@ -55,7 +56,7 @@ const inputTypes = [
 // }
 
 
-const Stage = ({id, canClose, onClose}) => {
+const Stage = ({id, canClose, onClose, onChange}) => {
     const [selected, setSelected] = useState("scene");
     const [lang, setLang] = useState("vie");
     const [data, setData] = useState({
@@ -73,6 +74,7 @@ const Stage = ({id, canClose, onClose}) => {
             type: selected,
             data: undefined,
         })
+        onChange(data);
     }
 
     const selectLangHandler = (event) => {
@@ -81,6 +83,7 @@ const Stage = ({id, canClose, onClose}) => {
             ...data,
             lang: lang
         })
+        onChange(data);
     }
 
 
@@ -90,7 +93,7 @@ const Stage = ({id, canClose, onClose}) => {
                 case "scene":
                     return <TextSearchControl id={id} label={"Enter the scene description"}/>
                 case "image":
-                    return;
+                    return <ImageSearchControl id={id} />;
                 case "text":
                     return <TextSearchControl />;
                 case "object":
@@ -111,7 +114,7 @@ const Stage = ({id, canClose, onClose}) => {
         </IconButton>}
         <p className='text-teal-500 mb-4'>Stage <span className='stage-name'></span></p>
         <div
-         className='flex flex-row gap-x-2 mb-4'>
+         className='flex flex-row justify-between mb-4'>
             {inputTypes.map(type => <IconButton 
                 key={type.name} 
                 label={type.name}
