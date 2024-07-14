@@ -13,6 +13,7 @@ const SearchBar = () => {
         key: uuidv4(),
         value: undefined,
     }]);
+    
 
     useEffect(() => {
         if(stages.length > 1) {
@@ -61,7 +62,7 @@ const SearchBar = () => {
     }
 
   return (
-    <div className='w-[22rem] bg-slate-100 h-screen px-6 py-8 overflow-y-scroll'>
+    <div className='w-[22rem] bg-slate-100 h-screen px-4 py-8 overflow-y-scroll'>
         <div className='flex flex-col gap-4'>
         {
             stages.map(elm => <Stage key={elm.key} canClose={canClose} id={elm.key} onClose={() => closeStageHandler(elm)} onChange={changeValueHandler(elm.key)}></Stage>)
