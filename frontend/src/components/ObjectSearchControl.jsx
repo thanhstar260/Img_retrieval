@@ -4,6 +4,7 @@ import { twMerge } from 'tailwind-merge'
 import IconButton from './IconButton'
 import BrushSizeSlider from './BrushSizeSlider'
 import Canvas from './Canvas'
+import SelectedObject from './SelectedObject'
 
 const objectTypes = [
     {
@@ -91,9 +92,38 @@ const getObjectById = (id) => {
 const ObjectSearchControl = () => {
     const [selectedObj, setSelectedObj] = useState(1);
 
-    const [selectedColor, setSelectedColor] = useState("red");
+    const [selectedColor, setSelectedColor] = useState("white");
 
     const [brushSize, setBrushSize] = useState(2);
+
+    const [collection, setCollection] = useState({});
+
+    const handleSelectColor = (color) => {
+        for(let key in collection) {
+            if(key !== getObjectById(selectedObj).name && collection[key] === color.name) {
+                alert("This color was used for another object, please choose another one");
+                return
+            } 
+        }
+
+        const name = getObjectById(selectedObj).name
+
+        setCollection({
+            ...collection,
+        [name]: color.name
+        });
+        
+        setSelectedColor(color.name);
+    }
+
+    const handleOnClose = (name) => {
+        const newCollection = {
+            ...collection
+        }
+
+        delete newCollection[name]
+        setCollection(newCollection)
+    }
 
 
   return (
@@ -111,7 +141,7 @@ const ObjectSearchControl = () => {
                         <IconButton
                             key={color.name} 
                             className={`p-0 hover:shadow-lg hover:scale-105 ${selectedColor === color.name ? 'ring-4 ring-teal-400' : ''}`}
-                            onClick={() => setSelectedColor(color.name)}>
+                            onClick={() => handleSelectColor(color)}>
                             <div className={
                                 twMerge(
                                     "size-6 rounded-full shrink-0 p-1",
@@ -129,6 +159,21 @@ const ObjectSearchControl = () => {
             <BrushSizeSlider className={'w-40'} value={brushSize} onChange={(e) => setBrushSize(e.target.value)}/>
         </div>
         <Canvas type={"rectangle"} color={selectedColor} brushSize={brushSize}/>
+
+        <div className='mt-4 flex items-center h-7'>
+            <p className='text-sm text-teal-500 mr-4'>Collection</p>
+            <div className='flex gap-2 overflow-y-hidden'>
+                {Object
+                    .keys(collection)
+                    .reverse()
+                    .map(name => 
+                        <SelectedObject 
+                            name={name} 
+                            color={collection[name]} 
+                            onRemove={() => handleOnClose(name)}
+                        />)}
+            </div>
+        </div>
     </div>
   )
 }

@@ -26,32 +26,27 @@ const Canvas = ({color, brushSize, type}) => {
         return () => {
             document.removeEventListener('keydown', handleKeyDown)
         }
-    }, [])
+    }, [history])
 
-    const saveCanvasState = () => {
-        const canvas = canvasRef.current;
-        setHistory([
-            ...history,
-            contextRef.current.getImageData(0, 0, canvas.width, canvas.height)
-        ])
+    const saveCanvasState = (snapshot) => {
+        setHistory((prevHis) => {
+            return [
+                ...prevHis,
+                snapshot
+            ]
+        })
     }
 
-    const restoreCanvas = () => {
-        const canvas = canvasRef.current;
-        if(history.length > 0) {
-            contextRef.current.putImageData(history[history.length - 1], 0, 0)
-        } else {
-            contextRef.current.clearRect(0, 0, canvas.width, canvas.height)
-        }
-    }
 
     const handleUndo = () => {
+        if(history.length > 0) {
+            contextRef.current.putImageData(history[history.length - 1], 0, 0)
+        }
         setHistory((prevHistory) => {
             const newHistory = [...prevHistory]
             newHistory.pop();
             return newHistory;
         })
-        restoreCanvas();
     }
 
     const drawRectangle = (e) => {
@@ -85,13 +80,14 @@ const Canvas = ({color, brushSize, type}) => {
             e.nativeEvent.offsetX, e.nativeEvent.offsetY
         )
         setIsDrawing(true);
-        setSnapshot(contextRef.current.getImageData(0, 0, canvasRef.current.width, canvasRef.current.height))
+        const snapshot = contextRef.current.getImageData(0, 0, canvasRef.current.width, canvasRef.current.height)
+        setSnapshot(snapshot)
+        saveCanvasState(snapshot)
     }
 
     const stopDrawing = (e) => {
         setIsDrawing(false);
         contextRef.current.closePath();
-        saveCanvasState();
     }
 
     useEffect(() => {
@@ -107,7 +103,7 @@ const Canvas = ({color, brushSize, type}) => {
   return (
     <canvas 
             ref={canvasRef} 
-            className='aspect-video  bg-white ring-2 ring-slate-400 mt-4 cursor-crosshair'
+            className='aspect-video  bg-white ring-2 ring-slate-300 mt-4 cursor-crosshair'
             onMouseDown={startDrawing}
             onMouseMove={type === 'rectangle' ? drawRectangle : handleDrawing}
             onMouseUp={stopDrawing}>
