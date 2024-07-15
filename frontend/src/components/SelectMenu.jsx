@@ -21,16 +21,17 @@ const SelectMenu = ({className,options, selected, onSelect}) => {
   const handleSelectItem = (event, id) => {
     event.stopPropagation();
     onSelect(id);
+    console.log(getItemById(id).name)
     setShowItems(false);
     setValue(getItemById(id).name);
   }
 
   const handleClickOutSide = (event) => {
-    if(selectRef.current && !selectRef.current.contains(event.target)) {
+    if(showItems && selectRef.current && !selectRef.current.contains(event.target)) {
       setShowItems(false);
-    }
-    if(getItemById(selected).name !== value) {
-      setValue(getItemById(selected).name)
+      if(getItemById(selected).name !== value) {
+        setValue(getItemById(selected).name)
+      }
     }
   }
 
@@ -58,11 +59,11 @@ const SelectMenu = ({className,options, selected, onSelect}) => {
         className)
     } onClick={handleClickSelectMenu}>
         <input 
-          className='mr-4 focus:outline-none' 
+          className='max-w-[90%] focus:outline-none ' 
           value={value} onChange={handleChangeValue}/>
         <LuChevronsUpDown className='absolute bottom-1/2 translate-y-1/2 right-3'/>
        {
-        showItems &&  <div className='absolute top-[120%] bg-white w-ful left-0 right-0 z-[1] rounded-lg shadow-md overflow-hidden'>
+        showItems &&  <div className='absolute top-[120%] bg-white w-ful left-0 right-0 z-[20] rounded-lg shadow-md overflow-hidden'>
         <ul 
           className=
           ' max-h-48 overflow-y-scroll'>
