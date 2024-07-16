@@ -16,6 +16,7 @@ test.py
 /unilm/
 /utils/
 class_name.json
+/meili/
 draw.py
 image1.jpg
 rectangles.txt
