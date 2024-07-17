@@ -1,6 +1,6 @@
-import logo from './logo.svg';
 import SearchBar from './layouts/SearchBar';
 import { useState } from 'react';
+import Result from './layouts/Result';
 
 function App() {
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -19,8 +19,9 @@ function App() {
 }
 
   return (
-    <div className="App">
+    <div className="App flex">
       <SearchBar onSubmit={handleSubmit} isSubmitting={isSubmitting}/>
+      <Result />
     </div>
     
   );
