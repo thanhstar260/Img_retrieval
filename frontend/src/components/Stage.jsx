@@ -58,7 +58,7 @@ const inputTypes = [
 // }
 
 
-const Stage = ({id, canClose, onClose, onChange, onStopDraw}) => {
+const Stage = ({id, canClose, onClose, onChange}) => {
     const [selected, setSelected] = useState("scene");
     const [lang, setLang] = useState("eng");
     const [data, setData] = useState({
@@ -78,21 +78,17 @@ const Stage = ({id, canClose, onClose, onChange, onStopDraw}) => {
         if(type === selected)
             return;
         setSelected(type);
-        setData({
-            ...data,
-            lang: lang
-        })
-        onChange(data);
     }
 
 
     const selectLangHandler = (event) => {
         setLang(event.target.value);
-        setData({
+        const newData = {
             ...data,
-            lang: lang
-        })
-        onChange(data);
+            lang
+        }
+        setData(newData);
+        onChange(newData);
     }
 
     const handleChangeData = (type, newSearchData) => {
@@ -103,6 +99,7 @@ const Stage = ({id, canClose, onClose, onChange, onStopDraw}) => {
         }
         newData.data[type] = newSearchData;
         setData(newData);
+        onChange(newData);
     }
 
     useEffect(() => {
