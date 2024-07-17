@@ -2,9 +2,13 @@ import React, { useState } from 'react'
 import BrushSizeSlider from './BrushSizeSlider';
 import Canvas from './Canvas';
 
-const SketchSearchControl = () => {
+const SketchSearchControl = ({data, onChange}) => {
 
     const [brushSize, setBrushSize] = useState(2);
+
+    const handleChangeData = (image) => {
+      onChange("sketch", image);
+    }
 
   return (
     <div>
@@ -13,7 +17,7 @@ const SketchSearchControl = () => {
             <span className='mr-4 text-teal-500 text-sm'>Brush</span>
             <BrushSizeSlider className={'w-40'} value={brushSize} onChange={(e) => setBrushSize(e.target.value)}/>
         </div>
-        <Canvas type={"drawing"} color="black" brushSize={brushSize}/>
+        <Canvas type={"drawing"} color="black" brushSize={brushSize} value={data} onStopDraw={handleChangeData}/>
     </div>
   )
 }

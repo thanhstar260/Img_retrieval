@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react'
 
-const Canvas = ({color, brushSize, type, onChange, object}) => {
+const Canvas = ({color, brushSize,type, onStopDraw, onUndo}) => {
     const canvasRef = useRef(null);
 
     const [isDrawing, setIsDrawing] = useState(false);
     const [prevCoordinate, setPreCoordinate] = useState({
-        offsetX: undefined,
-        offsetY: undefined
+        offsetX: null,
+        offsetY: null
     })
     const [snapshot, setSnapshot] = useState('');
 
@@ -22,7 +22,6 @@ const Canvas = ({color, brushSize, type, onChange, object}) => {
         }
 
         document.addEventListener('keydown', handleKeyDown)
-
         return () => {
             document.removeEventListener('keydown', handleKeyDown)
         }
@@ -42,11 +41,11 @@ const Canvas = ({color, brushSize, type, onChange, object}) => {
         if(history.length > 0) {
             contextRef.current.putImageData(history[history.length - 1], 0, 0)
             if(type === "rectangle") {
-                onChange(data => {
-                    const newData = [...data];
-                    newData.pop();
-                    return newData;
-                })
+                onUndo();
+            } else if(history.length > 1) {
+                onStopDraw(canvasRef.current.toDataURL())
+            } else {
+                onStopDraw(null);
             }
         }
         setHistory((prevHistory) => {
@@ -100,7 +99,8 @@ const Canvas = ({color, brushSize, type, onChange, object}) => {
 
     const stopDrawing = (e) => {
         if(color == "white")
-            return;
+            return;        
+
         setIsDrawing(false);
         contextRef.current.closePath();
         if(type == "rectangle" && color != "white") {
@@ -119,15 +119,13 @@ const Canvas = ({color, brushSize, type, onChange, object}) => {
                 prevCoordinate.offsetX,
                 prevCoordinate.offsetY
             ]
-            const data = {
-                object: object,
-                coordinate: coordinate
-            }
 
-            onChange((prev) => {
-                return [...prev, data]
-            })
+
+            onStopDraw(coordinate)
+        } else {
+            onStopDraw(canvasRef.current.toDataURL())
         }
+        
     }
 
     useEffect(() => {
@@ -140,6 +138,7 @@ const Canvas = ({color, brushSize, type, onChange, object}) => {
         contextRef.current = context
         
     }, [brushSize, color])
+
   return (
     <canvas 
             ref={canvasRef} 

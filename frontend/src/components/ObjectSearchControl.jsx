@@ -63,7 +63,7 @@ const colors = [
 ]
 
 
-const ObjectSearchControl = () => {
+const ObjectSearchControl = ({onChange, data}) => {
     const [selectedObj, setSelectedObj] = useState(objectTypes[0]);
 
     const [selectedColor, setSelectedColor] = useState("white");
@@ -71,8 +71,6 @@ const ObjectSearchControl = () => {
     const [brushSize, setBrushSize] = useState(2);
 
     const [collection, setCollection] = useState({});
-
-    const [data, setData] = useState([])
     
     const handleSelect = (obj) => {
         if(collection[obj]) {
@@ -82,6 +80,25 @@ const ObjectSearchControl = () => {
         }
 
         setSelectedObj(obj)
+    }
+
+    const handleStopDraw = (newOffset) => {
+        if(!data) {
+            onChange("object", [{[selectedObj]: newOffset}])
+        } else {
+            onChange("object", [...data, {[selectedObj]: newOffset}])
+        }
+    }
+
+    const handleUndo = () => {
+        if(data) {
+            if(data.length > 0) {
+                data.pop();
+                onChange("object", [...data]);
+            }
+        } else {
+            onChange("object", null)
+        }
     }
 
     const handleSelectColor = (color) => {
@@ -111,11 +128,6 @@ const ObjectSearchControl = () => {
         delete newCollection[name]
         setCollection(newCollection)
     }
-
-    useEffect(() => {
-        console.log(data)
-    }, [data])
-
 
   return (
     <div>
@@ -149,7 +161,7 @@ const ObjectSearchControl = () => {
             <span className='mr-4 text-teal-500 text-sm'>Brush</span>
             <BrushSizeSlider className={'w-40'} value={brushSize} onChange={(e) => setBrushSize(e.target.value)}/>
         </div>
-        <Canvas type={"rectangle"} color={selectedColor} brushSize={brushSize} onChange={setData} object={selectedObj}/>
+        <Canvas type={"rectangle"} color={selectedColor} brushSize={brushSize} onStopDraw={handleStopDraw} onUndo={handleUndo}/>
 
         <div className='mt-4 flex items-center h-7'>
             <p className='text-sm text-teal-500 mr-4'>Collection</p>

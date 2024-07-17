@@ -3,9 +3,8 @@ import IconButton from './IconButton'
 import { BiImageAdd } from "react-icons/bi";
 import { twMerge } from 'tailwind-merge';
 
-const ImageSearchControl = ({id}) => {
+const ImageSearchControl = ({id, data, onChange}) => {
     const fileRef = useRef(null);
-    const [image, setImage] = useState(undefined);
 
     const changeImageUrlHandler = (event) => {
         const val = event.target.value;
@@ -16,7 +15,7 @@ const ImageSearchControl = ({id}) => {
             url = null;
         }
         if(url) {
-            setImage(url);
+            onChange(id, data);
         }
     }
 
@@ -29,7 +28,7 @@ const ImageSearchControl = ({id}) => {
     const coverFileToURL = (blob) => {
         var reader = new FileReader();
                     reader.onload = function (event) {
-                        setImage(event.target.result);
+                        onChange(id, event.target.result);
                     }; 
                     reader.readAsDataURL(blob);
     }
@@ -67,11 +66,11 @@ const ImageSearchControl = ({id}) => {
         <div id={id} className="
         w-full h-[10rem] border-dashed border-teal-500 border-2 rounded-lg group transition-all relative overflow-hidden">
             <input type='file' className='hidden' ref={fileRef} accept='image/png,image.jpeg' onChange={changeFileHandler}></input>
-            {image && <img src={image} className='object-cover object-center w-full h-full border-none border-0' style={{border:'0'}}/>}
+            {data && <img src={data} className=' object-contain object-center w-full h-full border-none border-0' style={{border:'0'}}/>}
             <IconButton onClick={selectImageHandler} className={
                 twMerge(
                     "right-1/2 translate-x-1/2 top-1/2 -translate-y-1/2  bg-white absolute",
-                    image ? 'group-hover:block hidden' : ''
+                    data ? 'group-hover:block hidden' : ''
                 )
             }>
                 <BiImageAdd className='text-3xl'/>

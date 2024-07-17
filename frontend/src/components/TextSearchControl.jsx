@@ -1,6 +1,12 @@
 import React from 'react'
 
-const TextSearchControl = ({id, label}) => {
+const TextSearchControl = ({id, label, data, onChange}) => {
+  console.log("log", data);
+  const handleChangeData = (e) => {
+    console.log("hello")
+    const text = e.target.value;
+    onChange(id, text);
+  }
 
   return (
     <div>
@@ -9,7 +15,9 @@ const TextSearchControl = ({id, label}) => {
         focus:ring-teal-500
         px-3
         py-3
-        h-auto">
+        h-auto" 
+        value={data}
+        onChange={handleChangeData}>
         </textarea>
     </div>
   )
