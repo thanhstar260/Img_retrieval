@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react'
 
-const Canvas = ({color, brushSize, type}) => {
+const Canvas = ({color, brushSize,type, onStopDraw, onUndo}) => {
     const canvasRef = useRef(null);
 
     const [isDrawing, setIsDrawing] = useState(false);
     const [prevCoordinate, setPreCoordinate] = useState({
-        offsetX: undefined,
-        offsetY: undefined
+        offsetX: null,
+        offsetY: null
     })
     const [snapshot, setSnapshot] = useState('');
 
@@ -22,7 +22,6 @@ const Canvas = ({color, brushSize, type}) => {
         }
 
         document.addEventListener('keydown', handleKeyDown)
-
         return () => {
             document.removeEventListener('keydown', handleKeyDown)
         }
@@ -41,6 +40,13 @@ const Canvas = ({color, brushSize, type}) => {
     const handleUndo = () => {
         if(history.length > 0) {
             contextRef.current.putImageData(history[history.length - 1], 0, 0)
+            if(type === "rectangle") {
+                onUndo();
+            } else if(history.length > 1) {
+                onStopDraw(canvasRef.current.toDataURL())
+            } else {
+                onStopDraw(null);
+            }
         }
         setHistory((prevHistory) => {
             const newHistory = [...prevHistory]
@@ -50,6 +56,8 @@ const Canvas = ({color, brushSize, type}) => {
     }
 
     const drawRectangle = (e) => {
+        if(color == "white")
+            return;
         if (isDrawing) {
             contextRef.current.putImageData(snapshot, 0, 0);
             contextRef.current.strokeRect(
@@ -61,6 +69,8 @@ const Canvas = ({color, brushSize, type}) => {
     } 
 
     const handleDrawing = (e) => {
+        if(color == "white")
+            return;
         if (isDrawing) {
             contextRef.current.lineTo(
                 e.nativeEvent.offsetX,
@@ -71,6 +81,8 @@ const Canvas = ({color, brushSize, type}) => {
     }
 
     const startDrawing = (e) => {
+        if(color == "white")
+            return;
         setPreCoordinate({
             offsetX: e.nativeEvent.offsetX,
             offsetY: e.nativeEvent.offsetY
@@ -86,8 +98,34 @@ const Canvas = ({color, brushSize, type}) => {
     }
 
     const stopDrawing = (e) => {
+        if(color == "white")
+            return;        
+
         setIsDrawing(false);
         contextRef.current.closePath();
+        if(type == "rectangle" && color != "white") {
+            const currentOffset = {
+                x: e.nativeEvent.offsetX,
+                y: e.nativeEvent.offsetY
+            }
+
+            const coordinate = prevCoordinate.offsetX < currentOffset.x ?
+            [   prevCoordinate. offsetX, 
+                prevCoordinate.offsetY, 
+                currentOffset.x, currentOffset.y
+            ] : 
+            [   currentOffset.x,
+                currentOffset.y,
+                prevCoordinate.offsetX,
+                prevCoordinate.offsetY
+            ]
+
+
+            onStopDraw(coordinate)
+        } else {
+            onStopDraw(canvasRef.current.toDataURL())
+        }
+        
     }
 
     useEffect(() => {
@@ -100,6 +138,7 @@ const Canvas = ({color, brushSize, type}) => {
         contextRef.current = context
         
     }, [brushSize, color])
+
   return (
     <canvas 
             ref={canvasRef} 

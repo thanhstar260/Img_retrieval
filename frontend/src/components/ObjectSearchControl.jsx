@@ -7,30 +7,7 @@ import Canvas from './Canvas'
 import SelectedObject from './SelectedObject'
 
 const objectTypes = [
-    {
-        id: 1,
-        name: 'Human'
-    },
-    {
-        id: 2,
-        name: 'Dog'
-    },
-    {
-        id: 3,
-        name: 'Cat',
-    },
-    {
-        id: 4,
-        name: 'Book'
-    },
-    {
-        id: 5,
-        name: 'Table'
-    },
-    {
-        id: 6,
-        name: 'Car'
-    }
+    "human", "cat", "dog", "pig", "table", "computer", "chair", "book", "notebook"
 ]
 
 const colors = [
@@ -85,32 +62,59 @@ const colors = [
     }
 ]
 
-const getObjectById = (id) => {
-    return objectTypes.find((obj) => obj.id === id)
-}
 
-const ObjectSearchControl = () => {
-    const [selectedObj, setSelectedObj] = useState(1);
+const ObjectSearchControl = ({onChange, data}) => {
+    const [selectedObj, setSelectedObj] = useState(objectTypes[0]);
 
     const [selectedColor, setSelectedColor] = useState("white");
 
     const [brushSize, setBrushSize] = useState(2);
 
     const [collection, setCollection] = useState({});
+    
+    const handleSelect = (obj) => {
+        if(collection[obj]) {
+            setSelectedColor(collection[obj])
+        } else {
+            setSelectedColor("white")
+        }
+
+        setSelectedObj(obj)
+    }
+
+    const handleStopDraw = (newOffset) => {
+        if(!data) {
+            onChange("object", [{[selectedObj]: newOffset}])
+        } else {
+            onChange("object", [...data, {[selectedObj]: newOffset}])
+        }
+    }
+
+    const handleUndo = () => {
+        if(data) {
+            if(data.length > 0) {
+                data.pop();
+                onChange("object", [...data]);
+            }
+        } else {
+            onChange("object", null)
+        }
+    }
 
     const handleSelectColor = (color) => {
         for(let key in collection) {
-            if(key !== getObjectById(selectedObj).name && collection[key] === color.name) {
+            if(key !== selectedObj && collection[key] === color.name) {
                 alert("This color was used for another object, please choose another one");
                 return
-            } 
+            } else if(Object.keys(collection).includes(selectedObj) && collection[selectedObj] && collection[selectedObj] !== color.name) {
+                alert("This object already has a specific color");
+                return
+            }
         }
-
-        const name = getObjectById(selectedObj).name
 
         setCollection({
             ...collection,
-        [name]: color.name
+        [selectedObj]: color.name
         });
         
         setSelectedColor(color.name);
@@ -125,12 +129,11 @@ const ObjectSearchControl = () => {
         setCollection(newCollection)
     }
 
-
   return (
     <div>
         <div>
             <label className=' text-teal-500 mr-4 text-sm'>Object</label>
-            <SelectMenu className='max-w-44' options={objectTypes} selected={selectedObj} onSelect={setSelectedObj}/>
+            <SelectMenu className='max-w-44' options={objectTypes} selected={selectedObj} onSelect={handleSelect}/>
         </div>
         <div className='flex mt-2 h-12 items-center'>
             <span className='text-teal-500 mr-4 text-sm'>Color</span>
@@ -158,7 +161,7 @@ const ObjectSearchControl = () => {
             <span className='mr-4 text-teal-500 text-sm'>Brush</span>
             <BrushSizeSlider className={'w-40'} value={brushSize} onChange={(e) => setBrushSize(e.target.value)}/>
         </div>
-        <Canvas type={"rectangle"} color={selectedColor} brushSize={brushSize}/>
+        <Canvas type={"rectangle"} color={selectedColor} brushSize={brushSize} onStopDraw={handleStopDraw} onUndo={handleUndo}/>
 
         <div className='mt-4 flex items-center h-7'>
             <p className='text-sm text-teal-500 mr-4'>Collection</p>
@@ -168,6 +171,7 @@ const ObjectSearchControl = () => {
                     .reverse()
                     .map(name => 
                         <SelectedObject 
+                            key={name}
                             name={name} 
                             color={collection[name]} 
                             onRemove={() => handleOnClose(name)}

@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { MdMovieEdit } from "react-icons/md";
 import { CiImageOn } from "react-icons/ci";
 import { MdOutlineTextFields } from "react-icons/md";
@@ -31,12 +31,6 @@ const inputTypes = [
         icon: <MdOutlineTextFields />
     },
     {
-        type: "object",
-        name: "Object",
-        icon: <FaRegObjectUngroup />
-
-    },
-    {
         type: "speech",
         name: "Speech",
         icon: <MdOutlineKeyboardVoice />
@@ -45,7 +39,13 @@ const inputTypes = [
         type: "sketch",
         name: "Sketch",
         icon: <RiSketching />
-    }
+    },
+    {
+        type: "object",
+        name: "Object",
+        icon: <FaRegObjectUngroup />
+
+    },
 
 ]
 
@@ -60,53 +60,53 @@ const inputTypes = [
 
 const Stage = ({id, canClose, onClose, onChange}) => {
     const [selected, setSelected] = useState("scene");
-    const [lang, setLang] = useState("vie");
+    const [lang, setLang] = useState("eng");
     const [data, setData] = useState({
-        type: "scene",
-        data: undefined,
-        lang: 'vie'
+        data:  
+        {    
+            scene: undefined,
+            image: undefined,
+            text: undefined,
+            speech: undefined,
+            sketch: undefined,
+            object: undefined,
+        },
+        lang: 'eng'
     });
 
     const selectInputTypeHandler = (type) => {
         if(type === selected)
             return;
         setSelected(type);
-        setData({
-            ...data,
-            type: selected,
-            data: undefined,
-        })
-        onChange(data);
     }
+
 
     const selectLangHandler = (event) => {
         setLang(event.target.value);
-        setData({
+        const newData = {
             ...data,
-            lang: lang
-        })
-        onChange(data);
+            lang
+        }
+        setData(newData);
+        onChange(newData);
     }
 
-
-    const getSearchControl = useCallback(() => {
-        {
-            switch(selected) {
-                case "scene":
-                    return <TextSearchControl id={id} label={"Enter the scene description"}/>
-                case "image":
-                    return <ImageSearchControl id={id} />;
-                case "text":
-                    return <TextSearchControl id={id} label={"Enter your text"}/>;
-                case "object":
-                    return <ObjectSearchControl/>;
-                case "speech":
-                    return <TextSearchControl id={id} label={"Enter your text"}/>;
-                case "sketch":
-                    return <SketchSearchControl />;
-            }
+    const handleChangeData = (type, newSearchData) => {
+        console.log(data)
+        console.log(newSearchData)
+        const newData = {
+            ...data
         }
-    }, [selected])
+        newData.data[type] = newSearchData;
+        setData(newData);
+        onChange(newData);
+    }
+
+    useEffect(() => {
+        if(data) {
+
+        }
+    })
 
   return (
     <div className='relative px-4 py-4 bg-slate-50 rounded-lg'>
@@ -121,14 +121,29 @@ const Stage = ({id, canClose, onClose, onChange}) => {
                 key={type.name} 
                 label={type.name}
                 isSelected={selected === type.type}
-                onClick={() => selectInputTypeHandler(type.type)}>
+                onClick={() => selectInputTypeHandler(type.type)}
+                className={`${data.data[type.type] && selected !== type.type ? 'bg-violet-400 text-white' : ''}`}>
                 {type.icon}
             </IconButton>)}
         </div>
-
-        {
-                getSearchControl(selected)
-        }
+        <div className={`${selected === 'scene' ? 'block' : 'hidden'}`}>
+            <TextSearchControl id="scene" label={"Enter the scene description"} data={data.data["scene"]} onChange={handleChangeData}/>
+        </div>
+        <div className={`${selected === 'image' ? 'block' : 'hidden'}`}>
+            <ImageSearchControl id="image" data={data.data["image"]} onChange={handleChangeData}/>
+        </div>
+        <div className={`${selected === 'text' ? 'block' : 'hidden'}`}>
+            <TextSearchControl id="text" label={"Enter your text"} data={data.data["text"]} onChange={handleChangeData}/>
+        </div>
+        <div className={`${selected === 'speech' ? 'block' : 'hidden'}`}>
+            <TextSearchControl id="speech" label={"Enter your text"} data={data.data["speech"]} onChange={handleChangeData}/>   
+        </div>
+        <div className={`${selected === 'sketch' ? 'block' : 'hidden'}`}>
+                <SketchSearchControl data={data.data["sketch"]} onChange={handleChangeData}/>  
+        </div>
+        <div className={`${selected === 'object' ? 'block' : 'hidden'}`}>
+                <ObjectSearchControl data={data.data["object"]} onChange={handleChangeData}/>  
+        </div>
         <div className='flex items-center text-teal-500 mt-4'>
             <IoLanguageSharp className='text-lg mr-2' name={id}/>
             <span className='mr-4'>Language: </span>
