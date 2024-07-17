@@ -24,7 +24,7 @@ const ImageShow = ({ idImg, onClose }) => {
   };
   return (
     <div
-      className="fixed flex flex-col top-0 left-0 right-0 bottom-0 pt-20 bg-black bg-opacity-75 z-50"
+      className="fixed flex flex-col top-0 left-0 right-0 bottom-0 pt-14 bg-black bg-opacity-75 z-50"
       onClick={onClose}
     >
       <button

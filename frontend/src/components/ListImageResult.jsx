@@ -51,7 +51,7 @@ const ListImageResult = ({ ImageIdArr }) => {
           </button>
         ))}
       </div>
-      <div className="w-full grid grid-cols-6 overflow-y-scroll h-4/6 mb-2">
+      <div className="w-full grid grid-cols-6 overflow-y-scroll h-3/5 mb-2">
         {NewImageArr[stage].map((item, idx) => (
           <ImageItem
             key={`${stage}-${idx}`}
