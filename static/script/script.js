@@ -225,7 +225,7 @@ document.addEventListener("DOMContentLoaded", function () {
     function retrieveImage(query) {
         let route;
         route = '/retrieve_image';
-
+    
         fetch(route, {
             method: 'POST',
             headers: {
@@ -242,10 +242,12 @@ document.addEventListener("DOMContentLoaded", function () {
             if (data.result) {
                 const newResultsContainer = document.createElement('div');
                 newResultsContainer.className = 'container';
-
-                const imageContainer = document.createElement('div');
+    
+                let imageContainer = document.createElement('div'); // Declare imageContainer here
                 imageContainer.className = 'image-container';
-
+    
+                let i = 1;
+    
                 data.result.forEach(item => {
                     const imageItem = document.createElement('div');
                     imageItem.className = 'image-item';
@@ -254,13 +256,21 @@ document.addEventListener("DOMContentLoaded", function () {
                     image.alt = item.slice(16);
                     imageItem.appendChild(image);
                     imageContainer.appendChild(imageItem);
+                    if (i % 6 == 0) {
+                        newResultsContainer.appendChild(imageContainer);
+                        imageContainer = document.createElement('div'); // Update imageContainer's contents
+                        imageContainer.className = 'image-container';
+                    }
+                    i++;
                 });
-
-                newResultsContainer.appendChild(imageContainer);
+    
+                // Append any remaining images
+                if (imageContainer.children.length > 0) {
+                    newResultsContainer.appendChild(imageContainer);
+                }
+    
                 const existingResultsContainer = document.querySelector('.container');
                 existingResultsContainer.replaceWith(newResultsContainer);
-                const Container = document.querySelector('.container');
-                Container.style.marginLeft = '2rem';
                 attachEventListeners();
                 hidePopup();
             }
@@ -268,7 +278,7 @@ document.addEventListener("DOMContentLoaded", function () {
         .catch(error => {
             console.error('Error during AJAX request:', error);
         });
-    }
+    } 
 
     function attachEventListeners() {
         const imageItems = document.querySelectorAll(".image-item");
