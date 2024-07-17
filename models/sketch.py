@@ -91,12 +91,12 @@ class SKETCH:
 
 if __name__ == "__main__":
 
-    sket_query_path = r"C:\Users\admin\Projects\AIC\ZSE_SBIR\airplane.jpg"
+    sket_query_path = r"D:\Downloads\sketch.png"
 
-    image_path_dict = r"C:\Users\admin\Projects\AIC\DATA\image_path.json"
-    sket_feature_path = r'C:\Users\admin\Projects\AIC\ZSE_SBIR\features'
+    image_path_dict = r"D:\Temporal_search\data\image_path.json"
+    sket_feature_path = r'D:\Temporal_search\data\sketch_features'
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model_weight_path = r"C:\Users\admin\Projects\AIC\ZSE_SBIR\checkpoints/sketchy_ext/best_checkpoint.pth"
+    model_weight_path = r"D:\Downloads\best_checkpoint.pth"
     K = 40
 
     sketch_model = SKETCH()
@@ -111,4 +111,5 @@ if __name__ == "__main__":
 
     image_path = load_image_path(image_path_dict)
 
-    visualize(image_path, result, K)
+    # visualize(image_path, result, K)
+    print(result)

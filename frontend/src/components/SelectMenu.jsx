@@ -3,11 +3,8 @@ import { twMerge } from 'tailwind-merge';
 import { LuChevronsUpDown } from "react-icons/lu";
 
 const SelectMenu = ({className,options, selected, onSelect}) => {
-  const getItemById = useCallback((id) => {
-    return options.find(item => item.id === id)
-  }, [options]);
 
-  const [value, setValue] = useState(getItemById(selected).name)
+  const [value, setValue] = useState(selected)
 
   const [filterList, setFilterList] = useState(options);
 
@@ -21,16 +18,15 @@ const SelectMenu = ({className,options, selected, onSelect}) => {
   const handleSelectItem = (event, id) => {
     event.stopPropagation();
     onSelect(id);
-    console.log(getItemById(id).name)
     setShowItems(false);
-    setValue(getItemById(id).name);
+    setValue(id);
   }
 
   const handleClickOutSide = (event) => {
     if(showItems && selectRef.current && !selectRef.current.contains(event.target)) {
       setShowItems(false);
-      if(getItemById(selected).name !== value) {
-        setValue(getItemById(selected).name)
+      if(selected !== value) {
+        setValue(selected)
       }
     }
   }
@@ -46,7 +42,7 @@ const SelectMenu = ({className,options, selected, onSelect}) => {
     const val = event.target.value;
     setValue(val);
     setFilterList(options.filter(elm => {
-      return elm.name.toLowerCase().includes(val.toLowerCase());
+      return elm.toLowerCase().includes(val.toLowerCase());
     }))
   }
 
@@ -69,15 +65,15 @@ const SelectMenu = ({className,options, selected, onSelect}) => {
           ' max-h-48 overflow-y-scroll'>
           {filterList.map(option =>
             <li
-            key={option.id}
+            key={option}
             className={
               twMerge(
                 'px-4 py-1 hover:bg-teal-500 hover:text-white',
-                `${selected === option.id ? 'text-teal-500' : ''}`
+                `${selected === option ? 'text-teal-500' : ''}`
               )
             }
-            onClick={(event) => handleSelectItem(event, option.id)}>
-              <span>{option.name}</span>
+            onClick={(event) => handleSelectItem(event, option)}>
+              <span>{option}</span>
             </li>) }
         </ul>
       </div>

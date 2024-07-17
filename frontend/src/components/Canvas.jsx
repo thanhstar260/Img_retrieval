@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 
-const Canvas = ({color, brushSize, type}) => {
+const Canvas = ({color, brushSize, type, onChange, object}) => {
     const canvasRef = useRef(null);
 
     const [isDrawing, setIsDrawing] = useState(false);
@@ -41,6 +41,13 @@ const Canvas = ({color, brushSize, type}) => {
     const handleUndo = () => {
         if(history.length > 0) {
             contextRef.current.putImageData(history[history.length - 1], 0, 0)
+            if(type === "rectangle") {
+                onChange(data => {
+                    const newData = [...data];
+                    newData.pop();
+                    return newData;
+                })
+            }
         }
         setHistory((prevHistory) => {
             const newHistory = [...prevHistory]
@@ -50,6 +57,8 @@ const Canvas = ({color, brushSize, type}) => {
     }
 
     const drawRectangle = (e) => {
+        if(color == "white")
+            return;
         if (isDrawing) {
             contextRef.current.putImageData(snapshot, 0, 0);
             contextRef.current.strokeRect(
@@ -61,6 +70,8 @@ const Canvas = ({color, brushSize, type}) => {
     } 
 
     const handleDrawing = (e) => {
+        if(color == "white")
+            return;
         if (isDrawing) {
             contextRef.current.lineTo(
                 e.nativeEvent.offsetX,
@@ -71,6 +82,8 @@ const Canvas = ({color, brushSize, type}) => {
     }
 
     const startDrawing = (e) => {
+        if(color == "white")
+            return;
         setPreCoordinate({
             offsetX: e.nativeEvent.offsetX,
             offsetY: e.nativeEvent.offsetY
@@ -86,8 +99,35 @@ const Canvas = ({color, brushSize, type}) => {
     }
 
     const stopDrawing = (e) => {
+        if(color == "white")
+            return;
         setIsDrawing(false);
         contextRef.current.closePath();
+        if(type == "rectangle" && color != "white") {
+            const currentOffset = {
+                x: e.nativeEvent.offsetX,
+                y: e.nativeEvent.offsetY
+            }
+
+            const coordinate = prevCoordinate.offsetX < currentOffset.x ?
+            [   prevCoordinate. offsetX, 
+                prevCoordinate.offsetY, 
+                currentOffset.x, currentOffset.y
+            ] : 
+            [   currentOffset.x,
+                currentOffset.y,
+                prevCoordinate.offsetX,
+                prevCoordinate.offsetY
+            ]
+            const data = {
+                object: object,
+                coordinate: coordinate
+            }
+
+            onChange((prev) => {
+                return [...prev, data]
+            })
+        }
     }
 
     useEffect(() => {

@@ -249,9 +249,10 @@ if __name__ == "__main__":
         result = ocr.ocr_retrieval(text_query, K)
         
         # VISUALIZE RESULT
-        image_path_dict = r"C:\Users\admin\Projects\AIC\DATA\image_path.json"
+        image_path_dict = r"D:\Temporal_search\data\image_path.json"
         image_path = load_image_path(image_path_dict)
-        visualize(image_path, result, K)
+        # visualize(image_path, result, K)
+        print(result)
     else:
         # ASR
         asr_path = r"C:\Users\admin\Projects\AIC\DATA\asr\final_asr.json"
@@ -267,6 +268,7 @@ if __name__ == "__main__":
         # VISUALIZE RESULT
         image_path_dict = r"C:\Users\admin\Projects\AIC\DATA\image_path.json"
         image_path = load_image_path(image_path_dict)
-        visualize(image_path, result, K)
+        # visualize(image_path, result, K)
+        print(result)
     
     

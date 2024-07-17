@@ -111,12 +111,12 @@ class BEIT3:
 if __name__ == "__main__":
 
     # DEFINE PARAMETER
-    feature_folder_path = r"C:\Users\admin\Downloads\beit_features"
-    image_path_dict = r".\DATA\image_path.json"
+    feature_folder_path = r"D:\Downloads\data\data\beit3_features"
+    image_path_dict = r"D:\Downloads\data\data\image_path.json"
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model_weight_path = r"C:\Users\admin\Downloads\beit3_base_itc_patch16_224.pth"
+    model_weight_path = r"D:\Downloads\beit3_base_itc_patch16_224.pth"
     # model_weight_path = r"C:\Users\admin\Downloads\beit3_large_itc_patch16_224_flickr.pth"
-    tokenizer_path = r"C:\Users\admin\Downloads\beit3.spm"
+    tokenizer_path = r"D:\Downloads\beit3.spm"
 
     # text_query = "a woman feedding dogs in the park"
     text_query = "một người phụ nữ đang cho bầy chó ăn trong công viên"
@@ -138,12 +138,12 @@ if __name__ == "__main__":
         print("Text Query")
         text_query = translate(text_query)
         print("text translated: ", text_query)
-        distances,ids_result = beit3.Text_retrieval(text_query, K, device)
+        ids_result, distances = beit3.Text_retrieval(text_query, K, device)
     else:
         print()
         print("Image Query")
-        distances,ids_result = beit3.Image_retrieval(img_query_path, K, device)
+        ids_result, distances = beit3.Image_retrieval(img_query_path, K, device)
 
     image_path = load_image_path(image_path_dict)
-    visualize(image_path, ids_result, K)
-
+    # visualize(image_path, ids_result, K)
+    print(ids_result)
