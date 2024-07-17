@@ -1,10 +1,11 @@
-import logo from './logo.svg';
 import SearchBar from './layouts/SearchBar';
+import Result from './layouts/Result';
 
 function App() {
   return (
-    <div className="App">
+    <div className="App flex">
       <SearchBar />
+      <Result />
     </div>
     
   );
