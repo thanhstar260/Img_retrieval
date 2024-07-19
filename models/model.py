@@ -78,7 +78,7 @@ class Event_retrieval():
         ids, scr = self.objects.Objects_local_retrieval(objects_list, K, index_name, threshold_conf, threshold_iou)
         
         visualize(load_image_path(r".\DATA\image_path.json"), ids, len(ids), 8)
-        print("position: ",ids,scr,find_positions(ids, ids_first.tolist()))
+        # print("position: ",ids,scr,find_positions(ids, ids_first.tolist()))
         # visualize(load_image_path(r'D:\THANHSTAR\Projetcs\AIC\DATA\image_path.json'), ids)
         print("objects local retrieval: ", scr, ids)
         
