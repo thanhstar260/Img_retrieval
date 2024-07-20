@@ -9,7 +9,24 @@ import base64
 import os
 from models.utils import visualize, load_image_path, translate
 from typing import Dict
+from fastapi.middleware.cors import CORSMiddleware
+from dotenv import load_dotenv
 
+app = FastAPI()
+
+origins = [
+    "http://localhost:3000",
+]
+
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # initialization
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
@@ -21,14 +38,20 @@ tokenizer_path = r".\models\weights\beit3.spm"
 beit3_fea_path = r".\DATA\beit3_features"
     
 # SKETCH PARAMETER
-sket_model_path = r".\ZSE_SBIR\checkpoints\sketchy_ext\best_checkpoint.pth"
+sket_model_path = r".\models\weights\best_checkpoint.pth"
 sket_fea_path = r".\DATA\sketch_features"
 
-retrieval = Event_retrieval()
-retrieval.load_feature(type_fea="beit3", beit3_fea_path=beit3_fea_path)
-retrieval.load_model(device=device, type_model="beit3", beit3_model_path=beit3_model_path, tokenizer_path=tokenizer_path)
+load_dotenv()
+CHECK_SERVER = os.getenv("CHECK_SERVER")
+HOST_ELASTIC = os.getenv("HOST_ELASTIC")
+PORT_ELASTIC = int(os.getenv("PORT_ELASTIC"))
 
-app = FastAPI()
+retrieval = Event_retrieval()
+retrieval.load_feature(type_fea="all", beit3_fea_path=beit3_fea_path, sket_fea_path=sket_fea_path)
+retrieval.load_model(device=device, type_model="all", beit3_model_path=beit3_model_path, tokenizer_path=tokenizer_path, sket_model_path=sket_model_path)
+retrieval.connect_elastic(check_server = CHECK_SERVER, host=HOST_ELASTIC, port=PORT_ELASTIC)
+
+
 K = 40
 
 print("finish loading")
@@ -53,15 +76,15 @@ def handle_stage(stage):
         data = checkAndTranslate(stage.lang, stage.data)
         return handle_scene_query(data)
     elif(stage.type == "image"):
-        return handle_image_query(stage.lang, stage.data)
+        return handle_image_query(stage.data)
     elif(stage.type == "text"):
         data = checkAndTranslate(stage.data)
-        print("text")
+        return handle_text_query(data)
     elif(stage.type == "speech"):
         data = checkAndTranslate(stage.data)
-        print("speech")
+        return handle_speech_query(data)
     elif(stage.type == "sketch"):
-        print("sketch")
+        return handle_sketch_query(stage.data)
 
 def handle_scene_query(data):
     print("text translated: ", data)
@@ -94,3 +117,22 @@ def handle_object_query(ids, dis, object_list, K):
             check_list.append((object[0], item))
     ids, dis = retrieval.object_filter(ids, dis, check_list, K)
     return {"ids": ids, "distances": dis}
+def handle_sketch_query(data):
+    data = data.split(",")[1]
+    image_data = base64.b64decode(data)
+    image = Image.open(BytesIO(image_data))
+    ids_result, distances = retrieval.sketch.Sket_retrieval(image, K, device)
+    print(ids_result)
+    return {"ids": ids_result, "distances": distances}
+
+def handle_text_query(data):
+    ids_result, distances = retrieval.elastic.Elastic_retrieval(data, K, "ocr")
+    return {"ids": ids_result, "distances": distances}
+def handle_speech_query(data):
+    ids_result, distances = retrieval.elastic.Elastic_retrieval(data, K, "asr")
+    return {"ids": ids_result, "distances": distances}
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
+
