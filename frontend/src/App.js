@@ -5,6 +5,7 @@ import Result from './layouts/Result';
 
 function App() {
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [result, setResult] = useState({})
 
   const handleSubmit = async (data) => {
     const stages = Object.values(data);
@@ -49,14 +50,15 @@ function App() {
 
 
     setIsSubmitting(true);
-    const result = await fetch("http://127.0.0.1:8000/", {
+    const response = await fetch("http://127.0.0.1:8000/", {
       headers: {
         'Content-Type': 'application/json',
       },
       method: "POST",
       body: JSON.stringify(body)
     })
-    console.log(result)
+    const json = await response.json();
+    setResult(json);
     setIsSubmitting(false);
     
 
