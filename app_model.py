@@ -22,3 +22,13 @@ class SearchRequest(BaseModel):
 class SearchResult(BaseModel):
     ids: List[int]
     distances: List[float]
+
+class StageRerank(BaseModel):
+    ids: List[int]
+    dis: List[int]
+    positive_list: List[int]
+    negative_list: List[int]
+    
+class RerankRequest(BaseModel):
+    stages: List[StageRerank]
+    

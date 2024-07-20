@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app_model import SearchRequest, SearchResult
+from app_model import SearchRequest, SearchResult, RerankRequest
 from models.beit3_model import BEIT3
 from models.model import Event_retrieval
 from PIL import Image
@@ -91,3 +91,21 @@ def handle_image_query(data):
     print(ids_result)
     return {"ids": ids_result, "distances": distances}
 
+@app.post('/rerank')
+def handle_rerank_query(request: RerankRequest) -> Dict[int, SearchResult]:
+    result = {}
+    index = 0
+    for stage in request.stages:
+        ids, dis = retrieval.rerank(stage.dis, stage.ids, stage.positive_list, stage.negative_list)
+        stage_result = {"ids": ids, "distances": dis}
+        result.update({index: stage_result})
+        index += 1
+    return result
+
+def handle_object_query(ids, dis, object_list, K):
+    check_list = []
+    for object in object_list:
+        for item in object[1]:
+            check_list.append((object[0], item))
+    ids, dis = retrieval.object_filter(ids, dis, check_list, K)
+    return {"ids": ids, "distances": dis}
