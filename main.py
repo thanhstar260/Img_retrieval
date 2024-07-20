@@ -9,6 +9,7 @@ import base64
 import os
 from models.utils import visualize, load_image_path, translate
 from typing import Dict
+from fastapi.middleware.cors import CORSMiddleware
 
 
 # initialization
@@ -28,7 +29,21 @@ retrieval = Event_retrieval()
 retrieval.load_feature(type_fea="beit3", beit3_fea_path=beit3_fea_path)
 retrieval.load_model(device=device, type_model="beit3", beit3_model_path=beit3_model_path, tokenizer_path=tokenizer_path)
 
+origins = [
+    "http://localhost:3000",
+]
+
+
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 K = 40
 
 print("finish loading")
@@ -53,7 +68,7 @@ def handle_stage(stage):
         data = checkAndTranslate(stage.lang, stage.data)
         return handle_scene_query(data)
     elif(stage.type == "image"):
-        return handle_image_query(stage.lang, stage.data)
+        return handle_image_query(stage.data)
     elif(stage.type == "text"):
         data = checkAndTranslate(stage.data)
         print("text")

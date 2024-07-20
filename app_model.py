@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List, Optional, Dict
 from enum import Enum
 
 class Type(str, Enum):
@@ -9,14 +9,11 @@ class Type(str, Enum):
     speech = "speech"
     sketch = "sketch"
 
-class Object(BaseModel):
-    name: str
-    data: List[int]
 
 class Stage(BaseModel):
     type: Type
     data: str
-    object: Optional[Object] = None
+    object: Optional[Dict[str, List[List[int]]]] = None
     lang: str
 
 class SearchRequest(BaseModel):

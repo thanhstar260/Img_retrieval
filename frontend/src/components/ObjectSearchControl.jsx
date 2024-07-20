@@ -84,9 +84,9 @@ const ObjectSearchControl = ({onChange, data}) => {
 
     const handleStopDraw = (newOffset) => {
         if(!data) {
-            onChange("object", [{[selectedObj]: newOffset}])
+            onChange("object", [{object: selectedObj, offset: newOffset}])
         } else {
-            onChange("object", [...data, {[selectedObj]: newOffset}])
+            onChange("object", [...data, {object: selectedObj, offset:newOffset}])
         }
     }
 
