@@ -18,7 +18,7 @@ from ZSE_SBIR.utils.util import setup_seed, load_checkpoint
 class SKETCH:
     def __init__(self):
         self.model = None
-        self.faetures = None
+        # self.faetures = None
         self.faiss_index = None
         
     def load_model(self, device, model_weight_path):
@@ -38,26 +38,33 @@ class SKETCH:
         self.model.to(device)
         self.model.eval()
         
-    def load_feature(self, feature_folder_path):
+    def load_feature(self, feature_folder_path = None, distance_metric="cosine"):
         array_list = []
 
         for file_name in os.listdir(feature_folder_path):
             if file_name.endswith(".npy"):
                 file_path = os.path.join(feature_folder_path, file_name)
-                array = np.load(file_path)
+                array = np.load(file_path, allow_pickle= True)  
                 array_list.append(array)
 
-        self.faetures = np.concatenate(array_list, axis=0)  # (87306, 768)
-        
-    def create_faiss_index(self, distance_metric="cosine"):
-        # Khởi tạo index faiss.
-        # print(f"vectors shape: {self.faetures.shape[1]}")
+        features = np.concatenate(array_list, axis=0)  # (87306, 768)
         if distance_metric == "cosine":
-            self.faiss_index = faiss.IndexFlatIP(self.faetures.shape[1])
+            self.faiss_index = faiss.IndexFlatIP(features.shape[1])
         elif distance_metric == "L2":
-            self.faiss_index = faiss.IndexFlatL2(self.faetures.shape[1])
+            self.faiss_index = faiss.IndexFlatL2(features.shape[1])
+        # Thêm các vector vào index.
+        self.faiss_index.add(features)
+        
+    # def create_faiss_index(self, distance_metric="cosine", feature_folder_path = None):
+    #     # Khởi tạo index faiss.
+    #     features = self.load_feature(feature_folder_path)
+    #     # print(f"vectors shape: {self.faetures.shape[1]}")
+    #     if distance_metric == "cosine":
+    #         self.faiss_index = faiss.IndexFlatIP(features.shape[1])
+    #     elif distance_metric == "L2":
+    #         self.faiss_index = faiss.IndexFlatL2(features.shape[1])
             
-        self.faiss_index.add(self.faetures)
+    #     self.faiss_index.add(features)
             
     def extract_feature_query(self, sket_query_path, image_size, device):
         # Chuẩn bị transformations
@@ -70,17 +77,18 @@ class SKETCH:
         img_tensor = transform(img).unsqueeze(0).half().to(device)  # Chuyển sang half và đưa lên GPU
         with torch.no_grad():
             img_feature = self.model(img_tensor.float(), None, 'test', only_sa=True)[0]
-            
+        
         img_feature = img_feature[:,0,:] # (1, 768)
+        img_feature /= img_feature.norm(dim=-1, keepdim=True)
         return img_feature
         
     def find_k_nearest_neighbors(self, input_vector, k):
         if self.faiss_index is None:
-            self.create_faiss_index()
+            raise ValueError("Features is empty. Please load features first.")
 
         # Tính khoảng cách giữa input_vector và các vector trong index.
         distances, indices = self.faiss_index.search(input_vector.reshape(1, -1), k)
-        return distances, indices[0]
+        return distances[0], indices[0]
     
     def Sket_retrieval(self, sket_query_path, k, device):
         sket_vector_query = self.extract_feature_query(sket_query_path, 224, device)

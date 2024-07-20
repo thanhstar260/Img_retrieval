@@ -28,7 +28,7 @@ class OBJECTS(Elastic):
         else:
             print(f"Chỉ mục {index_name} đã tồn tại.")
             
-    def get_objects(self, objects_name_list,index_name= "objects", threshold=0.3, size= 1000):
+    def get_objects(self, check_list,index_name= "objects", threshold=0.3):
         # Tạo truy vấn Elasticsearch
         objects_name_list = [item[0] for item in check_list]
         objects_name_list = list(set(objects_name_list))
@@ -36,6 +36,7 @@ class OBJECTS(Elastic):
             self.connect_elasticsearch(host='localhost', port=9200, scheme='http')
             
         print(f"Đang tìm kiếm các đối tượng: {objects_name_list}")
+        size_scroll = 10000
         must_clauses = [{"match": {"class_name": obj}} for obj in objects_name_list]
         query = {
             "query": {
@@ -43,7 +44,7 @@ class OBJECTS(Elastic):
                     "must": must_clauses
                 }
             },
-            "size": size
+            "size": size_scroll
         }
 
         # Thực hiện truy vấn đầu tiên để khởi tạo scroll
@@ -156,13 +157,15 @@ class OBJECTS(Elastic):
         scr = [scores[i] for i in idx_sort]
         return ids, scr
     
-    def Objects_local_retrieval(self, objects_list, K, index_name="objects", threshold_conf=0.,threshold_iou=0.2, size=1000):
-        candidate = self.get_objects(objects_list, index_name, threshold_conf, size)
+    def Objects_local_retrieval(self, objects_list, K, index_name="objects", threshold_conf=0.,threshold_iou=0.2):
+        candidate = self.get_objects(objects_list, index_name, threshold_conf)
         results = self.search_objects(candidate, objects_list, threshold_iou)
         ids, scr = self.get_ids(results)
-        if len(ids) > K:
-            ids = ids[:K]
+        # if len(ids) > K:
+        #     ids = ids[:K]
         return ids, scr
+    
+    
 
 
 if __name__ == "__main__":
@@ -194,5 +197,5 @@ if __name__ == "__main__":
 
     ids,scr = objects.Objects_local_retrieval(check_list, K, threshold_iou = 0.1)
     print("score: ",np.round(scr, 4))
-    img_path = load_image_path(r'C:\Users\admin\Projects\AIC\DATA\image_path.json')
+    img_path = load_image_path(r'D:\THANHSTAR\Projetcs\AIC\DATA\image_path.json')
     visualize(img_path, ids)
