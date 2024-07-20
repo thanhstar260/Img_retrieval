@@ -21,3 +21,7 @@ class Stage(BaseModel):
 
 class SearchRequest(BaseModel):
     stages: List[Stage]
+
+class SearchResult(BaseModel):
+    ids: List[int]
+    distances: List[float]
