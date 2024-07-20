@@ -2,6 +2,8 @@ from deep_translator import GoogleTranslator
 import matplotlib.pyplot as plt
 import json
 from PIL import Image
+import os
+import numpy as np
 
 def translate(string):
     try:
@@ -92,3 +94,16 @@ def weighted_average(values):
         return 0
     
     return weighted_sum / sum_of_weights
+
+
+def load_features(feature_folder_path):
+    array_list = []
+
+    for file_name in os.listdir(feature_folder_path):
+        if file_name.endswith(".npy"):
+            file_path = os.path.join(feature_folder_path, file_name)
+            array = np.load(file_path)
+            array_list.append(array)
+            
+    features = np.concatenate(array_list, axis=0)
+    return features

@@ -9,7 +9,7 @@ const LangRadioGroup = ({value, onChange, name}) => {
             <label htmlFor='eng'>ENG</label>
         </div>
         <div className='inline-block'>
-            <input className='accent-teal-500'
+            <input className='accent-teal-500 mr-1'
             type='radio' name={name} value='vie' id='vie' checked={value === "vie"} onChange={onChange}/>
             <label htmlFor='vie'>VIE</label>
         </div>

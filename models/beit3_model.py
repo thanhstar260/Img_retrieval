@@ -3,74 +3,82 @@ import torch
 from PIL import Image
 import os
 import faiss
-import json
-import torch
+# import json
 from transformers import XLMRobertaTokenizer
-import torch.nn as nn
-import torch.nn.functional as F
+# import torch.nn as nn
+# import torch.nn.functional as F
 from torchvision import transforms
 from torchvision.transforms.functional import InterpolationMode
 
 import sys
 sys.path.append(r"./")
-from models.utils import translate, visualize, load_image_path
+from models.utils import translate, visualize, load_image_path, load_features
 
 sys.path.append(r"./unilm/beit3/")
 from unilm.beit3.modeling_finetune import beit3_base_patch16_224_retrieval
 
-DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 
 class BEIT3:
     def __init__(self):
-        self.model = None
+        self.beit3_model = None
         self.tokenizer = None
         self.faetures = None
         self.faiss_index = None
 
     def load_model(self, device, model_weight_path, tokenizer_path):
-        self.model = beit3_base_patch16_224_retrieval(pretrained=True)
+        self.beit3_model = beit3_base_patch16_224_retrieval(pretrained=True)
         checkpoint = torch.load(model_weight_path)
-        self.model.load_state_dict(checkpoint['model'])
+        self.beit3_model.load_state_dict(checkpoint['model'])
 
         self.tokenizer = XLMRobertaTokenizer(tokenizer_path)
-        self.model.to(device)
-        self.model.eval()
+        self.beit3_model.to(device)
+        self.beit3_model.eval()
 
-    def load_feature(self, feature_folder_path):
-        array_list = []
+    def load_feature(self, feature_folder_path, distance_metric="cosine"):
+        # array_list = []
 
-        for file_name in os.listdir(feature_folder_path):
-            if file_name.endswith(".npy"):
-                file_path = os.path.join(feature_folder_path, file_name)
-                array = np.load(file_path)
-                array_list.append(array)
+        # for file_name in os.listdir(feature_folder_path):
+        #     if file_name.endswith(".npy"):
+        #         file_path = os.path.join(feature_folder_path, file_name)
+        #         array = np.load(file_path)
+        #         array_list.append(array)
 
-        self.faetures = np.concatenate(array_list, axis=0)  # (87306, 768)
-        print(f"faetures shape: {self.faetures.shape}")
-
-    def create_faiss_index(self, distance_metric="cosine"):
-
-        # print(f"vectors shape: {self.faetures.shape[1]}")
-
-        # Khởi tạo index faiss.
+        # self.features = np.concatenate(array_list, axis=0)  # (87306, 768)
+        
+        self.features = load_features(feature_folder_path)
+        print(f"beit3_faetures shape: {self.features.shape}")
+        
         if distance_metric == "cosine":
-            self.faiss_index = faiss.IndexFlatIP(self.faetures.shape[1])
+            self.faiss_index = faiss.IndexFlatIP(self.features.shape[1])
         elif distance_metric == "L2":
-            self.faiss_index = faiss.IndexFlatL2(self.faetures.shape[1])
+            self.faiss_index = faiss.IndexFlatL2(self.features.shape[1])
         # Thêm các vector vào index.
-        self.faiss_index.add(self.faetures)
+        self.faiss_index.add(self.features)
+
+    # def create_faiss_index(self, distance_metric="cosine", feature_folder_path = None):
+
+    #     # print(f"vectors shape: {self.faetures.shape[1]}")
+    #     features = self.load_feature(feature_folder_path)
+    #     # Khởi tạo index faiss.
+    #     if distance_metric == "cosine":
+    #         self.faiss_index = faiss.IndexFlatIP(features.shape[1])
+    #     elif distance_metric == "L2":
+    #         self.faiss_index = faiss.IndexFlatL2(features.shape[1])
+    #     # Thêm các vector vào index.
+    #     self.faiss_index.add(features)
 
     def find_k_nearest_neighbors(self, vector_query, k):
         if self.faiss_index is None:
-            self.create_faiss_index()
+            raise ValueError("Features is empty. Please load features first.")
         # Tính khoảng cách giữa input_vector và các vector trong index.
         distances, indices = self.faiss_index.search(
             vector_query.reshape(1, -1), k)
-        return distances, indices[0]
+        return distances[0], indices[0]
 
-    def image_extract(self, image_path, image_size, device):
-        raw_image = Image.open(image_path).convert('RGB')
+    def image_extract(self, image, device, image_size=224):
+        # raw_image = Image.open(image_path).convert('RGB')
+        raw_image = image.convert('RGB')
         transform = transforms.Compose([
             transforms.Resize((image_size, image_size),
                               interpolation=InterpolationMode.BICUBIC),
@@ -79,13 +87,13 @@ class BEIT3:
         image_tensor = transform(raw_image).unsqueeze(0).to(device)
 
         with torch.no_grad():
-            vision_cls, _ = self.model(image=image_tensor, only_infer=True)
+            vision_cls, _ = self.beit3_model(image=image_tensor, only_infer=True)
 
         return vision_cls
 
 
-    def Image_retrieval(self, img_query_path, k, device):
-        image_features_query = self.image_extract(img_query_path, device)
+    def Image_retrieval(self, image, k, device):
+        image_features_query = self.image_extract(image, device)
         print(f"image_features_query: {image_features_query.shape}")
         distances, ids_result = self.find_k_nearest_neighbors(image_features_query.cpu().numpy(), k)
 
@@ -96,7 +104,7 @@ class BEIT3:
         print(f"text_tensor: {text_tensor.shape}")
         text_tensor = text_tensor.to(device)
         with torch.no_grad():
-            _, text_cls = self.model(text_description=text_tensor, only_infer=True)
+            _, text_cls = self.beit3_model(text_description=text_tensor, only_infer=True)
         return text_cls
     
     def Text_retrieval(self, text_query, k, device):
@@ -118,11 +126,12 @@ if __name__ == "__main__":
     # model_weight_path = r"C:\Users\admin\Downloads\beit3_large_itc_patch16_224_flickr.pth"
     tokenizer_path = r"D:\Downloads\beit3.spm"
 
+
     # text_query = "a woman feedding dogs in the park"
     text_query = "một người phụ nữ đang cho bầy chó ăn trong công viên"
     # text_query = "bình gốm"
     # text_query = "a dolphin playing with a pink ball"
-    img_query_path = r".\static\images\Keyframes_L04\L04_V002\0010.jpg"
+    img_query_path = r"D:\Downloads\z5482675577503_2688f79cc75b2487cf7e85fd358660f9.jpg"
 
     K = 40
 
@@ -132,7 +141,7 @@ if __name__ == "__main__":
     
     
     
-    TEST_TEXT = True
+    TEST_TEXT = False
     if TEST_TEXT:
         print()
         print("Text Query")
