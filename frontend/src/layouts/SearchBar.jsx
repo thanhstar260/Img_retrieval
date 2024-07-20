@@ -6,16 +6,19 @@ import { IoIosAdd } from "react-icons/io";
 import OutlineButton from '../components/OutlineButton';
 import { PiRankingLight } from "react-icons/pi";
 import { IoIosSearch } from "react-icons/io";
+import { twMerge } from 'tailwind-merge';
 
-const SearchBar = () => {
+const SearchBar = ({onSubmit, isSubmitting}) => {
     const [canClose, setCanClose] = useState(false);
-    const [stages, setStages] = useState([{
-        key: uuidv4(),
-        value: undefined,
-    }]);
+    const [stages, setStages] = useState({
+        [uuidv4()]: {
+            data: {},
+            lang: "eng"
+        }
+    });    
 
     useEffect(() => {
-        if(stages.length > 1) {
+        if(Object.keys(stages).length > 1) {
             setCanClose(true);
         } else {
             setCanClose(false);
@@ -26,45 +29,43 @@ const SearchBar = () => {
             .forEach((value, key) => {
                 value.innerHTML = key + 1;
             })
-    }, [stages])
+    }, [Object.keys(stages)])
     
     const addNewStageHandler = () => {
-        setStages([
+        setStages({
             ...stages,
-            {
-                key: uuidv4(),
-                value: undefined
+            [uuidv4()]: {
+                data: {},
+                lang: "eng",
             }
-        ])
-    }
+            })
+        } 
 
     const closeStageHandler = (key) => {
-        setStages(
-            stages.filter((ele => ele !== key))
-        )
+        delete stages[key];
+        setStages({...stages})
     }
 
-    const changeValueHandler = (key) => {
-        return (data) => {
-            const newStages = stages.map(elm => {
-                if(elm.key === key) {
-                    elm = {
-                        ...elm,
-                        value: data,
-                    }
+    const changeDataInStage = (key) => {
+        return (newValue) => {
+            console.log(stages);
+            setStages(
+                {
+                    ...stages,
+                    [key]: newValue
                 }
-                return elm;
-            })
-
-            setStages(newStages);
+            )
         }
     }
 
   return (
-    <div className='w-[22rem] bg-slate-100 h-screen px-6 py-8 overflow-scroll'>
+    <div className={twMerge(
+        'w-[22rem] bg-slate-100 h-screen px-4 py-8 overflow-y-scroll',
+        `${isSubmitting ? 'cursor-wait' : ''}`
+    )}>
         <div className='flex flex-col gap-4'>
         {
-            stages.map(elm => <Stage key={elm.key} canClose={canClose} id={elm.key} onClose={() => closeStageHandler(elm)} onChange={changeValueHandler(elm.key)}></Stage>)
+            Object.keys(stages).map(key => <Stage key={key} canClose={canClose} id={key} onClose={() => closeStageHandler(key)} onChange={changeDataInStage(key)}></Stage>)
         }
         </div>
         <IconButton 
@@ -79,7 +80,9 @@ const SearchBar = () => {
             <OutlineButton>
                 <PiRankingLight className='inline-block text-xl'/> Rerank
             </OutlineButton>
-            <OutlineButton>
+            <OutlineButton onClick={() => {console.log("hello");
+                onSubmit(stages)
+            }}>
                 <IoIosSearch className='inline-block text-xl'/> Search
             </OutlineButton>
         </div>
