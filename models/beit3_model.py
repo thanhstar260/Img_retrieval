@@ -69,8 +69,9 @@ class BEIT3:
             vector_query.reshape(1, -1), k)
         return distances, indices[0]
 
-    def image_extract(self, image_path, image_size, device):
-        raw_image = Image.open(image_path).convert('RGB')
+    def image_extract(self, image, device, image_size=224):
+        # raw_image = Image.open(image_path).convert('RGB')
+        raw_image = image.convert('RGB')
         transform = transforms.Compose([
             transforms.Resize((image_size, image_size),
                               interpolation=InterpolationMode.BICUBIC),
@@ -84,8 +85,8 @@ class BEIT3:
         return vision_cls
 
 
-    def Image_retrieval(self, img_query_path, k, device):
-        image_features_query = self.image_extract(img_query_path, device)
+    def Image_retrieval(self, image, k, device):
+        image_features_query = self.image_extract(image, device)
         print(f"image_features_query: {image_features_query.shape}")
         distances, ids_result = self.find_k_nearest_neighbors(image_features_query.cpu().numpy(), k)
 
@@ -122,7 +123,7 @@ if __name__ == "__main__":
     text_query = "một người phụ nữ đang cho bầy chó ăn trong công viên"
     # text_query = "bình gốm"
     # text_query = "a dolphin playing with a pink ball"
-    img_query_path = r".\static\images\Keyframes_L04\L04_V002\0010.jpg"
+    img_query_path = r"D:\Downloads\z5482675577503_2688f79cc75b2487cf7e85fd358660f9.jpg"
 
     K = 40
 
@@ -132,7 +133,7 @@ if __name__ == "__main__":
     
     
     
-    TEST_TEXT = True
+    TEST_TEXT = False
     if TEST_TEXT:
         print()
         print("Text Query")
