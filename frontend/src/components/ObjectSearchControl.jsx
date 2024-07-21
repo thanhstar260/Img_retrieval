@@ -7,8 +7,27 @@ import Canvas from './Canvas'
 import SelectedObject from './SelectedObject'
 
 const objectTypes = [
-    "human", "cat", "dog", "pig", "table", "computer", "chair", "book", "notebook"
-]
+    'person',        'bicycle',       'car',           'motorcycle',
+    'airplane',      'bus',           'train',         'truck',
+    'boat',          'traffic light', 'fire hydrant',  'stop sign',
+    'parking meter', 'bench',         'bird',          'cat',
+    'dog',           'horse',         'sheep',         'cow',
+    'elephant',      'bear',          'zebra',         'giraffe',
+    'backpack',      'umbrella',      'handbag',       'tie',
+    'suitcase',      'frisbee',       'skis',          'snowboard',
+    'sports ball',   'kite',          'baseball bat',  'baseball glove',
+    'skateboard',    'surfboard',     'tennis racket', 'bottle',
+    'wine glass',    'cup',           'fork',          'knife',
+    'spoon',         'bowl',          'banana',        'apple',
+    'sandwich',      'orange',        'broccoli',      'carrot',
+    'hot dog',       'pizza',         'donut',         'cake',
+    'chair',         'couch',         'potted plant',  'bed',
+    'dining table',  'toilet',        'tv',            'laptop',
+    'mouse',         'remote',        'keyboard',      'cell phone',
+    'microwave',     'oven',          'toaster',       'sink',
+    'refrigerator',  'book',          'clock',         'vase',
+    'scissors',      'teddy bear',    'hair drier',    'toothbrush'
+  ]
 
 const colors = [
     {
@@ -161,7 +180,7 @@ const ObjectSearchControl = ({onChange, data}) => {
             <span className='mr-4 text-teal-500 text-sm'>Brush</span>
             <BrushSizeSlider className={'w-40'} value={brushSize} onChange={(e) => setBrushSize(e.target.value)}/>
         </div>
-        <Canvas type={"rectangle"} color={selectedColor} brushSize={brushSize} onStopDraw={handleStopDraw} onUndo={handleUndo}/>
+        <Canvas type={"rectangle"} color={selectedColor} brushSize={brushSize} onStopDraw={handleStopDraw} onUndo={handleUndo} value={data}/>
 
         <div className='mt-4 flex items-center h-7'>
             <p className='text-sm text-teal-500 mr-4'>Collection</p>

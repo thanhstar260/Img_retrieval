@@ -92,8 +92,6 @@ const Stage = ({id, canClose, onClose, onChange}) => {
     }
 
     const handleChangeData = (type, newSearchData) => {
-        console.log(data)
-        console.log(newSearchData)
         const newData = {
             ...data
         }
@@ -101,12 +99,6 @@ const Stage = ({id, canClose, onClose, onChange}) => {
         setData(newData);
         onChange(newData);
     }
-
-    useEffect(() => {
-        if(data) {
-
-        }
-    })
 
   return (
     <div className='relative px-4 py-4 bg-slate-50 rounded-lg'>
@@ -122,7 +114,8 @@ const Stage = ({id, canClose, onClose, onChange}) => {
                 label={type.name}
                 isSelected={selected === type.type}
                 onClick={() => selectInputTypeHandler(type.type)}
-                className={`${data.data[type.type] && selected !== type.type ? 'bg-violet-400 text-white' : ''}`}>
+                className={`${data.data[type.type] && selected !== type.type ? 'bg-violet-400 text-white' : ''}`}
+                onDoubleClick={(e) => handleChangeData(type.type, undefined)}>
                 {type.icon}
             </IconButton>)}
         </div>

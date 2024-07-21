@@ -1,11 +1,12 @@
 import React, { useState } from 'react'
 import { twMerge } from 'tailwind-merge'
 
-const IconButton = ({className, onClick, isSelected = false, label, children, ...props}) => {
+const IconButton = ({className, onClick, onDoubleClick, isSelected = false, label, children, ...props}) => {
 
   return (
     <div 
     onClick={onClick}
+    onDoubleClick={onDoubleClick}
     className={twMerge(
         'group relative w-fit h-fit px-2 py-2 rounded-full hover:shadow-md cursor-pointer transition-all',
         `${isSelected ? 'bg-teal-500 text-white' : 'bg-transparent text-teal-500'}`,

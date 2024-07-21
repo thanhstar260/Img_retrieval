@@ -16,7 +16,7 @@ const TextSearchControl = ({id, label, data, onChange}) => {
         px-3
         py-3
         h-auto" 
-        value={data}
+        value={data || ""}
         onChange={handleChangeData}>
         </textarea>
     </div>

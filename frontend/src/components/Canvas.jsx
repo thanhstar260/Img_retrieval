@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 
-const Canvas = ({color, brushSize,type, onStopDraw, onUndo}) => {
+const Canvas = ({color, value,  brushSize, type, onStopDraw, onUndo, onDelete}) => {
     const canvasRef = useRef(null);
 
     const [isDrawing, setIsDrawing] = useState(false);
@@ -138,6 +138,13 @@ const Canvas = ({color, brushSize,type, onStopDraw, onUndo}) => {
         contextRef.current = context
         
     }, [brushSize, color])
+
+    useEffect(() => {
+        if(!value) {
+            setHistory([]);
+            contextRef.current.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+        }
+    }, [value])
 
   return (
     <canvas 
