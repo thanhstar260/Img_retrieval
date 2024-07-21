@@ -9,7 +9,7 @@ from models.beit3_model import BEIT3
 from models.elastic import Elastic
 from models.sketch import SKETCH
 from models.object import OBJECTS
-from models.utils import visualize, load_image_path, translate
+from models.utils import visualize, load_image_path, translate, find_positions
 import time
 import math
 import pandas as pd
@@ -78,7 +78,7 @@ class Event_retrieval():
         ids, scr = self.objects.Objects_local_retrieval(objects_list, K, index_name, threshold_conf, threshold_iou)
         
         visualize(load_image_path(r".\DATA\image_path.json"), ids, len(ids), 8)
-        # print("position: ",ids,scr,find_positions(ids, ids_first.tolist()))
+        print("position: ",ids,scr,find_positions(ids, ids_first.tolist()))
         # visualize(load_image_path(r'D:\THANHSTAR\Projetcs\AIC\DATA\image_path.json'), ids)
         print("objects local retrieval: ", scr, ids)
         

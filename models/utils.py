@@ -107,3 +107,14 @@ def load_features(feature_folder_path):
             
     features = np.concatenate(array_list, axis=0)
     return features
+
+
+# def find_positions(list_A, list_B):
+#     positions = []
+#     for element in list_A:
+#         if element in list_B:
+#             position = list_B.index(element)
+#         else:
+#             position = -1  # Hoặc bất kỳ giá trị đặc biệt nào để biểu thị rằng phần tử không tồn tại trong list_B
+#         positions.append(position)
+#     return positions

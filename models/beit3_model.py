@@ -76,7 +76,7 @@ class BEIT3:
             vector_query.reshape(1, -1), k)
         return distances[0], indices[0]
 
-    def image_extract(self, image_path, image_size, device):
+    def image_extract(self, image_path, device, image_size=224):
         raw_image = Image.open(image_path).convert('RGB')
         transform = transforms.Compose([
             transforms.Resize((image_size, image_size),
