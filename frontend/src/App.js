@@ -9,7 +9,7 @@ function App() {
   const [K, setK] = useState(40);
 
   const handleSubmit = async (data) => {
-    const stages = Object.values(data);
+    const stages = Object.values(JSON.parse(JSON.stringify(data)));
     const stagesBody = [];
     for(let stage of stages) {
       let count = 0

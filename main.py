@@ -82,10 +82,10 @@ def handle_stage(stage, K):
     elif(stage.type == "image"):
         return handle_image_query(stage.data, K)
     elif(stage.type == "text"):
-        data = checkAndTranslate(stage.data)
+        data = checkAndTranslate(stage.lang, stage.data)
         return handle_text_query(data, K)
     elif(stage.type == "speech"):
-        data = checkAndTranslate(stage.data)
+        data = checkAndTranslate(stage.lang, stage.data)
         return handle_speech_query(data, K)
     elif(stage.type == "sketch"):
         return handle_sketch_query(stage.data, K)
