@@ -18,6 +18,7 @@ class Stage(BaseModel):
 
 class SearchRequest(BaseModel):
     stages: List[Stage]
+    K: int
 
 class SearchResult(BaseModel):
     ids: List[int]

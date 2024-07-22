@@ -8,7 +8,7 @@ import { PiRankingLight } from "react-icons/pi";
 import { IoIosSearch } from "react-icons/io";
 import { twMerge } from 'tailwind-merge';
 
-const SearchBar = ({onSubmit, isSubmitting}) => {
+const SearchBar = ({onSubmit, isSubmitting, K, onChangeK}) => {
     const [canClose, setCanClose] = useState(false);
     const [stages, setStages] = useState({
         [uuidv4()]: {
@@ -60,9 +60,13 @@ const SearchBar = ({onSubmit, isSubmitting}) => {
 
   return (
     <div className={twMerge(
-        'w-[22rem] bg-slate-100 h-screen px-4 py-8 overflow-y-scroll',
+        'w-[22rem] bg-slate-100 h-screen px-4 py-8 overflow-y-scroll shrink-0',
         `${isSubmitting ? 'cursor-wait' : ''}`
     )}>
+        <div className='mb-4'>
+            <label className='text-teal-500 m-3'>K: </label>
+            <input type='number' className='ring-2 ring-slate-300 rounded-md max-w-20 focus:outline-none focus:ring-teal-500 transition-all px-2 py-0.25 text-slate-600' value={K} min={1} step={1} onChange={(e)=>{onChangeK(e.target.value)}}/>
+        </div>
         <div className='flex flex-col gap-4'>
         {
             Object.keys(stages).map(key => <Stage key={key} canClose={canClose} id={key} onClose={() => closeStageHandler(key)} onChange={changeDataInStage(key)}></Stage>)

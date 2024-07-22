@@ -6,6 +6,7 @@ import Result from './layouts/Result';
 function App() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [result, setResult] = useState({})
+  const [K, setK] = useState(40);
 
   const handleSubmit = async (data) => {
     const stages = Object.values(data);
@@ -45,7 +46,7 @@ function App() {
 
     }
 
-    const body = {stages: stagesBody}
+    const body = {stages: stagesBody, K: K}
     console.log(body)
 
 
@@ -66,7 +67,7 @@ function App() {
 
   return (
     <div className="App flex">
-      <SearchBar onSubmit={handleSubmit} isSubmitting={isSubmitting}/>
+      <SearchBar onSubmit={handleSubmit} isSubmitting={isSubmitting} K={K} onChangeK={setK}/>
       <Result />
     </div>
     
