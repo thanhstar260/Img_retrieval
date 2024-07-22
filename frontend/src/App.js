@@ -32,7 +32,6 @@ function App() {
     for (let stage of stages) {
       let count = 0;
       for (let type in stage.data) {
-        console.log(type);
         if (type === "object") continue;
         if (stage.data[type]) count++;
         else {
@@ -52,7 +51,6 @@ function App() {
       if (objectInput) {
         object = {};
         let group = Object.groupBy(objectInput, (object) => object.object);
-        console.log(object);
         for (let obj in group) {
           const elm = group[obj].map((elm) => elm.offset);
           object[obj] = elm;
@@ -63,7 +61,6 @@ function App() {
     }
 
     const body = { stages: stagesBody, K: K };
-    console.log(body);
 
     setIsSubmitting(true);
     const response = await fetch("http://127.0.0.1:8000/", {

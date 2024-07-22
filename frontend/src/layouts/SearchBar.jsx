@@ -48,7 +48,6 @@ const SearchBar = ({onSubmit, isSubmitting, K, onChangeK, onRerank}) => {
 
     const changeDataInStage = (key) => {
         return (newValue) => {
-            console.log(stages);
             setStages(
                 {
                     ...stages,
@@ -84,7 +83,7 @@ const SearchBar = ({onSubmit, isSubmitting, K, onChangeK, onRerank}) => {
             <OutlineButton onClick={onRerank}>
                 <PiRankingLight className='inline-block text-xl'/> Rerank
             </OutlineButton>
-            <OutlineButton onClick={() => {console.log("hello");
+            <OutlineButton onClick={() => {
                 onSubmit(stages)
             }}>
                 <IoIosSearch className='inline-block text-xl'/> Search
