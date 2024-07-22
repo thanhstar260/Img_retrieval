@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import ImageItem from "./ImageItem";
+import axios from 'axios';
 
 const ListImageResult = ({ ImageIdArr }) => {
   const [stage, setStage] = useState(0);
   const [NewImageArr, setNewImageArr] = useState([[]]);
-  const [idxSelect, setIdxSelect] = useState(0);
-
+  const [idxSelect, setIdxSelect] = useState(-1);
+  const [urlList, setUrlList] = useState([])
+  
   useEffect(() => {
     const tempArr = JSON.parse(JSON.stringify(ImageIdArr));
     for (let i = 0; i < tempArr.length; i++) {
@@ -15,6 +17,16 @@ const ListImageResult = ({ ImageIdArr }) => {
     }
     setNewImageArr(tempArr);
   }, [ImageIdArr]);
+
+  const fetchImageUrl = async (id) => {
+    try {
+      const response = await axios.get(`http://127.0.0.1:8000/get_image_url/${id}`);
+      return ("http://127.0.0.1:8000" + response.data.url);
+    } catch (error) {
+      console.error("Error fetching the image URL:", error);
+      return "";
+    }
+  };
 
   const handleStageClick = (idx) => {
     setStage(idx);
@@ -33,8 +45,12 @@ const ListImageResult = ({ ImageIdArr }) => {
     setNewImageArr(updatedNewImageArr);
   };
 
-  const handleSetIdxSelect = (idx) => {
+  const handleSetIdxSelect = async (idx) => {
     setIdxSelect(idx);
+    console.log(NewImageArr);
+
+    const newUrls = await Promise.all(NewImageArr.map((item,id) => fetchImageUrl(NewImageArr[id][idx].idImg)));
+    setUrlList(newUrls);
   };
   return (
     <div className="h-screen ">
@@ -67,18 +83,18 @@ const ListImageResult = ({ ImageIdArr }) => {
         ))}
       </div>
       <div className="border border-teal-500 p-1 h-40 flex gap-2 overflow-x-scroll">
-        {NewImageArr.map((stageArr, stageIdx) =>
+        {idxSelect>=0? NewImageArr.map((stageArr, stageIdx) =>
           stageArr.map((item, idx) =>
             idx === idxSelect ? (
               <img
                 key={`bottom-${stage}-${idx}`}
-                src="./id1.jpg"
+                src={urlList[stageIdx]}
                 alt={item.idImg}
                 className="max-h-full max-w-full h-auto border-4 hover:border-teal-500"
               />
             ) : null
           )
-        )}
+        ): null}
       </div>
     </div>
   );

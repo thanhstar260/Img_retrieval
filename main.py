@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from app_model import SearchRequest, SearchResult, RerankRequest
 from models.beit3_model import BEIT3
 from models.model import Event_retrieval
@@ -11,6 +11,7 @@ from models.utils import visualize, load_image_path, translate
 from typing import Dict
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
 
@@ -19,6 +20,7 @@ origins = [
 ]
 
 
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 app.add_middleware(
     CORSMiddleware,
@@ -99,26 +101,6 @@ def handle_image_query(data):
     print(ids_result)
     return {"ids": ids_result, "distances": distances}
 
-def handle_sketch_query(data):
-    data = data.split(",")[1]
-    image_data = base64.b64decode(data)
-    image = Image.open(BytesIO(image_data))
-    ids_result, distances = retrieval.sketch.Sket_retrieval(image, K, device)
-    print(ids_result)
-    return {"ids": ids_result, "distances": distances}
-
-def handle_text_query(data):
-    ids_result, distances = retrieval.elastic.Elastic_retrieval(data, K, "ocr")
-    return {"ids": ids_result, "distances": distances}
-def handle_speech_query(data):
-    ids_result, distances = retrieval.elastic.Elastic_retrieval(data, K, "asr")
-    return {"ids": ids_result, "distances": distances}
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
-
-
 @app.post('/rerank')
 def handle_rerank_query(request: RerankRequest) -> Dict[int, SearchResult]:
     result = {}
@@ -137,3 +119,40 @@ def handle_object_query(ids, dis, object_list, K):
             check_list.append((object[0], item))
     ids, dis = retrieval.object_filter(ids, dis, check_list, K)
     return {"ids": ids, "distances": dis}
+def handle_sketch_query(data):
+    data = data.split(",")[1]
+    image_data = base64.b64decode(data)
+    image = Image.open(BytesIO(image_data))
+    ids_result, distances = retrieval.sketch.Sket_retrieval(image, K, device)
+    print(ids_result)
+    return {"ids": ids_result, "distances": distances}
+
+def handle_text_query(data):
+    ids_result, distances = retrieval.elastic.Elastic_retrieval(data, K, "ocr")
+    return {"ids": ids_result, "distances": distances}
+def handle_speech_query(data):
+    ids_result, distances = retrieval.elastic.Elastic_retrieval(data, K, "asr")
+    return {"ids": ids_result, "distances": distances}
+
+@app.get("/get_image_url/{id}")
+async def get_image_url(id: str):
+    image_paths = load_image_path(r".\DATA\image_path.json")
+    if id in image_paths:
+        image_path = image_paths[id]
+        return {"url": f"{image_path[1:]}"}
+    else:
+        raise HTTPException(status_code=404, detail="Image not found")
+    
+@app.get("/get_video_url/{id}")
+async def get_video_url(id: str):
+    video_paths = load_image_path(r".\DATA\id2link.json")
+    if id in video_paths:
+        video_path = video_paths[id]
+        return {"url": f"{video_path}"}
+    else:
+        raise HTTPException(status_code=404, detail="Video not found")
+    
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
+
