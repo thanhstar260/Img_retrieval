@@ -65,76 +65,77 @@ def checkAndTranslate(lang, str):
 
 @app.post('/')
 def search_image(request: SearchRequest) -> Dict[int, SearchResult]:
+    list_ids = []
+    list_distances = []
     result = {}
     index = 0
     for stage in request.stages:
         stage_result = handle_stage(stage, request.K)
         if(stage.object):
             stage_result = handle_object_query(stage_result['ids'], stage_result['distances'], stage.object, K)
-        result.update({index: stage_result})
-        index += 1
+        # result.update({index: stage_result})
+        list_ids.extend(stage_result['ids'])
+        list_distances.extend(stage_result['distances'])
+
+    if len(request.stages) > 1:
+        ids, dis = retrieval.temporal_search(list_ids, list_distances)
+        for index in range(len(ids)):
+            result.update({index: {'ids': ids[index], 'distances': dis[index]}})
+    else:
+        result.update({'0': {'ids': list_ids, 'distances': list_distances}})
+
     return result
 
 def handle_stage(stage, K):
     if(stage.type == "scene"):
         data = checkAndTranslate(stage.lang, stage.data)
-        return handle_scene_query(data, K, stage.object)
+        return handle_scene_query(data, K)
     elif(stage.type == "image"):
-        return handle_image_query(stage.data, K, stage.object)
+        return handle_image_query(stage.data, K)
     elif(stage.type == "text"):
-        # data = checkAndTranslate(stage.data)
-        data = stage.data
-        return handle_text_query(data, K, stage.object)
+        return handle_text_query(stage.data, K)
     elif(stage.type == "speech"):
-        # data = checkAndTranslate(stage.data)
-        data = stage.data
-        return handle_speech_query(data, K, stage.object)
+        return handle_speech_query(stage.data, K)
     elif(stage.type == "sketch"):
-        return handle_sketch_query(stage.data, K, stage.object)
+        return handle_sketch_query(stage.data, K)
 
-def handle_scene_query(data, K, object):
+def handle_scene_query(data, K):
     print("text translated: ", data)
     ids_result, distances = retrieval.beit3.Text_retrieval(data, K * 10, device)
-    if(object):
-        print("object: ", object)
-        return handle_object_query(ids_result, distances, object, K)
     return {"ids": ids_result, "distances": distances}
 
-def handle_image_query(data, K, object):
+def handle_image_query(data, K):
     data = data.split(",")[1]
     image_data = base64.b64decode(data)
     image = Image.open(BytesIO(image_data))
     ids_result, distances = retrieval.beit3.Image_retrieval(image, K * 10, device)
     print(ids_result)
-    if(object):
-        return handle_object_query(ids_result, distances, object, K)
+
     return {"ids": ids_result, "distances": distances}
 
-def handle_sketch_query(data, K, object):
+def handle_sketch_query(data, K):
     data = data.split(",")[1]
     image_data = base64.b64decode(data)
     image = Image.open(BytesIO(image_data))
+    image.show()
     ids_result, distances = retrieval.sketch.Sket_retrieval(image, K * 10, device)
     print(ids_result)
-    if(object):
-        return handle_object_query(ids_result, distances, object, K)
     return {"ids": ids_result, "distances": distances}
 
-def handle_text_query(data, K, object):
+def handle_text_query(data, K):
     ids_result, distances = retrieval.elastic.Elastic_retrieval(data, K * 10, "ocr")
-    if(object):
-        return handle_object_query(ids_result, distances, object, K)
     return {"ids": ids_result, "distances": distances}
-def handle_speech_query(data, K, object):
+
+def handle_speech_query(data, K):
     ids_result, distances = retrieval.elastic.Elastic_retrieval(data, K, "asr")
-    if(object):
-        return handle_object_query(ids_result, distances, object, K)
     return {"ids": ids_result, "distances": distances}
 
 def handle_object_query(ids, dis, object_list, K):
     check_list = []
     for key, value in object_list.items():
         for item in value:
+            item[0],item[2] = int(item[0]*1280/300), int(item[2]*1280/300)
+            item[1],item[3] = int(item[1]*720/150), int(item[3]*720/150)
             check_list.append((key, item))
             
     print("check list: ", check_list)

@@ -43,7 +43,7 @@ const Canvas = ({color, value,  brushSize, type, onStopDraw, onUndo, onDelete}) 
             if(type === "rectangle") {
                 onUndo();
             } else if(history.length > 1) {
-                onStopDraw(canvasRef.current.toDataURL())
+                onStopDraw(canvasRef.current.toDataURL("image/jpeg"));
             } else {
                 onStopDraw(null);
             }
@@ -123,7 +123,7 @@ const Canvas = ({color, value,  brushSize, type, onStopDraw, onUndo, onDelete}) 
 
             onStopDraw(coordinate)
         } else {
-            onStopDraw(canvasRef.current.toDataURL())
+            onStopDraw(canvasRef.current.toDataURL("image/jpeg"))
         }
         
     }
