@@ -77,10 +77,10 @@ class Event_retrieval():
     def object_filter(self, ids_first, scr_first, objects_list, K, index_name="objects", threshold_conf=0.,threshold_iou=0.2):
         ids, scr = self.objects.Objects_local_retrieval(objects_list, K, index_name, threshold_conf, threshold_iou)
         
-        visualize(load_image_path(r".\DATA\image_path.json"), ids, len(ids), 8)
-        print("position: ",ids,scr,find_positions(ids, ids_first.tolist()))
+        # visualize(load_image_path(r".\DATA\image_path.json"), ids, len(ids), 8)
+        # print("position: ",ids,scr,find_positions(ids, ids_first.tolist()))
         # visualize(load_image_path(r'D:\THANHSTAR\Projetcs\AIC\DATA\image_path.json'), ids)
-        print("objects local retrieval: ", scr, ids)
+        # print("objects local retrieval: ", scr, ids)
         
         # print("objects local sigmoid: ", 1 / (1 + np.exp(-np.array(scr))))
         
