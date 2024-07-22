@@ -148,7 +148,6 @@ if __name__ == "__main__":
         text_query = "nguyễn phương hằng"
         ids, scr = es.Elastic_retrieval(text_query, K, index_name)
         
-
     else:
         # ASR
         asr_path = r"C:\Users\admin\Projects\AIC\DATA\asr\final_asr.json"

@@ -66,14 +66,14 @@ class SKETCH:
             
     #     self.faiss_index.add(features)
             
-    def extract_feature_query(self, sket_query_path, image_size, device):
+    def extract_feature_query(self, image, image_size, device):
         # Chuẩn bị transformations
         transform = transforms.Compose([
             transforms.Resize((image_size, image_size)),
             transforms.ToTensor(),
         ])
 
-        img = Image.open(sket_query_path).convert("RGB")
+        img = image.convert("RGB")
         img_tensor = transform(img).unsqueeze(0).half().to(device)  # Chuyển sang half và đưa lên GPU
         with torch.no_grad():
             img_feature = self.model(img_tensor.float(), None, 'test', only_sa=True)[0]
@@ -90,8 +90,8 @@ class SKETCH:
         distances, indices = self.faiss_index.search(input_vector.reshape(1, -1), k)
         return distances[0], indices[0]
     
-    def Sket_retrieval(self, sket_query_path, k, device):
-        sket_vector_query = self.extract_feature_query(sket_query_path, 224, device)
+    def Sket_retrieval(self, image, k, device):
+        sket_vector_query = self.extract_feature_query(image, 224, device)
         distances, ids_result = self.find_k_nearest_neighbors(sket_vector_query.cpu().numpy(), k)
         return ids_result, distances
     
@@ -99,12 +99,12 @@ class SKETCH:
 
 if __name__ == "__main__":
 
-    sket_query_path = r"C:\Users\admin\Projects\AIC\ZSE_SBIR\airplane.jpg"
+    sket_query_path = r"D:\Downloads\sketch.png"
 
-    image_path_dict = r"C:\Users\admin\Projects\AIC\DATA\image_path.json"
-    sket_feature_path = r'C:\Users\admin\Projects\AIC\ZSE_SBIR\features'
+    image_path_dict = r"D:\Temporal_search\data\image_path.json"
+    sket_feature_path = r'D:\Temporal_search\data\sketch_features'
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model_weight_path = r"C:\Users\admin\Projects\AIC\ZSE_SBIR\checkpoints/sketchy_ext/best_checkpoint.pth"
+    model_weight_path = r"D:\Downloads\best_checkpoint.pth"
     K = 40
 
     sketch_model = SKETCH()
@@ -117,6 +117,7 @@ if __name__ == "__main__":
     # print(result)
 
 
-    image_path = load_image_path(image_path_dict)
+    # image_path = load_image_path(image_path_dict)
 
-    visualize(image_path, result, K)
+    # visualize(image_path, result, K)
+    print(result)
