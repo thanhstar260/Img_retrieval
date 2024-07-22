@@ -1,15 +1,29 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { IoMdCloseCircleOutline } from "react-icons/io";
 import { ImYoutube2 } from "react-icons/im";
 import SliderImage from "./SliderImage";
 import YouTubeVideo from "./YouTuBeVideo";
 import { RxReset } from "react-icons/rx";
 import { IoMdSearch } from "react-icons/io";
+import axios from 'axios';
 
-const ImageShow = ({ idImg, onClose }) => {
+const ImageShow = ({ idImg, onClose, url }) => {
   const [showVideo, setShowVideo] = useState(false);
   const [NewShowIdImg, setNewShowIdImg] = useState(idImg);
+  const [urlImg, setUrlImg] = useState(url)
   const [toggle, setToggle] = useState(true);
+
+  useEffect(() => {
+    const fetchImageUrl = async () => {
+      try {
+        const response = await axios.get(`http://127.0.0.1:8000/get_image_url/${NewShowIdImg}`);
+        setUrlImg("http://127.0.0.1:8000" + response.data.url);
+      } catch (error) {
+        console.error("Error fetching the image URL:", error);
+      }
+    };
+    fetchImageUrl();
+  }, [NewShowIdImg]);
 
   const handleShowVideo = () => {
     setShowVideo(!showVideo);
@@ -40,7 +54,7 @@ const ImageShow = ({ idImg, onClose }) => {
         <div className="w-fit mb-12" onClick={(e) => e.stopPropagation()}>
           {!showVideo ? (
             <img
-              src="./id1.jpg"
+              src={urlImg}
               alt={NewShowIdImg}
               className="max-w-full max-h-full"
             />

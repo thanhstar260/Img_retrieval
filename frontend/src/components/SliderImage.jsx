@@ -1,7 +1,8 @@
 import Slider from "react-slick";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import axios from "axios";
 
 function SampleNextArrow(props) {
   const { className, style, onClick, updateImgIdArr } = props;
@@ -10,12 +11,11 @@ function SampleNextArrow(props) {
       className={className}
       style={{
         ...style,
-        display: "block",
+        display: "flex",
         background: "green",
         borderRadius: "50%",
         width: "30px",
         height: "30px",
-        display: "flex",
         justifyContent: "center",
         alignItems: "center",
       }}
@@ -34,12 +34,11 @@ function SamplePrevArrow(props) {
       className={className}
       style={{
         ...style,
-        display: "block",
+        display: "flex",
         background: "green",
         borderRadius: "50%",
         width: "30px",
         height: "30px",
-        display: "flex",
         justifyContent: "center",
         alignItems: "center",
       }}
@@ -58,6 +57,27 @@ const SliderImage = ({ idImg, onArrow }) => {
     idImg + 1,
     idImg + 2,
   ]);
+  const [urlImgArr, setUrlImgArr] = useState(["", "", "", "", ""]);
+  
+  useEffect(() => {
+    const fetchImageUrl = async (id) => {
+      try {
+        const response = await axios.get(`http://127.0.0.1:8000/get_image_url/${id}`);
+        return ("http://127.0.0.1:8000" + response.data.url);
+      } catch (error) {
+        console.error("Error fetching the image URL:", error);
+        return "";
+      }
+    };
+    const fetchAllImages = async () => {
+      const newUrls = await Promise.all(ImgIdArr.map(id => fetchImageUrl(id)));
+      setUrlImgArr(newUrls);
+    };
+
+    fetchAllImages();
+  }, [ImgIdArr]);
+  
+
   const [index, setIndex] = useState(2);
   const updateImgIdArr = (increment) => {
     const newImgIdArr = ImgIdArr.map((item) => item + increment);
@@ -85,8 +105,6 @@ const SliderImage = ({ idImg, onArrow }) => {
     }
     setImgIdArr(newImgIdArr);
     onArrow(newImgIdArr[newIndex]);
-    console.log(newImgIdArr);
-
   };
 
   const settings = {
@@ -105,8 +123,10 @@ const SliderImage = ({ idImg, onArrow }) => {
         {ImgIdArr.map((item, idx) => (
           <div key={`slider${idx}`} className="px-2 py-1">
             <img
-              src="./id1.jpg"
-              className={idx === index ? " rounded-lg border-4 border-teal-500" : ""}
+              src={urlImgArr[idx]}
+              className={
+                idx === index ? " rounded-lg border-4 border-teal-500" : ""
+              }
               alt={ImgIdArr[idx]}
             />
           </div>
