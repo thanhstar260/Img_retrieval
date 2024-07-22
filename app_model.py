@@ -18,6 +18,7 @@ class Stage(BaseModel):
 
 class SearchRequest(BaseModel):
     stages: List[Stage]
+    K: int
 
 class SearchResult(BaseModel):
     ids: List[int]
@@ -25,7 +26,7 @@ class SearchResult(BaseModel):
 
 class StageRerank(BaseModel):
     ids: List[int]
-    dis: List[int]
+    dis: List[float]
     positive_list: List[int]
     negative_list: List[int]
     

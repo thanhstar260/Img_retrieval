@@ -68,38 +68,73 @@ def search_image(request: SearchRequest) -> Dict[int, SearchResult]:
     result = {}
     index = 0
     for stage in request.stages:
-        stage_result = handle_stage(stage)
+        stage_result = handle_stage(stage, request.K)
+        if(stage.object):
+            stage_result = handle_object_query(stage_result['ids'], stage_result['distances'], stage.object, K)
         result.update({index: stage_result})
         index += 1
     return result
 
-def handle_stage(stage):
+def handle_stage(stage, K):
     if(stage.type == "scene"):
         data = checkAndTranslate(stage.lang, stage.data)
-        return handle_scene_query(data)
+        return handle_scene_query(data, K, stage.object)
     elif(stage.type == "image"):
-        return handle_image_query(stage.data)
+        return handle_image_query(stage.data, K, stage.object)
     elif(stage.type == "text"):
         data = checkAndTranslate(stage.data)
-        return handle_text_query(data)
+        return handle_text_query(data, K, stage.object)
     elif(stage.type == "speech"):
         data = checkAndTranslate(stage.data)
-        return handle_speech_query(data)
+        return handle_speech_query(data, K, stage.object)
     elif(stage.type == "sketch"):
-        return handle_sketch_query(stage.data)
+        return handle_sketch_query(stage.data, K, stage.object)
 
-def handle_scene_query(data):
+def handle_scene_query(data, K, object):
     print("text translated: ", data)
-    ids_result, distances = retrieval.beit3.Text_retrieval(data, K, device)
+    ids_result, distances = retrieval.beit3.Text_retrieval(data, K * 10, device)
+    if(object):
+        return handle_object_query(ids_result, distances, object, K)
     return {"ids": ids_result, "distances": distances}
 
-def handle_image_query(data):
+def handle_image_query(data, K, object):
     data = data.split(",")[1]
     image_data = base64.b64decode(data)
     image = Image.open(BytesIO(image_data))
-    ids_result, distances = retrieval.beit3.Image_retrieval(image, K, device)
+    ids_result, distances = retrieval.beit3.Image_retrieval(image, K * 10, device)
     print(ids_result)
+    if(object):
+        return handle_object_query(ids_result, distances, object, K)
     return {"ids": ids_result, "distances": distances}
+
+def handle_sketch_query(data, K, object):
+    data = data.split(",")[1]
+    image_data = base64.b64decode(data)
+    image = Image.open(BytesIO(image_data))
+    ids_result, distances = retrieval.sketch.Sket_retrieval(image, K * 10, device)
+    print(ids_result)
+    if(object):
+        return handle_object_query(ids_result, distances, object, K)
+    return {"ids": ids_result, "distances": distances}
+
+def handle_text_query(data, K, object):
+    ids_result, distances = retrieval.elastic.Elastic_retrieval(data, K * 10, "ocr")
+    if(object):
+        return handle_object_query(ids_result, distances, object, K)
+    return {"ids": ids_result, "distances": distances}
+def handle_speech_query(data, K, object):
+    ids_result, distances = retrieval.elastic.Elastic_retrieval(data, K, "asr")
+    if(object):
+        return handle_object_query(ids_result, distances, object, K)
+    return {"ids": ids_result, "distances": distances}
+
+def handle_object_query(ids, dis, object_list, K):
+    check_list = []
+    for key, value in object_list.items():
+        for item in value:
+            check_list.append((key, item))
+    ids, dis = retrieval.object_filter(ids, dis, check_list, K)
+    return {"ids": ids, "distances": dis}
 
 @app.post('/rerank')
 def handle_rerank_query(request: RerankRequest) -> Dict[int, SearchResult]:
@@ -112,27 +147,6 @@ def handle_rerank_query(request: RerankRequest) -> Dict[int, SearchResult]:
         index += 1
     return result
 
-def handle_object_query(ids, dis, object_list, K):
-    check_list = []
-    for object in object_list:
-        for item in object[1]:
-            check_list.append((object[0], item))
-    ids, dis = retrieval.object_filter(ids, dis, check_list, K)
-    return {"ids": ids, "distances": dis}
-def handle_sketch_query(data):
-    data = data.split(",")[1]
-    image_data = base64.b64decode(data)
-    image = Image.open(BytesIO(image_data))
-    ids_result, distances = retrieval.sketch.Sket_retrieval(image, K, device)
-    print(ids_result)
-    return {"ids": ids_result, "distances": distances}
-
-def handle_text_query(data):
-    ids_result, distances = retrieval.elastic.Elastic_retrieval(data, K, "ocr")
-    return {"ids": ids_result, "distances": distances}
-def handle_speech_query(data):
-    ids_result, distances = retrieval.elastic.Elastic_retrieval(data, K, "asr")
-    return {"ids": ids_result, "distances": distances}
 
 @app.get("/get_image_url/{id}")
 async def get_image_url(id: str):
@@ -145,7 +159,7 @@ async def get_image_url(id: str):
     
 @app.get("/get_video_url/{id}")
 async def get_video_url(id: str):
-    video_paths = load_image_path(r".\DATA\id2link.json")
+    video_paths = load_image_path(r".\DATA\id2link_convert.json")
     if id in video_paths:
         video_path = video_paths[id]
         return {"url": f"{video_path}"}
@@ -155,4 +169,3 @@ async def get_video_url(id: str):
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
-
