@@ -40,7 +40,7 @@ tokenizer_path = r".\models\weights\beit3.spm"
 beit3_fea_path = r".\DATA\beit3_features"
     
 # SKETCH PARAMETER
-sket_model_path = r".\models\weights\best_checkpoint.pth"
+sket_model_path = r"D:\THANHSTAR\Projetcs\AIC\ZSE_SBIR\checkpoints\sketchy_ext\best_checkpoint.pth"
 sket_fea_path = r".\DATA\sketch_features"
 
 load_dotenv()
@@ -74,16 +74,17 @@ def search_image(request: SearchRequest) -> Dict[int, SearchResult]:
         if(stage.object):
             stage_result = handle_object_query(stage_result['ids'], stage_result['distances'], stage.object, K)
         # result.update({index: stage_result})
-        list_ids.extend(stage_result['ids'])
-        list_distances.extend(stage_result['distances'])
+        list_ids.append(stage_result['ids'])
+        list_distances.append(stage_result['distances'])
 
+    # print("list ids: ", list_ids)
     if len(request.stages) > 1:
         # print(list_ids, list_distances)
         ids, dis = retrieval.temporal_search(list_ids, list_distances)
         for index in range(len(ids)):
-            result.update({index: {'ids': ids[index], 'distances': dis[index]}})
+            result.update({index: {'ids': ids[index], 'distances': dis}})
     else:
-        result.update({'0': {'ids': list_ids, 'distances': list_distances}})
+        result.update({'0': {'ids': list_ids[0], 'distances': list_distances[0]}})
 
     return result
 
