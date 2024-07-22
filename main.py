@@ -54,12 +54,12 @@ retrieval.load_model(device=device, type_model="all", beit3_model_path=beit3_mod
 retrieval.connect_elastic(check_server = CHECK_SERVER, host=HOST_ELASTIC, port=PORT_ELASTIC)
 
 
-K = 40
+K = 80
 
 print("finish loading")
 
 def checkAndTranslate(lang, str):
-    if(lang == "vie"):
+    if(lang != "eng"):
         str = translate(str)
     return str
 
@@ -94,18 +94,16 @@ def handle_stage(stage, K):
     elif(stage.type == "image"):
         return handle_image_query(stage.data, K)
     elif(stage.type == "text"):
-        data = checkAndTranslate(stage.lang, stage.data)
-        return handle_text_query(data, K)
+        return handle_text_query(stage.data, K)
     elif(stage.type == "speech"):
-        data = checkAndTranslate(stage.lang, stage.data)
-        return handle_speech_query(data, K)
+        return handle_speech_query(stage.data, K)
     elif(stage.type == "sketch"):
         return handle_sketch_query(stage.data, K)
 
 def handle_scene_query(data, K):
     print("text translated: ", data)
     ids_result, distances = retrieval.beit3.Text_retrieval(data, K * 10, device)
-    return {"ids": ids_result[:K], "distances": distances[:K]}
+    return {"ids": ids_result, "distances": distances}
 
 def handle_image_query(data, K):
     data = data.split(",")[1]
@@ -113,28 +111,35 @@ def handle_image_query(data, K):
     image = Image.open(BytesIO(image_data))
     ids_result, distances = retrieval.beit3.Image_retrieval(image, K * 10, device)
     print(ids_result)
-    return {"ids": ids_result[:K], "distances": distances[:K]}
+
+    return {"ids": ids_result, "distances": distances}
 
 def handle_sketch_query(data, K):
     data = data.split(",")[1]
     image_data = base64.b64decode(data)
     image = Image.open(BytesIO(image_data))
+    image.show()
     ids_result, distances = retrieval.sketch.Sket_retrieval(image, K * 10, device)
     print(ids_result)
-    return {"ids": ids_result[:K], "distances": distances[:K]}
+    return {"ids": ids_result, "distances": distances}
 
 def handle_text_query(data, K):
     ids_result, distances = retrieval.elastic.Elastic_retrieval(data, K * 10, "ocr")
-    return {"ids": ids_result[:K], "distances": distances[:K]}
-def handle_speech_query(data):
+    return {"ids": ids_result, "distances": distances}
+
+def handle_speech_query(data, K):
     ids_result, distances = retrieval.elastic.Elastic_retrieval(data, K, "asr")
-    return {"ids": ids_result[:K], "distances": distances[:K]}
+    return {"ids": ids_result, "distances": distances}
 
 def handle_object_query(ids, dis, object_list, K):
     check_list = []
-    for object in object_list:
-        for item in object[1]:
-            check_list.append((object[0], item))
+    for key, value in object_list.items():
+        for item in value:
+            item[0],item[2] = int(item[0]*1280/300), int(item[2]*1280/300)
+            item[1],item[3] = int(item[1]*720/150), int(item[3]*720/150)
+            check_list.append((key, item))
+            
+    print("check list: ", check_list)
     ids, dis = retrieval.object_filter(ids, dis, check_list, K)
     print(ids, dis)
     return {"ids": ids, "distances": dis}

@@ -100,9 +100,12 @@ class Elastic():
         # Thực hiện tìm kiếm
         res = self.es.search(index=index_name, body=query)
         # print(res)
-        ids = [hit['_source']["id"] for hit in res['hits']['hits']]
+        if index_name == "ocr":
+            ids = [hit['_source']["id"] for hit in res['hits']['hits']]
+        elif index_name == "asr":
+            ids = [hit['_source']["start"] for hit in res['hits']['hits']]
+
         scores = [hit['_score'] for hit in res['hits']['hits']]
-        # print(ids)
         # print(scores)
         scores = np.array(scores)
         scr_result = 1 / (1 + np.exp(-scores))
@@ -120,149 +123,6 @@ class Elastic():
         else:
             print(f"Index '{index_name}' không tồn tại.")
             
-            
-
-# class OCR(Elastic):
-#     def __init__(self):
-#         super().__init__()
-        
-#     def upload_data_to_elastic(self, data_path, index_name="objects"):
-#             """
-#             Đọc file JSON và thêm các phần tử vào Elasticsearch sau khi map class_name.
-            
-#             Args:
-#                 es (Elasticsearch): Đối tượng Elasticsearch.
-#                 data_path (str): Đường dẫn tới file JSON chứa dữ liệu.
-#                 class_name_path (str): Đường dẫn tới file class_name.
-#                 index_name (str): Tên index trong Elasticsearch.
-#             """
-            
-#             # Đọc toàn bộ nội dung của file JSON chứa dữ liệu
-#             with open(data_path, "r", encoding="utf-8") as file:
-#                 data = json.load(file)
-            
-            
-#             # Tạo danh sách các hành động để thêm vào Elasticsearch
-#             actions = [
-#                 {
-#                     "_index": index_name,
-#                     # "_id": item["index"],  # Sử dụng "index" làm "_id"
-#                     "_source": item
-#                 }
-#                 for item in data
-#             ]
-            
-#             # Sử dụng helpers.bulk để thêm dữ liệu vào Elasticsearch
-#             helpers.bulk(self.es, actions)
-            
-#     def ocr_retrieval(self, text_query, k, index_name="ocr"):
-
-#         query = {
-#             "query": {
-#                 "bool": {
-#                     "should": [
-#                         {
-#                             "multi_match": {
-#                                 "query": text_query,
-#                                 "fields": ["text"],
-#                                 "type": "phrase",
-#                                 "boost": 2  # Tăng cường độ ưu tiên cho kết quả chính xác
-#                             }
-#                         },
-#                         {
-#                             "multi_match": {
-#                                 "query": text_query,
-#                                 "fields": ["text"],
-#                                 "fuzziness": "AUTO"
-#                             }
-#                         }
-#                     ]
-#                 }
-#             },
-#             "size": k
-#         }
-
-#         # Thực hiện tìm kiếm
-#         res = self.es.search(index=index_name, body=query)
-#         # print(res)
-#         ids = [hit['_source']["id"] for hit in res['hits']['hits']]
-#         scores = [hit['_score'] for hit in res['hits']['hits']]
-#         # print(ids)
-#         # print(scores)
-#         return ids        
-    
-    
-# class ASR(Elastic):
-#     def __init__(self):
-#         super().__init__()
-        
-#     def upload_data_to_elastic(self, data_path, index_name="objects"):
-#             """
-#             Đọc file JSON và thêm các phần tử vào Elasticsearch sau khi map class_name.
-            
-#             Args:
-#                 es (Elasticsearch): Đối tượng Elasticsearch.
-#                 data_path (str): Đường dẫn tới file JSON chứa dữ liệu.
-#                 class_name_path (str): Đường dẫn tới file class_name.
-#                 index_name (str): Tên index trong Elasticsearch.
-#             """
-            
-#             # Đọc toàn bộ nội dung của file JSON chứa dữ liệu
-#             with open(data_path, "r", encoding="utf-8") as file:
-#                 data = json.load(file)
-            
-            
-#             # Tạo danh sách các hành động để thêm vào Elasticsearch
-#             actions = [
-#                 {
-#                     "_index": index_name,
-#                     # "_id": item["index"],  # Sử dụng "index" làm "_id"
-#                     "_source": item
-#                 }
-#                 for item in data
-#             ]
-            
-#             # Sử dụng helpers.bulk để thêm dữ liệu vào Elasticsearch
-#             helpers.bulk(self.es, actions)
-            
-#     def asr_retrieval(self, text_query, k, index_name="asr"):
-#         query = {
-#             "query": {
-#                 "bool": {
-#                     "should": [
-#                         {
-#                             "multi_match": {
-#                                 "query": text_query,
-#                                 "fields": ["text"],
-#                                 "type": "phrase",
-#                                 "boost": 2  # Tăng cường độ ưu tiên cho kết quả chính xác
-#                             }
-#                         },
-#                         {
-#                             "multi_match": {
-#                                 "query": text_query,
-#                                 "fields": ["text"],
-#                                 "fuzziness": "AUTO"
-#                             }
-#                         }
-#                     ]
-#                 }
-#             },
-#             "size": k
-#         }
-
-#         # Thực hiện tìm kiếm
-#         res = self.es.search(index=index_name, body=query)
-#         # print(res)
-#         start = [hit['_source']["start"] for hit in res['hits']['hits']]
-#         end = [hit['_source']["end"] for hit in res['hits']['hits']]
-#         # scores = [hit['_score'] for hit in res['hits']['hits']]
-#         ids = []
-#         for i in range(len(start)):
-#             id = list(range(int(start[i]), int(end[i])+1))
-#             ids.extend(id)
-#         return ids[:k]
-    
     
     
 if __name__ == "__main__":
@@ -272,43 +132,38 @@ if __name__ == "__main__":
     HOST_ELASTIC = os.getenv("HOST_ELASTIC")
     PORT_ELASTIC = int(os.getenv("PORT_ELASTIC"))
     
-    
-    ocr_check = True
+    es = Elastic()
+    es.connect_elastic(check_server=CHECK_SERVER, host=HOST_ELASTIC, port=PORT_ELASTIC)
+    ocr_check = False
     
     if ocr_check:
         # OCR
         ocr_path = r"C:\Users\admin\Projects\AIC\DATA\ocr\final_ocr_clean.json"
-        ocr = OCR()
-        ocr.connect_elastic(check_server=CHECK_SERVER, host=HOST_ELASTIC, port=PORT_ELASTIC)
-        # ocr.create_index("ocr")
+        index_name = "ocr"
+        
         # id_name = "id"
-        # ocr.upload_data_to_elastic(ocr_path, "ocr", id_name=id_name)
+        # es.upload_data_to_elastic(ocr_path, "ocr", id_name=id_name)
         
         K = 20
         text_query = "nguyễn phương hằng"
-        result = ocr.ocr_retrieval(text_query, K)
+        ids, scr = es.Elastic_retrieval(text_query, K, index_name)
         
-        # VISUALIZE RESULT
-        image_path_dict = r"D:\Temporal_search\data\image_path.json"
-        image_path = load_image_path(image_path_dict)
-        # visualize(image_path, result, K)
-        print(result)
     else:
         # ASR
         asr_path = r"C:\Users\admin\Projects\AIC\DATA\asr\final_asr.json"
-        asr = ASR()
-        asr.connect_elastic(check_server=CHECK_SERVER, host=HOST_ELASTIC, port=PORT_ELASTIC)
-        # asr.create_index("asr")
-        # asr.upload_data_to_elastic(asr_path, "asr")
+
+        index_name = "asr"
+        # es.upload_data_to_elastic(asr_path, index_name)
         
         K = 20
         text_query = "nguyễn phương hằng"
-        result = asr.asr_retrieval(text_query, K)
+        ids,scr = es.Elastic_retrieval(text_query, K, index_name)
         
-        # VISUALIZE RESULT
-        image_path_dict = r"C:\Users\admin\Projects\AIC\DATA\image_path.json"
-        image_path = load_image_path(image_path_dict)
-        # visualize(image_path, result, K)
-        print(result)
-    
+        
+        
+    # VISUALIZE RESULT
+    image_path_dict = r"D:\THANHSTAR\Projetcs\AIC\DATA\image_path.json"
+    image_path = load_image_path(image_path_dict)
+    visualize(image_path, ids, K)
+
     
