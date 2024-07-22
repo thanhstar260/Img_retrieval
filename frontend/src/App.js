@@ -1,76 +1,94 @@
-import SearchBar from './layouts/SearchBar';
-import { useState } from 'react';
-import Result from './layouts/Result';
-
+import SearchBar from "./layouts/SearchBar";
+import { useState, useEffect } from "react";
+import Result from "./layouts/Result";
 
 function App() {
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [result, setResult] = useState({})
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [result, setResult] = useState({});
   const [K, setK] = useState(40);
+  var dataRerank = null;
+
+  const handleSetDataRerank = (data) => {
+    dataRerank = data;
+  };
+
+  const handleRerank = async () => {
+    setIsSubmitting(true);
+    const response = await fetch("http://127.0.0.1:8000/rerank", {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      method: "POST",
+      body: JSON.stringify(dataRerank),
+    });
+    const json = await response.json();
+    setResult(json);
+    setIsSubmitting(false);
+  };
 
   const handleSubmit = async (data) => {
     const stages = Object.values(JSON.parse(JSON.stringify(data)));
     const stagesBody = [];
-    for(let stage of stages) {
-      let count = 0
-      for(let type in stage.data) {
-        console.log(type)
-        if(type === 'object')
-          continue
-        if(stage.data[type]) 
-          count++;
+    for (let stage of stages) {
+      let count = 0;
+      for (let type in stage.data) {
+        console.log(type);
+        if (type === "object") continue;
+        if (stage.data[type]) count++;
         else {
-          delete stage.data[type]
+          delete stage.data[type];
         }
       }
-      if(count != 1) {
-        alert("Each type has to have one type from scene or image, text, speech, sketch")
+      if (count != 1) {
+        alert(
+          "Each type has to have one type from scene or image, text, speech, sketch"
+        );
         return;
-      }    
+      }
       const type = Object.keys(stage.data)[0];
       const data = stage.data[type];
-      const objectInput = stage.data['object']
+      const objectInput = stage.data["object"];
       let object;
-      if(objectInput) {
-        object = {}
-        let group = Object.groupBy(objectInput, (object) => object.object)
-        console.log(object)
-        for(let obj in group) {
-          const elm = group[obj].map((elm) => elm.offset)
-          object[obj] = elm 
+      if (objectInput) {
+        object = {};
+        let group = Object.groupBy(objectInput, (object) => object.object);
+        console.log(object);
+        for (let obj in group) {
+          const elm = group[obj].map((elm) => elm.offset);
+          object[obj] = elm;
         }
-
       }
-      const lang = stage['lang']
-      stagesBody.push({type, data, object, lang});
-
+      const lang = stage["lang"];
+      stagesBody.push({ type, data, object, lang });
     }
 
-    const body = {stages: stagesBody, K: K}
-    console.log(body)
-
+    const body = { stages: stagesBody, K: K };
+    console.log(body);
 
     setIsSubmitting(true);
     const response = await fetch("http://127.0.0.1:8000/", {
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       method: "POST",
-      body: JSON.stringify(body)
-    })
+      body: JSON.stringify(body),
+    });
     const json = await response.json();
     setResult(json);
     setIsSubmitting(false);
-    
-
-}
+  };
 
   return (
     <div className="App flex">
-      <SearchBar onSubmit={handleSubmit} isSubmitting={isSubmitting} K={K} onChangeK={setK}/>
-      <Result />
+      <SearchBar
+        onSubmit={handleSubmit}
+        isSubmitting={isSubmitting}
+        K={K}
+        onChangeK={setK}
+        onRerank={handleRerank}
+      />
+      <Result onChangeDataRerank={handleSetDataRerank} result={result} K={K}/>
     </div>
-    
   );
 }
 

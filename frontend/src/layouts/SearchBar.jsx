@@ -8,7 +8,7 @@ import { PiRankingLight } from "react-icons/pi";
 import { IoIosSearch } from "react-icons/io";
 import { twMerge } from 'tailwind-merge';
 
-const SearchBar = ({onSubmit, isSubmitting, K, onChangeK}) => {
+const SearchBar = ({onSubmit, isSubmitting, K, onChangeK, onRerank}) => {
     const [canClose, setCanClose] = useState(false);
     const [stages, setStages] = useState({
         [uuidv4()]: {
@@ -81,7 +81,7 @@ const SearchBar = ({onSubmit, isSubmitting, K, onChangeK}) => {
         </IconButton>
 
         <div className='flex justify-around mt-8'>
-            <OutlineButton>
+            <OutlineButton onClick={onRerank}>
                 <PiRankingLight className='inline-block text-xl'/> Rerank
             </OutlineButton>
             <OutlineButton onClick={() => {console.log("hello");
