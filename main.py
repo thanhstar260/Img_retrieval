@@ -54,12 +54,12 @@ retrieval.load_model(device=device, type_model="all", beit3_model_path=beit3_mod
 retrieval.connect_elastic(check_server = CHECK_SERVER, host=HOST_ELASTIC, port=PORT_ELASTIC)
 
 
-K = 40
+K = 80
 
 print("finish loading")
 
 def checkAndTranslate(lang, str):
-    if(lang == "vie"):
+    if(lang != "eng"):
         str = translate(str)
     return str
 
@@ -82,10 +82,12 @@ def handle_stage(stage, K):
     elif(stage.type == "image"):
         return handle_image_query(stage.data, K, stage.object)
     elif(stage.type == "text"):
-        data = checkAndTranslate(stage.data)
+        # data = checkAndTranslate(stage.data)
+        data = stage.data
         return handle_text_query(data, K, stage.object)
     elif(stage.type == "speech"):
-        data = checkAndTranslate(stage.data)
+        # data = checkAndTranslate(stage.data)
+        data = stage.data
         return handle_speech_query(data, K, stage.object)
     elif(stage.type == "sketch"):
         return handle_sketch_query(stage.data, K, stage.object)
@@ -94,6 +96,7 @@ def handle_scene_query(data, K, object):
     print("text translated: ", data)
     ids_result, distances = retrieval.beit3.Text_retrieval(data, K * 10, device)
     if(object):
+        print("object: ", object)
         return handle_object_query(ids_result, distances, object, K)
     return {"ids": ids_result, "distances": distances}
 
@@ -133,6 +136,8 @@ def handle_object_query(ids, dis, object_list, K):
     for key, value in object_list.items():
         for item in value:
             check_list.append((key, item))
+            
+    print("check list: ", check_list)
     ids, dis = retrieval.object_filter(ids, dis, check_list, K)
     return {"ids": ids, "distances": dis}
 
