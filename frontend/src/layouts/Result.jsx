@@ -44,7 +44,7 @@ const Result = ({ result, onChangeDataRerank, K }) => {
     setIds([[inputValue]]);
   };
   return (
-    <div className="px-6 py-4 flex-grow w-3/5 h-full">
+    <div className="px-6 py-4 flex-grow h-full">
       <div className="flex flex-row gap-44 mb-3">
         <div className="flex gap-12">
           <button className={btn_style}>

@@ -1,11 +1,14 @@
 import SearchBar from "./layouts/SearchBar";
 import { useState, useEffect } from "react";
 import Result from "./layouts/Result";
+import { GoArrowRight } from "react-icons/go";
+import IconButton from "./components/IconButton";
 
 function App() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [result, setResult] = useState({});
   const [K, setK] = useState(40);
+  const [open, setOpen] = useState(true);
   var dataRerank = null;
 
   const handleSetDataRerank = (data) => {
@@ -76,13 +79,22 @@ function App() {
   };
 
   return (
-    <div className="App flex">
+    <div className="App flex flex-row overflow-hidden relative">
+      {!open && <IconButton 
+            label="Open"
+            className="border-2 border-teal-500 hover:bg-teal-500 hover:text-white mx-auto mt-4 absolute left-2"
+            onClick={() => setOpen(true)}
+        >
+             <GoArrowRight className='text-2xl'/>
+        </IconButton>}
       <SearchBar
         onSubmit={handleSubmit}
         isSubmitting={isSubmitting}
         K={K}
         onChangeK={setK}
         onRerank={handleRerank}
+        open={open}
+        setOpen={setOpen}
       />
       <Result onChangeDataRerank={handleSetDataRerank} result={result} K={K}/>
     </div>
