@@ -5,7 +5,7 @@ import SliderImage from "./SliderImage";
 import YouTubeVideo from "./YouTuBeVideo";
 import { RxReset } from "react-icons/rx";
 import { IoMdSearch } from "react-icons/io";
-import axios from 'axios';
+import imageUrls from "../../src/links/image_path.json";
 
 const ImageShow = ({ idImg, onClose, url }) => {
   const [showVideo, setShowVideo] = useState(false);
@@ -14,15 +14,8 @@ const ImageShow = ({ idImg, onClose, url }) => {
   const [toggle, setToggle] = useState(true);
 
   useEffect(() => {
-    const fetchImageUrl = async () => {
-      try {
-        const response = await axios.get(`http://127.0.0.1:8000/get_image_url/${NewShowIdImg}`);
-        setUrlImg("http://127.0.0.1:8000" + response.data.url);
-      } catch (error) {
-        console.error("Error fetching the image URL:", error);
-      }
-    };
-    fetchImageUrl();
+    const url = imageUrls[NewShowIdImg];
+    setUrlImg("http://127.0.0.1:8000" + url.slice(1));
   }, [NewShowIdImg]);
 
   const handleShowVideo = () => {
@@ -56,10 +49,10 @@ const ImageShow = ({ idImg, onClose, url }) => {
             <img
               src={urlImg}
               alt={NewShowIdImg}
-              className="max-w-full max-h-full"
+              style={{width: "720px", height: "auto"}}
             />
           ) : (
-            <YouTubeVideo idImg={idImg} />
+            <YouTubeVideo idImg={NewShowIdImg} />
           )}
           <div className="flex justify-between mt-2">
             <button

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import ImageItem from "./ImageItem";
-import axios from "axios";
+import imageUrls from "../../src/links/image_path.json";
 
 const ListImageResult = ({ ImageIdArr, dis, onChangeDataRerank, K }) => {
   const [stage, setStage] = useState(0);
@@ -28,9 +28,7 @@ const ListImageResult = ({ ImageIdArr, dis, onChangeDataRerank, K }) => {
     }
     setNewImageArr(tempArr);
   }, [ImageIdArr]);
-  useEffect(() => {
-    console.log("ranl ", dataReRank);
-  }, [dataReRank]);
+  
   useEffect(() => {
     const newStages = [];
     for (let i = 0; i < ImageIdArr.length; i++) {
@@ -50,17 +48,6 @@ const ListImageResult = ({ ImageIdArr, dis, onChangeDataRerank, K }) => {
   useEffect(() => {
     onChangeDataRerank(dataReRank);
   }, [dataReRank, onChangeDataRerank]);
-  const fetchImageUrl = async (id) => {
-    try {
-      const response = await axios.get(
-        `http://127.0.0.1:8000/get_image_url/${id}`
-      );
-      return "http://127.0.0.1:8000" + response.data.url;
-    } catch (error) {
-      console.error("Error fetching the image URL:", error);
-      return "";
-    }
-  };
 
   const handleStageClick = (idx) => {
     setStage(idx);
@@ -96,13 +83,9 @@ const ListImageResult = ({ ImageIdArr, dis, onChangeDataRerank, K }) => {
     setNewImageArr(updatedNewImageArr);
   };
 
-  const handleSetIdxSelect = async (idx) => {
+  const handleSetIdxSelect = (idx) => {
     setIdxSelect(idx);
-    console.log(NewImageArr);
-
-    const newUrls = await Promise.all(
-      NewImageArr.map((item, id) => fetchImageUrl(NewImageArr[id][idx].idImg))
-    );
+    const newUrls = NewImageArr.map((item, id) => "http://127.0.0.1:8000" + imageUrls[item[idx].idImg].slice(1));
     setUrlList(newUrls);
   };
   return (

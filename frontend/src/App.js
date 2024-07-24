@@ -10,7 +10,27 @@ function App() {
   const [K, setK] = useState(40);
   const [open, setOpen] = useState(true);
   var dataRerank = null;
+  const [resultHistory, setResultHistory] = useState([]);
+  const [index, setIndex] = useState(0);
+  const [isBack, setIsBack] = useState(false);
 
+  const BacktoResult = ()=>{
+    if(index + 1 < resultHistory.length) {
+      setResult(resultHistory[index+1])
+      setIndex(index+1)
+      setIsBack(true);
+    }
+  }
+
+  useEffect(() => {
+    if (Object.keys(result).length > 0 && !isBack) {
+      setResultHistory((prevHistory) => [result, ...prevHistory]);
+    }
+  }, [result]);
+
+  const resetIndex = ()=>{
+    setIndex(-1);
+  }
   const handleSetDataRerank = (data) => {
     dataRerank = data;
   };
@@ -26,6 +46,8 @@ function App() {
     });
     const json = await response.json();
     setResult(json);
+    setIndex(0);
+    setIsBack(false);
     setIsSubmitting(false);
   };
 
@@ -75,6 +97,8 @@ function App() {
     });
     const json = await response.json();
     setResult(json);
+    setIndex(0);
+    setIsBack(false);
     setIsSubmitting(false);
   };
 
@@ -96,7 +120,7 @@ function App() {
         open={open}
         setOpen={setOpen}
       />
-      <Result onChangeDataRerank={handleSetDataRerank} result={result} K={K}/>
+      <Result onChangeDataRerank={handleSetDataRerank} result={result} K={K} onGoBack={BacktoResult} onClear={resetIndex}/>
     </div>
   );
 }

@@ -6,7 +6,7 @@ import { IoMdSearch } from "react-icons/io";
 import ListImageResult from "../components/ListImageResult";
 import { useState, useEffect } from "react";
 
-const Result = ({ result, onChangeDataRerank, K }) => {
+const Result = ({ result, onChangeDataRerank, K, onGoBack, onClear }) => {
   const [reloadCount, setReloadCount] = useState(0);
   const [inputValue, setInputValue] = useState();
   const [dis, setDis] = useState([]);
@@ -41,17 +41,21 @@ const Result = ({ result, onChangeDataRerank, K }) => {
     }
   };
   const handleSetIds = () => {
-    setIds([[inputValue]]);
+    setIds([[parseInt(inputValue)]]);
   };
+  const handleClear = () =>{
+    setIds([]);
+    onClear();
+  }
   return (
     <div className="px-6 py-4 flex-grow h-full">
       <div className="flex flex-row gap-44 mb-3">
         <div className="flex gap-12">
-          <button className={btn_style}>
+          <button className={btn_style} onClick={onGoBack}>
             <SlReload size={30} />
           </button>
           <button className={btn_style}>
-            <GoHome size={30} onClick={handleReload} />
+            <GoHome size={30} onClick={handleClear} />
           </button>
         </div>
         <div className="flex flex-row items-center border rounded-full px-3 border-teal-500 w-full">
