@@ -83,13 +83,16 @@ const Stage = ({id, canClose, onClose, onChange}) => {
 
     const selectLangHandler = (event) => {
         setLang(event.target.value);
+    }
+    useEffect(() => {
         const newData = {
             ...data,
             lang
         }
+
         setData(newData);
         onChange(newData);
-    }
+      }, [lang]);
 
     const handleChangeData = (type, newSearchData) => {
         const newData = {

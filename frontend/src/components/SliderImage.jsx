@@ -2,7 +2,7 @@ import Slider from "react-slick";
 import React, { useState, useEffect } from "react";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import axios from "axios";
+import imageUrls from "../../src/links/image_path.json";
 
 function SampleNextArrow(props) {
   const { className, style, onClick, updateImgIdArr } = props;
@@ -60,21 +60,11 @@ const SliderImage = ({ idImg, onArrow }) => {
   const [urlImgArr, setUrlImgArr] = useState(["", "", "", "", ""]);
   
   useEffect(() => {
-    const fetchImageUrl = async (id) => {
-      try {
-        const response = await axios.get(`http://127.0.0.1:8000/get_image_url/${id}`);
-        return ("http://127.0.0.1:8000" + response.data.url);
-      } catch (error) {
-        console.error("Error fetching the image URL:", error);
-        return "";
-      }
-    };
-    const fetchAllImages = async () => {
-      const newUrls = await Promise.all(ImgIdArr.map(id => fetchImageUrl(id)));
-      setUrlImgArr(newUrls);
-    };
-
-    fetchAllImages();
+    const newUrls = [];
+    for (let i = 0; i < ImgIdArr.length; i++) {
+        newUrls.push("http://127.0.0.1:8000" + imageUrls[ImgIdArr[i]].slice(1));
+    } 
+    setUrlImgArr(newUrls);
   }, [ImgIdArr]);
   
 

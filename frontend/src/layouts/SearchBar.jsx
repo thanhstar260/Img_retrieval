@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import IconButton from '../components/IconButton';
 import Stage from '../components/Stage';
 import { v4 as uuidv4 } from 'uuid';
@@ -7,15 +7,16 @@ import OutlineButton from '../components/OutlineButton';
 import { PiRankingLight } from "react-icons/pi";
 import { IoIosSearch } from "react-icons/io";
 import { twMerge } from 'tailwind-merge';
+import { GoArrowLeft } from "react-icons/go";
 
-const SearchBar = ({onSubmit, isSubmitting, K, onChangeK}) => {
+const SearchBar = ({onSubmit, isSubmitting, K, onChangeK, onRerank, open, setOpen}) => {
     const [canClose, setCanClose] = useState(false);
     const [stages, setStages] = useState({
         [uuidv4()]: {
             data: {},
             lang: "eng"
         }
-    });    
+    });
 
     useEffect(() => {
         if(Object.keys(stages).length > 1) {
@@ -48,7 +49,6 @@ const SearchBar = ({onSubmit, isSubmitting, K, onChangeK}) => {
 
     const changeDataInStage = (key) => {
         return (newValue) => {
-            console.log(stages);
             setStages(
                 {
                     ...stages,
@@ -60,13 +60,21 @@ const SearchBar = ({onSubmit, isSubmitting, K, onChangeK}) => {
 
   return (
     <div className={twMerge(
-        'w-[22rem] bg-slate-100 h-screen px-4 py-8 overflow-y-scroll shrink-0',
-        `${isSubmitting ? 'cursor-wait' : ''}`
+        'w-[24rem] bg-slate-100 h-screen px-4 py-8 overflow-y-scroll shrink-0 relative transition-all',
+        `${isSubmitting ? 'cursor-wait' : ''}`,
+        `${!open ? ' -translate-x-full w-0' : ''}`
     )}>
-        <div className='mb-4'>
+        <div className='mb-6'>
             <label className='text-teal-500 m-3'>K: </label>
             <input type='number' className='ring-2 ring-slate-300 rounded-md max-w-20 focus:outline-none focus:ring-teal-500 transition-all px-2 py-0.25 text-slate-600' value={K} min={1} step={1} onChange={(e)=>{onChangeK(e.target.value)}}/>
         </div>
+        <IconButton 
+            label="Close"
+            className="border-2 border-teal-500 hover:bg-teal-500 hover:text-white mx-auto mt-4 absolute right-4 top-1"
+            onClick={() => setOpen(false)}
+        >
+             <GoArrowLeft className='text-2xl'/>
+        </IconButton>
         <div className='flex flex-col gap-4'>
         {
             Object.keys(stages).map(key => <Stage key={key} canClose={canClose} id={key} onClose={() => closeStageHandler(key)} onChange={changeDataInStage(key)}></Stage>)
@@ -81,10 +89,10 @@ const SearchBar = ({onSubmit, isSubmitting, K, onChangeK}) => {
         </IconButton>
 
         <div className='flex justify-around mt-8'>
-            <OutlineButton>
+            <OutlineButton onClick={onRerank}>
                 <PiRankingLight className='inline-block text-xl'/> Rerank
             </OutlineButton>
-            <OutlineButton onClick={() => {console.log("hello");
+            <OutlineButton onClick={() => {
                 onSubmit(stages)
             }}>
                 <IoIosSearch className='inline-block text-xl'/> Search

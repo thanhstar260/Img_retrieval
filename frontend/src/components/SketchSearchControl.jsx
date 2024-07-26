@@ -18,7 +18,9 @@ const SketchSearchControl = ({data, onChange}) => {
             <span className='mr-4 text-teal-500 text-sm'>Brush</span>
             <BrushSizeSlider className={'w-40'} value={brushSize} onChange={(e) => setBrushSize(e.target.value)}/>
         </div>
+        <div className='w-full flex justify-center'>
         <Canvas type={"drawing"} color="black" brushSize={brushSize} value={data} onStopDraw={handleChangeData}/>
+        </div>
     </div>
   )
 }

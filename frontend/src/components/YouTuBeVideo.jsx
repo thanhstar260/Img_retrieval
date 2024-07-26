@@ -1,28 +1,20 @@
 import { useEffect, useState } from "react";
 import React from "react";
-import axios from "axios";
+import videoUrls from "../../src/links/id2link_convert.json";
 
 const YouTubeVideo = ({ idImg }) => {
   const [urlVideo, setUrlVideo] = useState("");
 
   useEffect(() => {
-    const fetchVideoUrl = async () => {
-      try {
-        const response = await axios.get(
-          `http://127.0.0.1:8000/get_video_url/${idImg}`
-        );
-        setUrlVideo(response.data.url);
-      } catch (error) {
-        console.error("Error fetching the image URL:", error);
-      }
-    };
-    fetchVideoUrl();
+    const url = videoUrls[idImg];
+    setUrlVideo(url);
   }, [idImg]);
+
   return (
     <div>
       <iframe
-        width="650"
-        height="400"
+        width="720"
+        height="405"
         src={urlVideo}
         title="YouTube video player"
         frameborder="0"

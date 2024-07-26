@@ -5,7 +5,6 @@ __pycache__/
 /CLIP/
 /Clip_caption_prefix/
 /static/images/
-utils/__pycache__/
 .env
 /ZSE_SBIR/
 /checkpoints/
@@ -14,7 +13,6 @@ test.py
 /static/sketch_query/sketch.jpg
 /elasticsearch/
 /unilm/
-/utils/
 class_name.json
 /meili/
 draw.py

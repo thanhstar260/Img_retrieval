@@ -180,7 +180,9 @@ const ObjectSearchControl = ({onChange, data}) => {
             <span className='mr-4 text-teal-500 text-sm'>Brush</span>
             <BrushSizeSlider className={'w-40'} value={brushSize} onChange={(e) => setBrushSize(e.target.value)}/>
         </div>
+        <div className='w-full flex justify-center'>
         <Canvas type={"rectangle"} color={selectedColor} brushSize={brushSize} onStopDraw={handleStopDraw} onUndo={handleUndo} value={data}/>
+        </div>
 
         <div className='mt-4 flex items-center h-7'>
             <p className='text-sm text-teal-500 mr-4'>Collection</p>
