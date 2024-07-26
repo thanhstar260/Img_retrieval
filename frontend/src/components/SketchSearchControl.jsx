@@ -7,6 +7,7 @@ const SketchSearchControl = ({data, onChange}) => {
     const [brushSize, setBrushSize] = useState(2);
 
     const handleChangeData = (image) => {
+      console.log(image)
       onChange("sketch", image);
     }
 

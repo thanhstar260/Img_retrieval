@@ -12,6 +12,7 @@ from typing import Dict
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from fastapi.staticfiles import StaticFiles
+from io import BytesIO
 
 app = FastAPI()
 
@@ -107,6 +108,7 @@ def handle_sketch_query(data, K):
     data = data.split(",")[1]
     image_data = base64.b64decode(data)
     image = Image.open(BytesIO(image_data))
+    
     ids_result, distances = retrieval.sketch.Sket_retrieval(image, K * 10, device)
     print(ids_result)
     return {"ids": ids_result[:K], "distances": distances[:K]}

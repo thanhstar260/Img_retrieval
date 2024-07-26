@@ -142,7 +142,7 @@ const Canvas = ({color, value,  brushSize, type, onStopDraw, onUndo, onDelete}) 
     useEffect(() => {
         if(!value) {
             setHistory([]);
-            contextRef.current.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+            contextRef.current.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
         }
     }, [value])
 
