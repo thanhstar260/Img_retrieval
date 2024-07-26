@@ -142,6 +142,7 @@ const Canvas = ({color, value,  brushSize, type, onStopDraw, onUndo, onDelete}) 
     useEffect(() => {
         if(!value) {
             setHistory([]);
+            contextRef.current.fillStyle = "white"
             contextRef.current.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
         }
     }, [value])
