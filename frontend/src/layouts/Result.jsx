@@ -12,6 +12,7 @@ const Result = ({ result, onChangeDataRerank, K, onGoBack, onClear }) => {
   const [dis, setDis] = useState([]);
   const [ids, setIds] = useState([]);
   const [K1, setK] = useState(K);
+  const [isShowIdlist, setIsShowIdlist] = useState(false);
 
   useEffect(() => {
     setK(K);
@@ -34,21 +35,27 @@ const Result = ({ result, onChangeDataRerank, K, onGoBack, onClear }) => {
     setIds(idsList);
     handleReload();
   }, [result]);
-  
+
   const handleKeyPress = (event) => {
     if (event.key === "Enter") {
       handleSetIds();
     }
   };
   const handleSetIds = () => {
-    setIds([[parseInt(inputValue)]]);
+    if(inputValue === "") return
+    const values = inputValue.split(',').map(value => parseInt(value.trim()));
+    setIds([values]);
   };
-  const handleClear = () =>{
+  const handleClear = () => {
+    setIsShowIdlist(false);
     setIds([]);
     onClear();
-  }
+  };
+  const ShowIdList = () => {
+    setIsShowIdlist(!isShowIdlist);
+  };
   return (
-    <div className="px-6 py-4 flex-grow h-full">
+    <div className="px-6 py-4 flex-grow h-screen">
       <div className="flex flex-row gap-44 mb-3">
         <div className="flex gap-12">
           <button className={btn_style} onClick={onGoBack}>
@@ -70,8 +77,14 @@ const Result = ({ result, onChangeDataRerank, K, onGoBack, onClear }) => {
           </button>
         </div>
         <div className="flex gap-12">
-          <button className={btn_style}>
-            <GrNotes size={30} />
+          <button
+            className={
+              !isShowIdlist
+                ? btn_style
+                : "px-2 py-2 rounded-full transition-all text-white bg-teal-500"
+            }
+          >
+            <GrNotes size={30} onClick={ShowIdList} />
           </button>
           <button className={btn_style}>
             <RiSendPlane2Fill size={30} />
@@ -80,7 +93,14 @@ const Result = ({ result, onChangeDataRerank, K, onGoBack, onClear }) => {
       </div>
 
       {/*Two-dimensional array [stage][idx] -> idImg*/}
-      {ids.length>0 && <ListImageResult K={K1} onChangeDataRerank = {onChangeDataRerank} key={reloadCount} ImageIdArr={ids} dis={dis} />}
+        <ListImageResult
+          K={K1}
+          onChangeDataRerank={onChangeDataRerank}
+          key={reloadCount}
+          ImageIdArr={ids}
+          dis={dis}
+          isShowIdlist={isShowIdlist}
+        />
     </div>
   );
 };
