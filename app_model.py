@@ -10,13 +10,13 @@ from enum import Enum
 #     sketch = "sketch"
 
 
-class Data:
-     scene: str = None
-     image: str = None
-     speech: str = None
-     text: str = None
-     sketch: str = None
-     object: Optional[Dict[str, List[List[int]]]] = None
+class Data(BaseModel):
+    scene: str = None
+    image: str = None
+    speech: str = None
+    text: str = None
+    sketch: str = None
+    object: Optional[Dict[str, List[List[int]]]] = None
 
 class Stage(BaseModel):
     data: Data

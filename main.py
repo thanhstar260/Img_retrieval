@@ -7,7 +7,7 @@ from io import BytesIO
 import torch
 import base64
 import os
-from models.utils import visualize, load_image_path, translate
+from models.utils import visualize, load_image_path, translate, rrf
 from typing import Dict
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
@@ -42,7 +42,7 @@ beit3_fea_path = r".\DATA\beit3_features"
     
 # SKETCH PARAMETER
 #r"D:\THANHSTAR\Projetcs\AIC\ZSE_SBIR\checkpoints\sketchy_ext\best_checkpoint.pth"
-sket_model_path = r"D:\THANHSTAR\Projetcs\AIC\ZSE_SBIR\checkpoints\sketchy_ext\best_checkpoint.pth"
+sket_model_path = r".\models\weights\best_checkpoint.pth"
 sket_fea_path = r".\DATA\sketch_features"
 
 load_dotenv()
@@ -92,22 +92,36 @@ def search_image(request: SearchRequest) -> Dict[int, SearchResult]:
 
 def handle_stage(stage, K):
     list_ids = []
+    distances = []
+    ids = []
     if(stage.data.scene != None):
         data = checkAndTranslate(stage.lang, stage.data.scene)
         stage_result = handle_scene_query(data, K)
-        list_ids.append(stage_result['ids'])
+        list_ids.append(stage_result['ids'].tolist())
+        distances = stage_result['distances']
     if(stage.data.image != None):
         stage_result = handle_image_query(stage.data.image, K)
-        list_ids.append(stage_result['ids'])
+        list_ids.append(stage_result['ids'].tolist())
+        distances = stage_result['distances']
     if(stage.data.text != None):
         stage_result = handle_text_query(stage.data.text, K)
         list_ids.append(stage_result['ids'])
+        distances = stage_result['distances']
     if(stage.data.speech != None):
         stage_result = handle_speech_query(stage.data.sketch, K)
         list_ids.append(stage_result['ids'])
+        distances = stage_result['distances']
     if(stage.data.sketch != None):
         stage_result = handle_sketch_query(stage.data.sketch, K)
         list_ids.append(stage_result['ids'])
+        distances = stage_result['distances']
+    
+    if(len(list_ids) > 1):
+        ids, distances = rrf(list_ids, K)
+    else:
+        ids = list_ids[0]
+
+    return {'ids': ids, 'distances': distances}
 
 def handle_scene_query(data, K):
     print("text translated: ", data)

@@ -110,6 +110,7 @@ def load_features(feature_folder_path):
 
 
 def rrf(ids, k=60):
+    print(ids)
     scores = {}
     for i in range(len(ids)):
         for id in ids[i]:
