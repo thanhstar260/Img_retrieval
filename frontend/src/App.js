@@ -63,9 +63,9 @@ function App() {
           delete stage.data[type];
         }
       }
-      if (count != 1) {
+      if (count < 1) {
         alert(
-          "Each type has to have one type from scene or image, text, speech, sketch"
+          "Each stage has to have one type from scene or image, text, speech, sketch"
         );
         return;
       }
@@ -103,7 +103,7 @@ function App() {
   };
 
   return (
-    <div className="App flex flex-row overflow-hidden relative">
+    <div className="App h-screen flex flex-row overflow-hidden relative">
       {!open && <IconButton 
             label="Open"
             className="border-2 border-teal-500 hover:bg-teal-500 hover:text-white mx-auto mt-4 absolute left-2"

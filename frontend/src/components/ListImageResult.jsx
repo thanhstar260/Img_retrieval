@@ -89,7 +89,7 @@ const ListImageResult = ({ ImageIdArr, dis, onChangeDataRerank, K }) => {
     setUrlList(newUrls);
   };
   return (
-    <div className="h-screen ">
+    <div className="h-full">
       <div className="flex flex-row gap-4 mb-2">
         {ImageIdArr.map((item, idx) => (
           <button
