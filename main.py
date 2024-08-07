@@ -42,7 +42,7 @@ beit3_fea_path = r".\DATA\beit3_features"
     
 # SKETCH PARAMETER
 #r"D:\THANHSTAR\Projetcs\AIC\ZSE_SBIR\checkpoints\sketchy_ext\best_checkpoint.pth"
-sket_model_path = r".\models\weights\best_checkpoint.pth"
+sket_model_path = r"D:\THANHSTAR\Projetcs\AIC\ZSE_SBIR\checkpoints\sketchy_ext\best_checkpoint.pth"
 sket_fea_path = r".\DATA\sketch_features"
 
 load_dotenv()

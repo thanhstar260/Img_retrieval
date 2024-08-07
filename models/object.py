@@ -196,6 +196,7 @@ if __name__ == "__main__":
     # print(calculate_iou(person_list, [1020.793212890625,100.4671630859375,1232.89111328125,424.25213623046875]))
 
     ids,scr = objects.Objects_local_retrieval(check_list, K, threshold_iou = 0.1)
+    print("ids: ", ids)
     print("score: ",np.round(scr, 4))
     img_path = load_image_path(r'D:\THANHSTAR\Projetcs\AIC\DATA\image_path.json')
     visualize(img_path, ids)
