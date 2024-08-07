@@ -2,18 +2,24 @@ from pydantic import BaseModel
 from typing import List, Optional, Dict
 from enum import Enum
 
-class Type(str, Enum):
-    scene = "scene"
-    image = "image"
-    text = "text"
-    speech = "speech"
-    sketch = "sketch"
+# class Type(str, Enum):
+#     scene = "scene"
+#     image = "image"
+#     text = "text"
+#     speech = "speech"
+#     sketch = "sketch"
 
+
+class Data(BaseModel):
+    scene: str = None
+    image: str = None
+    speech: str = None
+    text: str = None
+    sketch: str = None
+    object: Optional[Dict[str, List[List[int]]]] = None
 
 class Stage(BaseModel):
-    type: Type
-    data: str
-    object: Optional[Dict[str, List[List[int]]]] = None
+    data: Data
     lang: str
 
 class SearchRequest(BaseModel):

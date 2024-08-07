@@ -7,7 +7,7 @@ from io import BytesIO
 import torch
 import base64
 import os
-from models.utils import visualize, load_image_path, translate
+from models.utils import visualize, load_image_path, translate, rrf
 from typing import Dict
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
@@ -42,7 +42,7 @@ beit3_fea_path = r".\DATA\beit3_features"
     
 # SKETCH PARAMETER
 #r"D:\THANHSTAR\Projetcs\AIC\ZSE_SBIR\checkpoints\sketchy_ext\best_checkpoint.pth"
-sket_model_path = r"D:\THANHSTAR\Projetcs\AIC\ZSE_SBIR\checkpoints\sketchy_ext\best_checkpoint.pth"
+sket_model_path = r".\models\weights\best_checkpoint.pth"
 sket_fea_path = r".\DATA\sketch_features"
 
 load_dotenv()
@@ -73,7 +73,7 @@ def search_image(request: SearchRequest) -> Dict[int, SearchResult]:
     index = 0
     for stage in request.stages:
         stage_result = handle_stage(stage, request.K)
-        if(stage.object):
+        if(stage.data.object != None):
             stage_result = handle_object_query(stage_result['ids'], stage_result['distances'], stage.object, K)
         # result.update({index: stage_result})
         list_ids.append(stage_result['ids'])
@@ -91,17 +91,37 @@ def search_image(request: SearchRequest) -> Dict[int, SearchResult]:
     return result
 
 def handle_stage(stage, K):
-    if(stage.type == "scene"):
-        data = checkAndTranslate(stage.lang, stage.data)
-        return handle_scene_query(data, K)
-    elif(stage.type == "image"):
-        return handle_image_query(stage.data, K)
-    elif(stage.type == "text"):
-        return handle_text_query(stage.data, K)
-    elif(stage.type == "speech"):
-        return handle_speech_query(stage.data, K)
-    elif(stage.type == "sketch"):
-        return handle_sketch_query(stage.data, K)
+    list_ids = []
+    distances = []
+    ids = []
+    if(stage.data.scene != None):
+        data = checkAndTranslate(stage.lang, stage.data.scene)
+        stage_result = handle_scene_query(data, K)
+        list_ids.append(stage_result['ids'].tolist())
+        distances = stage_result['distances']
+    if(stage.data.image != None):
+        stage_result = handle_image_query(stage.data.image, K)
+        list_ids.append(stage_result['ids'].tolist())
+        distances = stage_result['distances']
+    if(stage.data.text != None):
+        stage_result = handle_text_query(stage.data.text, K)
+        list_ids.append(stage_result['ids'])
+        distances = stage_result['distances']
+    if(stage.data.speech != None):
+        stage_result = handle_speech_query(stage.data.sketch, K)
+        list_ids.append(stage_result['ids'])
+        distances = stage_result['distances']
+    if(stage.data.sketch != None):
+        stage_result = handle_sketch_query(stage.data.sketch, K)
+        list_ids.append(stage_result['ids'])
+        distances = stage_result['distances']
+    
+    if(len(list_ids) > 1):
+        ids, distances = rrf(list_ids, K)
+    else:
+        ids = list_ids[0]
+
+    return {'ids': ids, 'distances': distances}
 
 def handle_scene_query(data, K):
     print("text translated: ", data)

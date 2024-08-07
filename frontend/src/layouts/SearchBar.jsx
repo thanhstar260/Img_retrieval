@@ -60,7 +60,7 @@ const SearchBar = ({onSubmit, isSubmitting, K, onChangeK, onRerank, open, setOpe
 
   return (
     <div className={twMerge(
-        'w-[24rem] bg-slate-100 h-screen px-4 py-8 overflow-y-scroll shrink-0 relative transition-all',
+        'w-[24rem] bg-slate-100 h-screen px-4 py-8 overflow-y-scroll shrink-0 sticky top-0 transition-all',
         `${isSubmitting ? 'cursor-wait' : ''}`,
         `${!open ? ' -translate-x-full w-0' : ''}`
     )}>
