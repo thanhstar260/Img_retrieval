@@ -109,12 +109,14 @@ def load_features(feature_folder_path):
     return features
 
 
-def find_positions(list_A, list_B):
-    positions = []
-    for element in list_A:
-        if element in list_B:
-            position = list_B.index(element)
-        else:
-            position = -1  # Hoặc bất kỳ giá trị đặc biệt nào để biểu thị rằng phần tử không tồn tại trong list_B
-        positions.append(position)
-    return positions
+def rrf(ids, k=60):
+    scores = {}
+    for i in range(len(ids)):
+        for id in ids[i]:
+            if id not in scores:
+                scores[id] = 0
+            rank = ids[i].index(id)
+            scores[id] += 1 / (k + rank)
+    scores = dict(sorted(scores.items(), key=lambda item: item[1], reverse=True))
+    ids, scores = list(scores.keys()), list(scores.values())
+    return ids, scores

@@ -9,7 +9,7 @@ from models.beit3_model import BEIT3
 from models.elastic import Elastic
 from models.sketch import SKETCH
 from models.object import OBJECTS
-from models.utils import visualize, load_image_path, translate, find_positions
+from models.utils import visualize, load_image_path, translate, rrf
 import time
 import math
 import pandas as pd
