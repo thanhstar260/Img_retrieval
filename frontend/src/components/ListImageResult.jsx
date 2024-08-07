@@ -1,8 +1,16 @@
 import React, { useEffect, useState } from "react";
 import ImageItem from "./ImageItem";
 import imageUrls from "../../src/links/image_path.json";
+import IdListSubmit from "./IdListSubmit";
+import { IoClose } from "react-icons/io5";
 
-const ListImageResult = ({ ImageIdArr, dis, onChangeDataRerank, K }) => {
+const ListImageResult = ({
+  ImageIdArr,
+  dis,
+  onChangeDataRerank,
+  K,
+  isShowIdlist,
+}) => {
   const [stage, setStage] = useState(0);
   const [NewImageArr, setNewImageArr] = useState([[]]);
   const [idxSelect, setIdxSelect] = useState(-1);
@@ -10,6 +18,7 @@ const ListImageResult = ({ ImageIdArr, dis, onChangeDataRerank, K }) => {
   const [dataReRank, setDataReRank] = useState({ stages: [] });
   const [distance, setDistance] = useState([[]]);
   const [K1, setK] = useState(K);
+  const [submitId, setSubmitId] = useState([]);
 
   useEffect(() => {
     setDistance(dis);
@@ -28,7 +37,15 @@ const ListImageResult = ({ ImageIdArr, dis, onChangeDataRerank, K }) => {
     }
     setNewImageArr(tempArr);
   }, [ImageIdArr]);
-  
+
+  useEffect(() => {
+    const savedIds = localStorage.getItem("submitIds");
+    if (savedIds) {
+      const idsArray = JSON.parse(savedIds);
+      setSubmitId(idsArray);
+    }
+  }, []);
+
   useEffect(() => {
     const newStages = [];
     for (let i = 0; i < ImageIdArr.length; i++) {
@@ -58,6 +75,14 @@ const ListImageResult = ({ ImageIdArr, dis, onChangeDataRerank, K }) => {
     updatedNewImageArr[stage][idx].isLike = value;
     setNewImageArr(updatedNewImageArr);
 
+    for (let i = 0; i < updatedNewImageArr.length; i++)
+      for (let j = 0; j < updatedNewImageArr[i].length; j++)
+        if (
+          updatedNewImageArr[i][j].idImg ===
+          updatedNewImageArr[stage][idx].idImg
+        )
+          updatedNewImageArr[i][j].isLike = value;
+
     const clonedDataReRank = { ...dataReRank };
     var tempLike = [];
     var tempDislike = [];
@@ -74,51 +99,122 @@ const ListImageResult = ({ ImageIdArr, dis, onChangeDataRerank, K }) => {
       clonedDataReRank.stages[i].negative_list = tempDislike;
     }
     setDataReRank(clonedDataReRank);
+    console.log(dataReRank);
   };
 
   const handleCheckBox = (idx) => {
     const updatedNewImageArr = [...NewImageArr];
     updatedNewImageArr[stage][idx].isSelect =
       !updatedNewImageArr[stage][idx].isSelect;
+
+    var savedIds = [];
+    if (localStorage.getItem("submitIds"))
+      savedIds = JSON.parse(localStorage.getItem("submitIds"));
+    const newID = updatedNewImageArr[stage][idx].idImg;
+    if (updatedNewImageArr[stage][idx].isSelect) {
+      if (!savedIds.includes(newID)) savedIds.push(newID);
+    } else {
+      savedIds = savedIds.filter((item) => item !== newID);
+    }
+    localStorage.setItem("submitIds", JSON.stringify(savedIds));
+    setSubmitId(savedIds);
+
+    for (let i = 0; i < updatedNewImageArr.length; i++)
+      for (let j = 0; j < updatedNewImageArr[i].length; j++)
+        if (
+          updatedNewImageArr[i][j].idImg ===
+          updatedNewImageArr[stage][idx].idImg
+        )
+          updatedNewImageArr[i][j].isSelect =
+            updatedNewImageArr[stage][idx].isSelect;
     setNewImageArr(updatedNewImageArr);
+
+    const updatedSubmitId = [];
+    for (let i = 0; i < updatedNewImageArr.length; i++)
+      for (let j = 0; j < updatedNewImageArr[i].length; j++)
+        if (updatedNewImageArr[i][j].isSelect) {
+          const ID = updatedNewImageArr[i][j].idImg;
+          if (!updatedSubmitId.includes(ID)) updatedSubmitId.push(ID);
+        }
   };
 
   const handleSetIdxSelect = (idx) => {
     setIdxSelect(idx);
-    const newUrls = NewImageArr.map((item, id) => "http://127.0.0.1:8000" + imageUrls[item[idx].idImg].slice(1));
+    const newUrls = NewImageArr.map(
+      (item, id) =>
+        "http://127.0.0.1:8000" + imageUrls[item[idx].idImg].slice(1)
+    );
     setUrlList(newUrls);
   };
+
+  const ClearSubmitId = (id) => {
+    var savedIds = [];
+    if (localStorage.getItem("submitIds")) {
+      savedIds = JSON.parse(localStorage.getItem("submitIds"));
+    }
+    if (id === "all") savedIds = [];
+    else savedIds = savedIds.filter((item) => item !== id);
+    localStorage.setItem("submitIds", JSON.stringify(savedIds));
+    setSubmitId(savedIds);
+  };
+  const CloseStage = (stage) => {
+    const updatedNewImageArr = [...NewImageArr];
+    updatedNewImageArr.splice(stage, 1);
+    setStage(0);
+    setNewImageArr(updatedNewImageArr);
+  };
   return (
-    <div className="h-full">
-      <div className="flex flex-row gap-4 mb-2">
-        {ImageIdArr.map((item, idx) => (
-          <button
-            key={`stage${idx}`}
-            className={`hover:text-teal-500 ${
-              stage === idx ? "text-teal-500" : "text-black"
-            }`}
-            onClick={() => handleStageClick(idx)}
-          >
-            Stage {idx + 1}
-          </button>
-        ))}
-      </div>
-      <div className="w-full grid grid-cols-6 overflow-y-scroll h-3/5 mb-2">
-        {NewImageArr[stage].slice(0, K1).map((item, idx) => (
-          <ImageItem
-            key={`${stage}-${idx}`}
-            idImg={item.idImg}
-            idx={idx}
-            isSelect={item.isSelect}
-            isLiked={item.isLike}
-            idxSelect={idxSelect}
-            onCheckBox={(value) => handleCheckBox(idx)}
-            onLike={(value) => handleLike(value, idx)}
-            onClickImg={(value) => handleSetIdxSelect(idx)}
-          />
-        ))}
-      </div>
-      <div className="border border-teal-500 p-1 h-40 flex gap-2 overflow-x-scroll">
+    <div className="h-full relative">
+      {isShowIdlist && (
+        <IdListSubmit listId={submitId} ClearID={ClearSubmitId} />
+      )}
+      {NewImageArr.length > 0 && (
+        <div className="flex flex-row gap-4 mb-2 ">
+          {NewImageArr.map((item, idx) => (
+            <div
+              key={`stage${idx}`}
+              className={`flex gap-4 ${
+                stage === idx ? "text-teal-500" : "text-black"
+              }`}
+            >
+              <button
+                className={`hover:text-teal-500 ${
+                  stage === idx ? "text-teal-500" : "text-black"
+                }`}
+                onClick={() => handleStageClick(idx)}
+              >
+                Stage {idx + 1}
+              </button>
+              {NewImageArr.length > 1 && (
+                <button
+                  className="p-1 rounded-full transition-all hover:text-white hover:bg-red-500"
+                  onClick={() => CloseStage(idx)}
+                >
+                  <IoClose />
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+      {NewImageArr.length > 0 && (
+        <div className="w-full grid grid-cols-6 overflow-y-scroll h-3/5 mb-2">
+          {NewImageArr[stage].slice(0, K1).map((item, idx) => (
+            <ImageItem
+              key={`${stage}-${idx}`}
+              idImg={item.idImg}
+              idx={idx}
+              isSelect={item.isSelect}
+              isLiked={item.isLike}
+              idxSelect={idxSelect}
+              onCheckBox={(value) => handleCheckBox(idx)}
+              onLike={(value) => handleLike(value, idx)}
+              onClickImg={(value) => handleSetIdxSelect(idx)}
+            />
+          ))}
+        </div>
+      )}
+      <div className="border border-teal-500 p-1 h-40 gap-2 overflow-x-auto w-full bottom-12 absolute flex flex-row">
         {idxSelect >= 0
           ? NewImageArr.map((stageArr, stageIdx) =>
               stageArr.map((item, idx) =>
