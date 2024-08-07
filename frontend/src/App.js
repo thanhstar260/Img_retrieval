@@ -59,18 +59,13 @@ function App() {
       for (let type in stage.data) {
         if (type === "object") continue;
         if (stage.data[type]) count++;
-        else {
-          delete stage.data[type];
-        }
       }
       if (count < 1) {
         alert(
-          "Each stage has to have one type from scene or image, text, speech, sketch"
+          "At least one stage excepting object stage must not blank"
         );
         return;
       }
-      const type = Object.keys(stage.data)[0];
-      const data = stage.data[type];
       const objectInput = stage.data["object"];
       let object;
       if (objectInput) {
@@ -82,7 +77,7 @@ function App() {
         }
       }
       const lang = stage["lang"];
-      stagesBody.push({ type, data, object, lang });
+      stagesBody.push({ data: {...stage.data, object: objectInput}, lang });
     }
 
     const body = { stages: stagesBody, K: K };

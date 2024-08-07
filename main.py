@@ -73,7 +73,7 @@ def search_image(request: SearchRequest) -> Dict[int, SearchResult]:
     index = 0
     for stage in request.stages:
         stage_result = handle_stage(stage, request.K)
-        if(stage.object):
+        if(stage.data.object != None):
             stage_result = handle_object_query(stage_result['ids'], stage_result['distances'], stage.object, K)
         # result.update({index: stage_result})
         list_ids.append(stage_result['ids'])
@@ -91,17 +91,23 @@ def search_image(request: SearchRequest) -> Dict[int, SearchResult]:
     return result
 
 def handle_stage(stage, K):
-    if(stage.type == "scene"):
-        data = checkAndTranslate(stage.lang, stage.data)
-        return handle_scene_query(data, K)
-    elif(stage.type == "image"):
-        return handle_image_query(stage.data, K)
-    elif(stage.type == "text"):
-        return handle_text_query(stage.data, K)
-    elif(stage.type == "speech"):
-        return handle_speech_query(stage.data, K)
-    elif(stage.type == "sketch"):
-        return handle_sketch_query(stage.data, K)
+    list_ids = []
+    if(stage.data.scene != None):
+        data = checkAndTranslate(stage.lang, stage.data.scene)
+        stage_result = handle_scene_query(data, K)
+        list_ids.append(stage_result['ids'])
+    if(stage.data.image != None):
+        stage_result = handle_image_query(stage.data.image, K)
+        list_ids.append(stage_result['ids'])
+    if(stage.data.text != None):
+        stage_result = handle_text_query(stage.data.text, K)
+        list_ids.append(stage_result['ids'])
+    if(stage.data.speech != None):
+        stage_result = handle_speech_query(stage.data.sketch, K)
+        list_ids.append(stage_result['ids'])
+    if(stage.data.sketch != None):
+        stage_result = handle_sketch_query(stage.data.sketch, K)
+        list_ids.append(stage_result['ids'])
 
 def handle_scene_query(data, K):
     print("text translated: ", data)
