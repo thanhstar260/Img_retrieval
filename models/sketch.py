@@ -88,7 +88,7 @@ class SKETCH:
 
         # Tính khoảng cách giữa input_vector và các vector trong index.
         distances, indices = self.faiss_index.search(input_vector.reshape(1, -1), k)
-        return distances[0], indices[0]
+        return distances[0].tolist(), indices[0].tolist()
     
     def Sket_retrieval(self, image, k, device):
         sket_vector_query = self.extract_feature_query(image, 224, device)

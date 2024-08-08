@@ -9,6 +9,7 @@ from models.beit3_model import BEIT3
 from models.elastic import Elastic
 from models.sketch import SKETCH
 from models.object import OBJECTS
+from models.llm import LLM
 from models.utils import visualize, load_image_path, translate, rrf
 import time
 import math
@@ -21,6 +22,7 @@ class Event_retrieval():
         self.elastic = Elastic()
         self.sketch = SKETCH()
         self.objects = OBJECTS()
+        self.llm = LLM()
         self.mapdata = None
     
     def load_model(self, device, type_model = "all", beit3_model_path = None, tokenizer_path = None, sket_model_path = "None"):
@@ -73,7 +75,6 @@ class Event_retrieval():
         self.elastic.connect_elastic(check_server, host, port, scheme)
         self.objects.connect_elastic(check_server, host, port, scheme)
         
-    
     def object_filter(self, ids_first, scr_first, objects_list, K, index_name="objects", threshold_conf=0.,threshold_iou=0.2):
         ids, scr = self.objects.Objects_local_retrieval(objects_list, K, index_name, threshold_conf, threshold_iou)
         
@@ -377,9 +378,31 @@ if __name__ == "__main__":
     # visualize(load_image_path(r".\DATA\image_path.json"), ids[1][:K], K, 8, (10,5))
     
     
+    # RUN LLM
+    index_name = r"D:\THANHSTAR\Projetcs\AIC\DATA\asr\llm_index"
+    
+    llm = model.llm
+    
+    # ĐẦU TIÊN CHẠY 2 DÒNG DƯỚI NÀY ĐỂ TẠO DATABASE,XONG CHẠY LẦN 2 TRỞ ĐI THÌ CMT NÓ LẠI
+    # asr_path = r"D:\THANHSTAR\Projetcs\AIC\DATA\asr\final_asr.json"
+    # llm.create_db(index_name, asr_path)
+    # CHẠY LẦN ĐẦU CẦN LOAD_MODEL VỚI TẠO DATABASE NÊN HƠI LÂU
+
     
     
+    llm.load_db(index_name = index_name)
+
+    # # LLM retrieval
+    # query = "nhà hàng michelin 5 sao"
+    # ids, scores = llm.retrieve(query)
+    # print(ids)
+    # print(scores)
     
     
+    # # LLM QA
+    # question = "buổi ra mắt Michelin vào thời gian nào?"
+    # result, source_document = llm.retrival_QA(question)
+    # print(result)
+    # print(source_document)
     
     

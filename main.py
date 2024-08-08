@@ -41,8 +41,8 @@ tokenizer_path = r".\models\weights\beit3.spm"
 beit3_fea_path = r".\DATA\beit3_features"
     
 # SKETCH PARAMETER
-#r"D:\THANHSTAR\Projetcs\AIC\ZSE_SBIR\checkpoints\sketchy_ext\best_checkpoint.pth"
-sket_model_path = r".\models\weights\best_checkpoint.pth"
+sket_model_path = r"D:\THANHSTAR\Projetcs\AIC\ZSE_SBIR\checkpoints\sketchy_ext\best_checkpoint.pth"
+# sket_model_path = r".\models\weights\best_checkpoint.pth"
 sket_fea_path = r".\DATA\sketch_features"
 
 load_dotenv()
@@ -97,18 +97,18 @@ def handle_stage(stage, K):
     if(stage.data.scene != None):
         data = checkAndTranslate(stage.lang, stage.data.scene)
         stage_result = handle_scene_query(data, K)
-        list_ids.append(stage_result['ids'].tolist())
+        list_ids.append(stage_result['ids'])
         distances = stage_result['distances']
     if(stage.data.image != None):
         stage_result = handle_image_query(stage.data.image, K)
-        list_ids.append(stage_result['ids'].tolist())
+        list_ids.append(stage_result['ids'])
         distances = stage_result['distances']
     if(stage.data.text != None):
         stage_result = handle_text_query(stage.data.text, K)
         list_ids.append(stage_result['ids'])
         distances = stage_result['distances']
     if(stage.data.speech != None):
-        stage_result = handle_speech_query(stage.data.sketch, K)
+        stage_result = handle_speech_query(stage.data.speech, K)
         list_ids.append(stage_result['ids'])
         distances = stage_result['distances']
     if(stage.data.sketch != None):
