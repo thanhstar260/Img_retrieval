@@ -18,11 +18,9 @@ _ = load_dotenv()
 
 class LLM:
     def __init__(self, model_embedding_name= "hiieu/halong_embedding", openai_model="gpt-4o-mini"):
-        self.model_embedding_name = model_embedding_name
+        self.model_emb = HuggingFaceEmbeddings(model_name=model_embedding_name)
         self.openai_model = openai_model
         self.openai_api_key = os.getenv("OPENAI_API_KEY")
-        self.model_emb = None
-        self.docs = None
         self.db = None
 
     def transform_json_to_documents(self, file_path, chunk_size=100, chunk_overlap=20):
@@ -124,13 +122,11 @@ class LLM:
         return ids, scores
     
     def create_db(self, index_name, asr_path, chunk_size=100, chunk_overlap=20):
-        self.model_emb = HuggingFaceEmbeddings(model_name=self.model_embedding_name)
-        self.docs = self.transform_json_to_documents(asr_path, chunk_size=chunk_size, chunk_overlap=chunk_overlap)
-        self.db = FAISS.from_documents(self.docs, self.model_emb)
+        docs = self.transform_json_to_documents(asr_path, chunk_size=chunk_size, chunk_overlap=chunk_overlap)
+        self.db = FAISS.from_documents(docs, self.model_emb)
         self.db.save_local(index_name)
 
     def load_db(self, index_name, allow_dangerous_deserialization=True):
-        self.model_emb = HuggingFaceEmbeddings(model_name=self.model_embedding_name)
         self.db = FAISS.load_local(index_name, self.model_emb, allow_dangerous_deserialization=allow_dangerous_deserialization)
 
     def retrieve(self, query):
