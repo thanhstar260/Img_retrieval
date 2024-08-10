@@ -16,6 +16,7 @@ class Data(BaseModel):
     speech: str = None
     text: str = None
     sketch: str = None
+    llm: str = None
     object: Optional[Dict[str, List[List[int]]]] = None
 
 class Stage(BaseModel):

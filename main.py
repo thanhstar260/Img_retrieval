@@ -41,9 +41,13 @@ tokenizer_path = r".\models\weights\beit3.spm"
 beit3_fea_path = r".\DATA\beit3_features"
     
 # SKETCH PARAMETER
-sket_model_path = r"D:\THANHSTAR\Projetcs\AIC\ZSE_SBIR\checkpoints\sketchy_ext\best_checkpoint.pth"
-# sket_model_path = r".\models\weights\best_checkpoint.pth"
+# sket_model_path = r"D:\THANHSTAR\Projetcs\AIC\ZSE_SBIR\checkpoints\sketchy_ext\best_checkpoint.pth"
+sket_model_path = r".\models\weights\best_checkpoint.pth"
 sket_fea_path = r".\DATA\sketch_features"
+tokenizer_path = r".\models\weights\beit3.spm"
+index_name = r".\DATA\asr\llm_index"
+asr_path = r".\DATA\asr\final_asr.json"
+
 
 load_dotenv()
 CHECK_SERVER = os.getenv("CHECK_SERVER")
@@ -54,6 +58,8 @@ retrieval = Event_retrieval()
 retrieval.load_feature(type_fea="all", beit3_fea_path=beit3_fea_path, sket_fea_path=sket_fea_path)
 retrieval.load_model(device=device, type_model="all", beit3_model_path=beit3_model_path, tokenizer_path=tokenizer_path, sket_model_path=sket_model_path)
 retrieval.connect_elastic(check_server = CHECK_SERVER, host=HOST_ELASTIC, port=PORT_ELASTIC)
+# retrieval.llm.create_db(index_name=index_name, asr_path=asr_path)
+retrieval.llm.load_db(index_name = index_name)
 
 
 K = 80
@@ -115,6 +121,10 @@ def handle_stage(stage, K):
         stage_result = handle_sketch_query(stage.data.sketch, K)
         list_ids.append(stage_result['ids'])
         distances = stage_result['distances']
+    if(stage.data.llm != None):
+        stage_result = handle_llm_query(stage.data.llm, K)
+        list_ids.append(stage_result['ids'])
+        distances = stage_result['distances']
     
     if(len(list_ids) > 1):
         ids, distances = rrf(list_ids, K)
@@ -151,6 +161,10 @@ def handle_text_query(data, K):
 
 def handle_speech_query(data, K):
     ids_result, distances = retrieval.elastic.Elastic_retrieval(data, K, "asr")
+    return {"ids": ids_result, "distances": distances}
+
+def handle_llm_query(data, K):
+    ids_result, distances = retrieval.llm.retrieve(data)
     return {"ids": ids_result, "distances": distances}
 
 def handle_object_query(ids, dis, object_list, K):

@@ -13,6 +13,7 @@ import { IoIosClose } from "react-icons/io";
 import ImageSearchControl from './ImageSearchControl';
 import ObjectSearchControl from './ObjectSearchControl';
 import SketchSearchControl from './SketchSearchControl';
+import { BsRobot } from "react-icons/bs";
 
 const inputTypes = [
     {
@@ -34,6 +35,11 @@ const inputTypes = [
         type: "speech",
         name: "Speech",
         icon: <MdOutlineKeyboardVoice />
+    },
+    {
+        type: "llm",
+        name: 'LLM',
+        icon: <BsRobot />
     },
     {
         type: "sketch",
@@ -68,11 +74,15 @@ const Stage = ({id, canClose, onClose, onChange}) => {
             image: undefined,
             text: undefined,
             speech: undefined,
+            llm: undefined,
             sketch: undefined,
             object: undefined,
         },
         lang: 'eng'
     });
+
+    console.log(data);
+    
 
     const selectInputTypeHandler = (type) => {
         if(type === selected)
@@ -104,7 +114,7 @@ const Stage = ({id, canClose, onClose, onChange}) => {
     }
 
   return (
-    <div className='relative px-4 py-4 bg-slate-50 rounded-lg'>
+    <div className='relative px-4 py-4 bg-slate-50 rounded-lg shadow-smz'>
         {canClose && 
             <IconButton onClick={onClose} label="Close" className='absolute top-3 right-4 text-gray-600 hover:text-red-500'>
             <IoIosClose />
@@ -133,6 +143,9 @@ const Stage = ({id, canClose, onClose, onChange}) => {
         </div>
         <div className={`${selected === 'speech' ? 'block' : 'hidden'}`}>
             <TextSearchControl id="speech" label={"Enter your text"} data={data.data["speech"]} onChange={handleChangeData}/>   
+        </div>
+        <div className={`${selected === 'llm' ? 'block' : 'hidden'}`}>
+            <TextSearchControl id="llm" label={"Enter your text"} data={data.data["llm"]} onChange={handleChangeData}/>   
         </div>
         <div className={`${selected === 'sketch' ? 'block' : 'hidden'}`}>
                 <SketchSearchControl data={data.data["sketch"]} onChange={handleChangeData}/>  
