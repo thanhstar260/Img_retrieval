@@ -39,4 +39,7 @@ class StageRerank(BaseModel):
     
 class RerankRequest(BaseModel):
     stages: List[StageRerank]
+
+class QARequest(BaseModel):
+    message: str
     

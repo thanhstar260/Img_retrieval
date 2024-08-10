@@ -1,5 +1,5 @@
 from fastapi import FastAPI, HTTPException
-from app_model import SearchRequest, SearchResult, RerankRequest
+from app_model import SearchRequest, SearchResult, RerankRequest, QARequest
 from models.beit3_model import BEIT3
 from models.model import Event_retrieval
 from PIL import Image
@@ -209,6 +209,13 @@ async def get_video_url(id: str):
         return {"url": f"{video_path}"}
     else:
         raise HTTPException(status_code=404, detail="Video not found")
+    
+@app.post('/qa')
+def answer_question(rq: QARequest):
+    answer = retrieval.llm.retrival_QA(rq.message)
+    return {
+        "data": answer
+    }
     
 if __name__ == "__main__":
     import uvicorn

@@ -62,7 +62,7 @@ function App() {
       }
       if (count < 1) {
         alert(
-          "At least one stage excepting object stage must not blank"
+          "At least one stage excepting object stage must not be blank"
         );
         return;
       }

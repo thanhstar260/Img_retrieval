@@ -8,6 +8,7 @@ import { PiRankingLight } from "react-icons/pi";
 import { IoIosSearch } from "react-icons/io";
 import { twMerge } from 'tailwind-merge';
 import { GoArrowLeft } from "react-icons/go";
+import QABox from '../components/QABox';
 
 const SearchBar = ({onSubmit, isSubmitting, K, onChangeK, onRerank, open, setOpen}) => {
     const [canClose, setCanClose] = useState(false);
@@ -75,6 +76,7 @@ const SearchBar = ({onSubmit, isSubmitting, K, onChangeK, onRerank, open, setOpe
         >
              <GoArrowLeft className='text-2xl'/>
         </IconButton>
+        <QABox className="mb-6"/>
         <div className='flex flex-col gap-4'>
         {
             Object.keys(stages).map(key => <Stage key={key} canClose={canClose} id={key} onClose={() => closeStageHandler(key)} onChange={changeDataInStage(key)}></Stage>)
