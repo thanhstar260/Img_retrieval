@@ -5,10 +5,11 @@ import { RiSendPlane2Fill } from "react-icons/ri";
 import { IoMdSearch } from "react-icons/io";
 import ListImageResult from "../components/ListImageResult";
 import { useState, useEffect } from "react";
+import imageUrls from "../../src/links/image_path.json";
 
 const Result = ({ result, onChangeDataRerank, K, onGoBack, onClear }) => {
   const [reloadCount, setReloadCount] = useState(0);
-  const [inputValue, setInputValue] = useState();
+  const [inputValue, setInputValue] = useState("");
   const [dis, setDis] = useState([]);
   const [ids, setIds] = useState([]);
   const [K1, setK] = useState(K);
@@ -42,8 +43,18 @@ const Result = ({ result, onChangeDataRerank, K, onGoBack, onClear }) => {
     }
   };
   const handleSetIds = () => {
-    if(inputValue === "") return
-    const values = inputValue.split(',').map(value => parseInt(value.trim()));
+    if (!inputValue) return;
+    var values = [];
+    const regex = /^(\d+,)*\d+$/;
+    if (regex.test(inputValue))
+      values = inputValue.split(",").map((value) => parseInt(value.trim()));
+    else{
+      for (const [key, value] of Object.entries(imageUrls)) {
+        if (value.includes(inputValue)) {
+          values.push(parseInt(key));
+        }
+      }
+    }
     setIds([values]);
   };
   const handleClear = () => {
