@@ -77,7 +77,7 @@ function App() {
         }
       }
       const lang = stage["lang"];
-      stagesBody.push({ data: {...stage.data, object: objectInput}, lang });
+      stagesBody.push({ data: {...stage.data, object: object}, lang });
     }
 
     const body = { stages: stagesBody, K: K };
