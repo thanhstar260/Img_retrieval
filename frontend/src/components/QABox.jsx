@@ -1,6 +1,8 @@
 import React, { useRef, useState } from 'react'
 import { twMerge } from 'tailwind-merge';
 import { IoChatbubblesOutline } from "react-icons/io5";
+import IconButton from './IconButton';
+import { FaRegTrashCan } from "react-icons/fa6";
 
 const QABox = ({className}) => {
   const [answer, setAnswer] = useState('')
@@ -29,13 +31,21 @@ const QABox = ({className}) => {
       alert("Have error when answering your question")
     }
   }
+  
+  const handleDelete = () => {
+    inputRef.current.value = '';
+    setAnswer('');
+  }
 
   return (
     <div className={twMerge(
-      "bg-slate-50 rounded-md p-4",
+      "bg-slate-50 rounded-md p-4 relative",
       className
     )}>
-      <div className='font-medium flex text-teal-500 items-center gap-2 mb-3'>
+      <IconButton onClick={handleDelete} label="Delete" className={`absolute top-3 right-4 text-gray-600 hover:text-red-500 ${loading ? 'pointer-events-none' : ''}`}>
+      <FaRegTrashCan className='text-xs' />
+      </IconButton>
+      <div className='font-medium flex text-teal-500 items-center gap-2 mb-4'>
         <IoChatbubblesOutline className='size-6'/>
         <p>Q&A</p>
       </div>

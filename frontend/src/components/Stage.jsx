@@ -153,7 +153,7 @@ const Stage = ({id, canClose, onClose, onChange}) => {
         <div className={`${selected === 'object' ? 'block' : 'hidden'}`}>
                 <ObjectSearchControl data={data.data["object"]} onChange={handleChangeData}/>  
         </div>
-        <div className='flex items-center text-teal-500 mt-4'>
+        <div className={`flex items-center text-teal-500 mt-4 ${selected === 'scene' ? 'block' : 'hidden'}`}>
             <IoLanguageSharp className='text-lg mr-2' name={id}/>
             <span className='mr-4'>Language: </span>
             <LangRadioGroup value={lang} onChange={selectLangHandler}/>
