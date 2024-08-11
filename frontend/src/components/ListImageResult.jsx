@@ -3,6 +3,8 @@ import ImageItem from "./ImageItem";
 import imageUrls from "../../src/links/image_path.json";
 import IdListSubmit from "./IdListSubmit";
 import { IoClose } from "react-icons/io5";
+import { FaChevronDown } from "react-icons/fa6";
+import { FaChevronUp } from "react-icons/fa6";
 
 const ListImageResult = ({
   ImageIdArr,
@@ -19,6 +21,7 @@ const ListImageResult = ({
   const [distance, setDistance] = useState([[]]);
   const [K1, setK] = useState(K);
   const [submitId, setSubmitId] = useState([]);
+  const [isHidden, setIsHidden] = useState(false);
 
   useEffect(() => {
     setDistance(dis);
@@ -163,6 +166,12 @@ const ListImageResult = ({
     setStage(0);
     setNewImageArr(updatedNewImageArr);
   };
+  const HiddenBar = () => {
+    setIsHidden(!isHidden);
+  };
+  const HiddenStyle = {
+    transition: "height 0.4s ease",
+  };
   return (
     <div className="h-full relative">
       {isShowIdlist && (
@@ -198,7 +207,12 @@ const ListImageResult = ({
         </div>
       )}
       {NewImageArr.length > 0 && (
-        <div className="w-full grid grid-cols-6 overflow-y-scroll h-3/5 mb-2">
+        <div
+          className={`w-full grid grid-cols-5 overflow-y-scroll mb-2 ${
+            isHidden ? "h-5/6" : "h-4/6"
+          }`}
+          style={HiddenStyle}
+        >
           {NewImageArr[stage].slice(0, K1).map((item, idx) => (
             <ImageItem
               key={`${stage}-${idx}`}
@@ -214,22 +228,42 @@ const ListImageResult = ({
           ))}
         </div>
       )}
-      <div className="border border-teal-500 p-1 h-40 gap-2 overflow-x-auto w-full bottom-12 absolute flex flex-row">
-        {idxSelect >= 0
-          ? NewImageArr.map((stageArr, stageIdx) =>
-              stageArr.map((item, idx) =>
-                idx === idxSelect ? (
+      <div
+        style={HiddenStyle}
+        className={`border border-teal-500 p-1 gap-2 overflow-x-auto w-full bottom-12 absolute flex flex-row ${
+          isHidden ? "h-0 border-none" : "h-1/5"
+        }`}
+      >
+        {idxSelect >= 0 &&
+          !isHidden &&
+          NewImageArr.map((stageArr, stageIdx) =>
+            stageArr.map(
+              (item, idx) =>
+                idx === idxSelect && (
                   <img
                     key={`bottom-${stage}-${idx}`}
                     src={urlList[stageIdx]}
                     alt={item.idImg}
                     className="max-h-full max-w-full h-auto border-4 hover:border-teal-500"
                   />
-                ) : null
-              )
+                )
             )
-          : null}
+          )}
+        {!isHidden && <button
+          className="bottom-2 right-3 absolute opacity-50 hover:opacity-100 hover: text-teal-500"
+          onClick={HiddenBar}
+        >
+          <FaChevronDown size={25} />
+        </button>}
       </div>
+      {isHidden && (
+        <button
+          className="bottom-12 right-3 absolute opacity-50 hover:opacity-100 hover: text-teal-500"
+          onClick={HiddenBar}
+        >
+          <FaChevronUp size={25} />
+        </button>
+      )}
     </div>
   );
 };

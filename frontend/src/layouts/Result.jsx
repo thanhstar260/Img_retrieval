@@ -8,7 +8,6 @@ import { useState, useEffect } from "react";
 import imageUrls from "../../src/links/image_path.json";
 
 const Result = ({ result, onChangeDataRerank, K, onGoBack, onClear }) => {
-  const [reloadCount, setReloadCount] = useState(0);
   const [inputValue, setInputValue] = useState("");
   const [dis, setDis] = useState([]);
   const [ids, setIds] = useState([]);
@@ -21,10 +20,6 @@ const Result = ({ result, onChangeDataRerank, K, onGoBack, onClear }) => {
   const btn_style =
     "text-teal-500 px-2 py-2 rounded-full transition-all hover:text-white hover:bg-teal-500";
 
-  const handleReload = () => {
-    setReloadCount((prevCount) => prevCount + 1);
-  };
-
   useEffect(() => {
     const idsList = [];
     const disList = [];
@@ -34,7 +29,6 @@ const Result = ({ result, onChangeDataRerank, K, onGoBack, onClear }) => {
     }
     setDis(disList);
     setIds(idsList);
-    handleReload();
   }, [result]);
 
   const handleKeyPress = (event) => {
@@ -46,8 +40,10 @@ const Result = ({ result, onChangeDataRerank, K, onGoBack, onClear }) => {
     if (!inputValue) return;
     var values = [];
     const regex = /^(\d+,)*\d+$/;
-    if (regex.test(inputValue))
+    if (regex.test(inputValue)){
       values = inputValue.split(",").map((value) => parseInt(value.trim()));
+      values = [...new Set(values)];
+    }
     else{
       for (const [key, value] of Object.entries(imageUrls)) {
         if (value.includes(inputValue)) {
@@ -107,7 +103,6 @@ const Result = ({ result, onChangeDataRerank, K, onGoBack, onClear }) => {
         <ListImageResult
           K={K1}
           onChangeDataRerank={onChangeDataRerank}
-          key={reloadCount}
           ImageIdArr={ids}
           dis={dis}
           isShowIdlist={isShowIdlist}
