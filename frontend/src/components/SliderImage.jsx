@@ -15,7 +15,7 @@ function SampleNextArrow(props) {
         background: "green",
         borderRadius: "50%",
         width: "30px",
-        height: "30px",
+        height: "29px",
         justifyContent: "center",
         alignItems: "center",
       }}
@@ -38,7 +38,7 @@ function SamplePrevArrow(props) {
         background: "green",
         borderRadius: "50%",
         width: "30px",
-        height: "30px",
+        height: "29px",
         justifyContent: "center",
         alignItems: "center",
       }}
@@ -58,12 +58,14 @@ const SliderImage = ({ idImg, onArrow }) => {
     idImg + 2,
   ]);
   const [urlImgArr, setUrlImgArr] = useState(["", "", "", "", ""]);
-  
+
   useEffect(() => {
     const newUrls = [];
     for (let i = 0; i < ImgIdArr.length; i++) {
+      if (imageUrls[ImgIdArr[i]])
         newUrls.push("http://127.0.0.1:8000" + imageUrls[ImgIdArr[i]].slice(1));
-    } 
+      else newUrls.push("");
+    }
     setUrlImgArr(newUrls);
   }, [ImgIdArr]);
   

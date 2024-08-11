@@ -40,11 +40,13 @@ const Result = ({ result, onChangeDataRerank, K, onGoBack, onClear }) => {
     if (!inputValue) return;
     var values = [];
     const regex = /^(\d+,)*\d+$/;
-    if (regex.test(inputValue)){
-      values = inputValue.split(",").map((value) => parseInt(value.trim()));
+    if (regex.test(inputValue)) {
+      values = inputValue
+        .split(",")
+        .map((value) => parseInt(value.trim()))
+        .filter((value) => value >= 0 && value <= 87305);
       values = [...new Set(values)];
-    }
-    else{
+    } else {
       for (const [key, value] of Object.entries(imageUrls)) {
         if (value.includes(inputValue)) {
           values.push(parseInt(key));
