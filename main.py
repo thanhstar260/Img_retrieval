@@ -41,8 +41,8 @@ tokenizer_path = r".\models\weights\beit3.spm"
 beit3_fea_path = r".\DATA\beit3_features"
     
 # SKETCH PARAMETER
-# sket_model_path = r"D:\THANHSTAR\Projetcs\AIC\ZSE_SBIR\checkpoints\sketchy_ext\best_checkpoint.pth"
-sket_model_path = r".\models\weights\best_checkpoint.pth"
+sket_model_path = r"D:\THANHSTAR\Projetcs\AIC\ZSE_SBIR\checkpoints\sketchy_ext\best_checkpoint.pth"
+# sket_model_path = r".\models\weights\best_checkpoint.pth"
 sket_fea_path = r".\DATA\sketch_features"
 tokenizer_path = r".\models\weights\beit3.spm"
 index_name = r".\DATA\asr\llm_index"
@@ -219,7 +219,8 @@ def answer_question(rq: QARequest):
     
 @app.post('/searchbyimg')
 def search_by_img(request: QARequest):
-    ids, dis = retrieval.beit3.Image_retrieval(request.message, K * 10, device)
+    image = Image.open(request.message)
+    ids, dis = retrieval.beit3.Image_retrieval(image, K * 10, device)
     return {
         "ids": ids,
         "dis": dis,
