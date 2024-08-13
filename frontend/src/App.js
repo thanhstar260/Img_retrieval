@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Result from "./layouts/Result";
 import { GoArrowRight } from "react-icons/go";
 import IconButton from "./components/IconButton";
+import { MyProvider } from "./components/DataContext";
 
 function App() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -115,7 +116,15 @@ function App() {
         open={open}
         setOpen={setOpen}
       />
-      <Result onChangeDataRerank={handleSetDataRerank} result={result} K={K} onGoBack={BacktoResult} onClear={resetIndex}/>
+      <MyProvider>
+        <Result
+          onChangeDataRerank={handleSetDataRerank}
+          result={result}
+          K={K}
+          onGoBack={BacktoResult}
+          onClear={resetIndex}
+        />
+      </MyProvider>
     </div>
   );
 }

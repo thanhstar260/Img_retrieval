@@ -1,3 +1,4 @@
+import React, { useContext } from 'react';
 import { SlReload } from "react-icons/sl";
 import { GoHome } from "react-icons/go";
 import { GrNotes } from "react-icons/gr";
@@ -6,13 +7,14 @@ import { IoMdSearch } from "react-icons/io";
 import ListImageResult from "../components/ListImageResult";
 import { useState, useEffect } from "react";
 import imageUrls from "../../src/links/image_path.json";
+import { DataContext } from '../components/DataContext';
 
 const Result = ({ result, onChangeDataRerank, K, onGoBack, onClear }) => {
   const [inputValue, setInputValue] = useState("");
-  const [dis, setDis] = useState([]);
-  const [ids, setIds] = useState([]);
   const [K1, setK] = useState(K);
   const [isShowIdlist, setIsShowIdlist] = useState(false);
+
+  const {ids, setIds, dis, setDis} = useContext(DataContext);
 
   useEffect(() => {
     setK(K);

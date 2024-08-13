@@ -217,6 +217,14 @@ def answer_question(rq: QARequest):
         "data": answer
     }
     
+@app.post('/searchbyimg')
+def search_by_img(request: QARequest):
+    ids, dis = retrieval.beit3.Image_retrieval(request.message, K * 10, device)
+    return {
+        "ids": ids,
+        "dis": dis,
+    }
+    
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
